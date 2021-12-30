@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypeAuth\TypeAuth.Core.csproj" />
+    <ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

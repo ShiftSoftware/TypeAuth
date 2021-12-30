@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.Core", "TypeAuth\TypeAuth.Core.csproj", "{54CFA4B8-E748-4AF7-8066-A6D19F21FE72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.Core", "TypeAuth.Core\TypeAuth.Core.csproj", "{54CFA4B8-E748-4AF7-8066-A6D19F21FE72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuthTests", "TypeAuthTests\TypeAuthTests.csproj", "{3842FD5D-B148-4CEA-AC4B-647D762923D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuthTests", "TypeAuth.Core.Tests\TypeAuthTests.csproj", "{3842FD5D-B148-4CEA-AC4B-647D762923D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
