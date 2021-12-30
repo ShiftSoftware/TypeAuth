@@ -1,0 +1,10 @@
+﻿{
+  "SystemActions": {
+    "Dashboard": {
+      "Users": [ 1, 2 ]
+    }
+  },
+  "CRMActions": {
+    "Customers": [ 1 ]
+  }
+}
