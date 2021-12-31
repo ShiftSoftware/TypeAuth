@@ -112,44 +112,44 @@
 
             if ((actionCursor.GetType() == typeof(Action) || actionCursor.GetType() == typeof(DynamicAction)) && (accessTypes.Count > 0 || accessValue != null))
             {
-                var thePermission = (Action)actionCursor;
+                var theAction = (Action)actionCursor;
 
-                if (thePermission.Type == ActionType.Text && accessValue == null)
+                if (theAction.Type == ActionType.Text && accessValue == null)
                 {
                     if (accessTypes.Contains(Access.Maximum))
-                        accessValue = thePermission.MaximumAccess;
+                        accessValue = theAction.MaximumAccess;
                     else
-                        accessValue = thePermission.MinimumAccess;
+                        accessValue = theAction.MinimumAccess;
                 }
 
-                this.ActionBank.Add(new ActionBankItem(thePermission, accessTypes, accessValue));
+                this.ActionBank.Add(new ActionBankItem(theAction, accessTypes, accessValue));
             }
         }
 
-        private ActionBankItem? LocatePermissionInBank(Action permissionToCheck)
+        private ActionBankItem? LocateActionInBank(Action actionToCheck)
         {
-            ActionBankItem? permissionMatch = null;
+            ActionBankItem? actionMatch = null;
 
-            var theDynamicPermission = permissionToCheck as DynamicAction;
+            var theDynamicAction = actionToCheck as DynamicAction;
 
-            if (theDynamicPermission is not null)
+            if (theDynamicAction is not null)
             {
-                permissionMatch = this.ActionBank.Where(x => x.Action.GetType() == typeof(DynamicAction)).FirstOrDefault(x => ((DynamicAction)x.Action).Id.Equals(theDynamicPermission.Id));
+                actionMatch = this.ActionBank.Where(x => x.Action.GetType() == typeof(DynamicAction)).FirstOrDefault(x => ((DynamicAction)x.Action).Id.Equals(theDynamicAction.Id));
             }
             else
-                permissionMatch = this.ActionBank.FirstOrDefault(x => x.Action == permissionToCheck);
+                actionMatch = this.ActionBank.FirstOrDefault(x => x.Action == actionToCheck);
 
-            return permissionMatch;
+            return actionMatch;
         }
 
-        private bool CheckPermissionBank(Action permissionToCheck, Access accessTypeToCheck)
+        private bool CheckActionBank(Action actionToCheck, Access accessTypeToCheck)
         {
             var access = false;
 
-            var permissionMatch = this.LocatePermissionInBank(permissionToCheck);
+            var actionMatch = this.LocateActionInBank(actionToCheck);
 
-            if (permissionMatch != null)
-                access = permissionMatch.AccessList.IndexOf(accessTypeToCheck) > -1;
+            if (actionMatch != null)
+                access = actionMatch.AccessList.IndexOf(accessTypeToCheck) > -1;
 
             return access;
         }
@@ -159,42 +159,42 @@
             return id == SelfRererenceKey ? actualValue : id;
         }
 
-        public List<Access> PermissionAccessTypes(Action permission)
+        public List<Access> ActionAccessTypes(Action action)
         {
             var accessTypes = new List<Access>();
 
-            var permissionMatch = this.LocatePermissionInBank(permission);
+            var actionMatch = this.LocateActionInBank(action);
 
-            if (permissionMatch != null)
-                accessTypes = permissionMatch.AccessList;
+            if (actionMatch != null)
+                accessTypes = actionMatch.AccessList;
 
             return accessTypes;
         }
-        public bool CanRead(Action permission)
+        public bool CanRead(Action action)
         {
-            return this.CheckPermissionBank(permission, Access.Read);
+            return this.CheckActionBank(action, Access.Read);
         }
-        public bool CanWrite(Action permission)
+        public bool CanWrite(Action action)
         {
-            return this.CheckPermissionBank(permission, Access.Write);
+            return this.CheckActionBank(action, Access.Write);
         }
-        public bool CanDelete(Action permission)
+        public bool CanDelete(Action action)
         {
-            return this.CheckPermissionBank(permission, Access.Delete);
+            return this.CheckActionBank(action, Access.Delete);
         }
-        public bool CanAccess(Action permission)
+        public bool CanAccess(Action action)
         {
-            return this.CheckPermissionBank(permission, Access.Read);
+            return this.CheckActionBank(action, Access.Read);
         }
-        public string? AccessValue(Action permission)
+        public string? AccessValue(Action action)
         {
-            var access = permission.MinimumAccess;
+            var access = action.MinimumAccess;
 
-            var permissionMatch = this.LocatePermissionInBank(permission);
+            var actionMatch = this.LocateActionInBank(action);
 
-            if (permissionMatch != null && permissionMatch.AccessValue != null)
+            if (actionMatch != null && actionMatch.AccessValue != null)
             {
-                access = permissionMatch.AccessValue;
+                access = actionMatch.AccessValue;
             }
 
             return access;
@@ -202,19 +202,19 @@
 
         public Dictionary<string, List<Access>> AllItems(List<DynamicAction> dataList)
         {
-            return dataList.Select(x => new { x.Id, AccessTypes = PermissionAccessTypes(x) }).ToDictionary(x => x.Id, x => x.AccessTypes);
+            return dataList.Select(x => new { x.Id, AccessTypes = ActionAccessTypes(x) }).ToDictionary(x => x.Id, x => x.AccessTypes);
         }
         public List<string> ReadableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckPermissionBank(x, Access.Read)).Select(x => x.Id).ToList();
+            return dataList.Where(x => CheckActionBank(x, Access.Read)).Select(x => x.Id).ToList();
         }
         public List<string> WritableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckPermissionBank(x, Access.Write)).Select(x => x.Id).ToList();
+            return dataList.Where(x => CheckActionBank(x, Access.Write)).Select(x => x.Id).ToList();
         }
         public List<string> DeletableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckPermissionBank(x, Access.Delete)).Select(x => x.Id).ToList();
+            return dataList.Where(x => CheckActionBank(x, Access.Delete)).Select(x => x.Id).ToList();
         }
     }
 }
