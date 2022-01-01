@@ -1,0 +1,7 @@
+﻿{
+  "CRMActions": {
+    "Customers": [ 1, 2 ],
+    "DiscountVouchers": [ 1, 2 ],
+    "DiscountValue": "10"
+  }
+}

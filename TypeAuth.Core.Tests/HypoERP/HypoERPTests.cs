@@ -5,22 +5,28 @@ using System.Collections.Generic;
 
 namespace HypoERP
 {
+    class AccessTreeFiles
+    {
+        public static string SuperAdmin = System.IO.File.ReadAllText("HypoERP/AccessTrees/SuperAdmin.json");
+        public static string SalesAdmin = System.IO.File.ReadAllText("HypoERP/AccessTrees/SalesAdmin.json");
+        public static string CRMAgent = System.IO.File.ReadAllText("HypoERP/AccessTrees/CRMAgent.json");
+    }
+
+    class Helper
+    {
+        public static TypeAuthContext GetSuperAdminTypeAuthContext(string file)
+        {
+            return new TypeAuthContext(file, typeof(SystemActions), typeof(CRMActions));
+        }
+    }
+
     [TestClass()]
     public class SuperAdmin
     {
-        class AccessTreeFiles
-        {
-            public static string SuperAdmin = System.IO.File.ReadAllText("HypoERP/AccessTrees/SuperAdmin.json");
-        }
-
-        private TypeAuthContext GetSuperAdminTypeAuthContext(string file) {
-            return new TypeAuthContext(file, typeof(SystemActions), typeof(CRMActions));
-        }
-
         [TestMethod("Login via WildCard")]
         public void LoginViaWildCard()
         {
-            var tAuth = GetSuperAdminTypeAuthContext(AccessTreeFiles.SuperAdmin);
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.SuperAdmin);
 
             Assert.IsTrue(tAuth.CanAccess(SystemActions.Login.MultipleSession));
         }
@@ -40,7 +46,7 @@ namespace HypoERP
         [TestMethod("Customer via WildCard")]
         public void CustomerViaWildCard()
         {
-            var tAuth = GetSuperAdminTypeAuthContext(AccessTreeFiles.SuperAdmin);
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.SuperAdmin);
 
             Assert.IsTrue(tAuth.CanDelete(CRMActions.Customers));
         }
@@ -84,5 +90,53 @@ namespace HypoERP
 
         //    Assert.AreEqual("0", ac.AccessValue(CRMActions.SaleDiscount));
         //}
+    }
+
+    [TestClass()]
+    public class SalesAdmin
+    {
+        [TestMethod("Full Discount via Wild Card")]
+        public void FullDiscountViaWildCard()
+        {
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.SalesAdmin);
+
+            Assert.AreEqual("100", tAuth.AccessValue(CRMActions.DiscountValue));
+        }
+
+        [TestMethod("Only Read/Write users")]
+        public void OnlyReadWriteUsers()
+        {
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.SalesAdmin);
+
+            Assert.IsTrue(
+                tAuth.CanRead(SystemActions.UserModule.Users) &&
+                tAuth.CanWrite(SystemActions.UserModule.Users) &&
+                !tAuth.CanDelete(SystemActions.UserModule.Users)
+            );
+        }
+
+        [TestMethod("Full Access on Discount Voucher")]
+        public void FullDiscountOnDiscountVoucher()
+        {
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.SalesAdmin);
+
+            Assert.IsTrue(
+                tAuth.CanRead(CRMActions.DiscountVouchers) &&
+                tAuth.CanWrite(CRMActions.DiscountVouchers) &&
+                tAuth.CanDelete(CRMActions.DiscountVouchers)
+            );
+        }
+    }
+
+    [TestClass()]
+    public class CRMAgent
+    {
+        [TestMethod("10% Discount Value")]
+        public void _10PercentDiscountValue()
+        {
+            var tAuth = Helper.GetSuperAdminTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            Assert.AreEqual("10", tAuth.AccessValue(CRMActions.DiscountValue));
+        }
     }
 }
