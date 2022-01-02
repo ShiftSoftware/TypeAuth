@@ -1,4 +1,5 @@
-﻿namespace ShiftSoftware.TypeAuth.Core
+﻿using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
+namespace ShiftSoftware.TypeAuth.Core
 {
     /// <summary>
     /// An action that's dynamically generated from data. This is used for handling Data Level (Or Row-Level) Access Control.

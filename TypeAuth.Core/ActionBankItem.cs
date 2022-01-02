@@ -1,4 +1,6 @@
-﻿namespace ShiftSoftware.TypeAuth.Core
+﻿using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
+
+namespace ShiftSoftware.TypeAuth.Core
 {
     internal class ActionBankItem
     {

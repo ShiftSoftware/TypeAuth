@@ -1,157 +1,48 @@
-﻿namespace ShiftSoftware.TypeAuth.Core
+﻿using ShiftSoftware.TypeAuth.Core.Actions;
+
+namespace ShiftSoftware.TypeAuth.Core
 {
     /// <summary>
     /// This is what you use to check Action Trees against an Access Tree
     /// </summary>
     public class TypeAuthContext
     {
-        public const string SelfRererenceKey = "shift-software:type-auth:self-reference";
-        protected private List<ActionBankItem> ActionBank { get; set; }
+        private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
+        public const string SelfRererenceKey = "shift-software:type-auth-core:self-reference";
+
+        public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
+        {
+            this.TypeAuthContextHelper = new TypeAuthContextHelper();
+            this.Init(new List<string> { accessTreeJSONString }, actionTrees);
+        }
 
         /// <summary>
         /// Constructs a Context by Providing a list of Action Trees and an Access Tree provided as a serialized JSON string.
         /// </summary>
         /// <param name="actionTrees">A list of Action Trees to Check your Access Tree against.</param>
         /// <param name="accessTreeJSONString">The Access Tree provided as a JSON string. Access Tree contains the Actions that a Subject can perform.</param>
-        public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
+        public TypeAuthContext(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
-            ActionBank = new List<ActionBankItem>();
-
-            var actionTree = GenerateActionTree(actionTrees.ToList());
-
-            var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
-
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented));
-            Console.WriteLine();
-
-            if (accessTree != null)
-            {
-                Console.WriteLine(accessTree.ToString());
-                this.PopulateActionBank(actionTree, accessTree);
-            }
+            this.TypeAuthContextHelper = new TypeAuthContextHelper();
+            this.Init(accessTreeJSONStrings, actionTrees);
         }
 
-        private Dictionary<string, object> GenerateActionTree(List<Type> actionTrees, Dictionary<string, object>? rootDictionary = null)
+        private void Init(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
-            if (rootDictionary is null)
-                rootDictionary = new Dictionary<string, object>();
+            var actionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList());
 
-            foreach (var tree in actionTrees)
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented));
+            //Console.WriteLine();
+
+            foreach (var accessTreeJSONString in accessTreeJSONStrings)
             {
-                var treeDictionary = new Dictionary<string, object>();
+                var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
 
-                rootDictionary[tree.Name] = treeDictionary;
-
-                var childTress = tree.GetNestedTypes().ToList().Where(x => x.GetCustomAttributes(typeof(ActionTree), false) != null).ToList();
-
-                GenerateActionTree(childTress, treeDictionary);
-
-                tree.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).ToList().ForEach(y =>
-                {
-                    var value = (Action?)y.GetValue(y);
-
-                    if (value is not null)
-                        treeDictionary[y.Name] = value;
-                });
-
-                tree.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Where(y => y.ReturnType == typeof(List<DynamicAction>)).ToList().ForEach(y =>
-                {
-                    var invoked = (y.Invoke(y, new object[] { this }) as List<DynamicAction>);
-
-                    if (invoked != null)
-                        treeDictionary[y.Name] = invoked.ToDictionary(z => z.Id.ToString(), z => (object)new DynamicAction(z.Id.ToString(), z.Name, z.Type));
-                });
+                //Console.WriteLine(accessTree.ToString());
+                this.TypeAuthContextHelper.PopulateActionBank(actionTree, accessTree);
             }
 
-            return rootDictionary;
-        }
-
-        private void PopulateActionBank(object actionCursor, object? accessCursor)
-        {
-            var accessTypes = new List<Access>();
-            string? accessValue = null;
-
-            if (accessCursor != null)
-            {
-                if (accessCursor.GetType() == typeof(Newtonsoft.Json.Linq.JValue))
-                {
-                    accessValue = accessCursor.ToString();
-                }
-                else if (accessCursor.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                {
-                    var theArray = ((Newtonsoft.Json.Linq.JArray)accessCursor).Select(x => x.ToObject<Access>()).ToList();
-
-                    accessTypes.AddRange(theArray);
-                }
-            }
-
-            if (actionCursor.GetType() == typeof(Dictionary<string, object>))
-            {
-                var theDictionary = (Dictionary<string, object>)actionCursor;
-
-                foreach (var key in theDictionary.Keys)
-                {
-                    //Wild Card: Access already provided at this Level of the Access Tree. But the action tree has more child nodes.
-                    //The current Access is simply passed to every child node of the the current Action Node
-                    if (accessTypes.Count > 0 || accessValue != null)
-                    {
-                        this.PopulateActionBank(theDictionary[key], accessCursor);
-                    }
-                    else 
-                    {
-                        if (accessCursor != null)
-                        {
-                            var accessCursorDictionary = (Newtonsoft.Json.Linq.JObject)accessCursor;
-
-                            PopulateActionBank(theDictionary[key], accessCursorDictionary[key]);
-                        }
-                    }
-
-                }
-            }
-
-            if ((actionCursor.GetType() == typeof(Action) || actionCursor.GetType() == typeof(DynamicAction)) && (accessTypes.Count > 0 || accessValue != null))
-            {
-                var theAction = (Action)actionCursor;
-
-                if (theAction.Type == ActionType.Text && accessValue == null)
-                {
-                    if (accessTypes.Contains(Access.Maximum))
-                        accessValue = theAction.MaximumAccess;
-                    else
-                        accessValue = theAction.MinimumAccess;
-                }
-
-                this.ActionBank.Add(new ActionBankItem(theAction, accessTypes, accessValue));
-            }
-        }
-
-        private ActionBankItem? LocateActionInBank(Action actionToCheck)
-        {
-            ActionBankItem? actionMatch = null;
-
-            var theDynamicAction = actionToCheck as DynamicAction;
-
-            if (theDynamicAction is not null)
-            {
-                actionMatch = this.ActionBank.Where(x => x.Action.GetType() == typeof(DynamicAction)).FirstOrDefault(x => ((DynamicAction)x.Action).Id.Equals(theDynamicAction.Id));
-            }
-            else
-                actionMatch = this.ActionBank.FirstOrDefault(x => x.Action == actionToCheck);
-
-            return actionMatch;
-        }
-
-        private bool CheckActionBank(Action actionToCheck, Access accessTypeToCheck)
-        {
-            var access = false;
-
-            var actionMatch = this.LocateActionInBank(actionToCheck);
-
-            if (actionMatch != null)
-                access = actionMatch.AccessList.IndexOf(accessTypeToCheck) > -1;
-
-            return access;
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
         }
 
         public static string ReplaceSelfReferenceVariable(string id, string actualValue)
@@ -159,62 +50,100 @@
             return id == SelfRererenceKey ? actualValue : id;
         }
 
-        public List<Access> ActionAccessTypes(Action action)
-        {
-            var accessTypes = new List<Access>();
+        //public List<Access> ActionAccessTypes(Action action)
+        //{
+        //    var accessTypes = new List<Access>();
 
-            var actionMatch = this.LocateActionInBank(action);
+        //    var actionMatch = this.TypeAuthContextHelper.LocateActionInBank(action);
 
-            if (actionMatch != null)
-                accessTypes = actionMatch.AccessList;
+        //    if (actionMatch != null)
+        //        accessTypes = actionMatch.AccessList;
 
-            return accessTypes;
-        }
-        public bool CanRead(Action action)
+        //    return accessTypes;
+        //}
+        
+        public bool CanRead(ReadAction action)
         {
-            return this.CheckActionBank(action, Access.Read);
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
         }
-        public bool CanWrite(Action action)
+        public bool CanRead(ReadWriteAction action)
         {
-            return this.CheckActionBank(action, Access.Write);
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
         }
-        public bool CanDelete(Action action)
+        public bool CanRead(ReadWriteDeleteAction action)
         {
-            return this.CheckActionBank(action, Access.Delete);
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
         }
-        public bool CanAccess(Action action)
+
+        public bool CanWrite(ReadWriteAction action)
         {
-            return this.CheckActionBank(action, Access.Read);
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Write);
         }
-        public string? AccessValue(Action action)
+        public bool CanWrite(ReadWriteDeleteAction action)
+        {
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Write);
+        }
+
+        public bool CanDelete(ReadWriteDeleteAction action)
+        {
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Delete);
+        }
+
+        public bool CanAccess(BooleanAction action)
+        {
+            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+        }
+        public string? AccessValue(TextAction action)
         {
             var access = action.MinimumAccess;
 
-            var actionMatch = this.LocateActionInBank(action);
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action);
 
-            if (actionMatch != null && actionMatch.AccessValue != null)
+            for (int i = 0; i < actionMatches.Count; i++)
             {
-                access = actionMatch.AccessValue;
+                string? thisAccess = actionMatches[i].AccessValue;
+
+                if (i > 0)
+                {
+                    if (action.SortFunction != null)
+                        thisAccess = action.SortFunction(access, thisAccess);
+                }
+
+                if (thisAccess != null)
+                    access = thisAccess;
             }
+
+            //if (actionMatches.Count == 1 && actionMatches.First().AccessValue != null)
+            //{
+            //    access = actionMatches.First().AccessValue;
+            //}
+            //else
+            //{
+
+            //}
+
+            //actionMatches.Sort((a, b) => ((TextAction)a.Action).SortFunction(a.AccessValue, b.AccessValue));
+
+            //access = actionMatches.First().AccessValue;
 
             return access;
         }
 
-        public Dictionary<string, List<Access>> AllItems(List<DynamicAction> dataList)
-        {
-            return dataList.Select(x => new { x.Id, AccessTypes = ActionAccessTypes(x) }).ToDictionary(x => x.Id, x => x.AccessTypes);
-        }
+        //public Dictionary<string, List<Access>> AllItems(List<DynamicAction> dataList)
+        //{
+        //    return dataList.Select(x => new { x.Id, AccessTypes = ActionAccessTypes(x) }).ToDictionary(x => x.Id, x => x.AccessTypes);
+        //}
         public List<string> ReadableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckActionBank(x, Access.Read)).Select(x => x.Id).ToList();
+            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Read)).Select(x => x.Id).ToList();
         }
         public List<string> WritableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckActionBank(x, Access.Write)).Select(x => x.Id).ToList();
+            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Write)).Select(x => x.Id).ToList();
         }
         public List<string> DeletableItems(List<DynamicAction> dataList)
         {
-            return dataList.Where(x => CheckActionBank(x, Access.Delete)).Select(x => x.Id).ToList();
+            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Delete)).Select(x => x.Id).ToList();
         }
     }
 }
