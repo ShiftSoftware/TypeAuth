@@ -31,7 +31,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     var value = (Action?)y.GetValue(y);
 
-                    if (value is not null)
+                    if (value !=  null)
                         treeDictionary[y.Name] = value;
                 });
 
@@ -114,7 +114,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
             var theDynamicAction = actionToCheck as DynamicAction;
 
-            if (theDynamicAction is not null)
+            if (theDynamicAction != null)
             {
                 actionMatches = this.ActionBank.Where(x => x.Action.GetType() == typeof(DynamicAction)).Where(x => ((DynamicAction)x.Action).Id.Equals(theDynamicAction.Id)).ToList();
             }
