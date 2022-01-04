@@ -6,7 +6,7 @@
         {
         }
 
-        public ReadWriteAction(string? name, string? description) : base(name, ActionType.ReadWrite, description)
+        public ReadWriteAction(string? name, string? description = null) : base(name, ActionType.ReadWrite, description)
         {
         }
     }

@@ -7,7 +7,7 @@
 
         }
 
-        public ReadAction(string? name, string? description): base(name, ActionType.Read, description)
+        public ReadAction(string? name, string? description = null): base(name, ActionType.Read, description)
         {
 
         }
