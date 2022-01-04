@@ -87,6 +87,18 @@ namespace HypoERP
                 tAuth.CanDelete(CRMActions.DiscountVouchers)
             );
         }
+
+        [TestMethod("Full Access on Tickets & Comments")]
+        public void FullDiscountOnTicketsAndComments()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
+
+            Assert.IsTrue(
+                tAuth.CanRead(CRMActions.Tickets) &&
+                tAuth.CanWrite(CRMActions.Tickets) &&
+                tAuth.CanRead(CRMActions.SocialMediaComments)
+            );
+        }
     }
 
     [TestClass()]
@@ -98,6 +110,72 @@ namespace HypoERP
             var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
             Assert.AreEqual("10", tAuth.AccessValue(CRMActions.DiscountValue));
+        }
+
+        [TestMethod("Read/Write Tickets")]
+        public void ReadWriteTickets()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            Assert.IsTrue(
+                tAuth.CanRead(CRMActions.Tickets) &&
+                tAuth.CanWrite(CRMActions.Tickets)
+            );
+        }
+
+        [TestMethod("Read Comments")]
+        public void ReadComments()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            Assert.IsTrue(
+                tAuth.CanRead(CRMActions.SocialMediaComments)
+            );
+        }
+    }
+
+    [TestClass()]
+    public class Affiliate
+    {
+        [TestMethod("Read Only on Customers")]
+        public void ReadOnlyOnCustomers()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            Assert.IsTrue(
+                tAuth.CanRead(CRMActions.Customers) &&
+                !tAuth.CanWrite(CRMActions.Customers) &&
+                !tAuth.CanDelete(CRMActions.Customers)
+            );
+        }
+
+        [TestMethod("2% Discount Value")]
+        public void _2PercentDiscount()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            Assert.AreEqual("2", tAuth.AccessValue(CRMActions.DiscountValue));
+        }
+
+        [TestMethod("No Access on Tickets")]
+        public void ReadWriteTickets()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            Assert.IsTrue(
+                !tAuth.CanRead(CRMActions.Tickets) &&
+                !tAuth.CanWrite(CRMActions.Tickets)
+            );
+        }
+
+        [TestMethod("No Access on Comments")]
+        public void ReadComments()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            Assert.IsTrue(
+                !tAuth.CanRead(CRMActions.SocialMediaComments)
+            );
         }
     }
 

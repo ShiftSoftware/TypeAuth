@@ -2,6 +2,8 @@
   "CRMActions": {
     "Customers": [ 1, 2 ],
     "DiscountVouchers": [ 1, 2 ],
-    "DiscountValue": "10"
+    "DiscountValue": "10",
+    "Tickets": [ 1, 2 ],
+    "SocialMediaComments": [ 1 ]
   }
 }

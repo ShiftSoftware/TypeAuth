@@ -10,6 +10,7 @@ namespace TypeAuthTests.HypoERP.ActionTrees
     {
         public readonly static ReadWriteDeleteAction Customers = new ReadWriteDeleteAction("Customers");
         public readonly static ReadWriteDeleteAction DiscountVouchers = new ReadWriteDeleteAction("Discount Vouchers");
+       
         public readonly static TextAction DiscountValue = new TextAction("Sale Discount", "", "100", "0", (a, b) =>
         {
             var numbers = new System.Collections.Generic.List<int>();
@@ -24,5 +25,8 @@ namespace TypeAuthTests.HypoERP.ActionTrees
 
             return null;
         });
+
+        public readonly static ReadWriteAction Tickets = new ReadWriteAction("Tickets");
+        public readonly static ReadAction SocialMediaComments = new ReadAction("Social Media Comments");
     }
 }
