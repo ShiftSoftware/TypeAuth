@@ -2,6 +2,7 @@
 using ShiftSoftware.TypeAuth.Core;
 using TypeAuthTests.HypoERP.ActionTrees;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HypoERP
 {
@@ -132,6 +133,90 @@ namespace HypoERP
                 tAuth.CanRead(CRMActions.SocialMediaComments)
             );
         }
+
+        [TestMethod("Morning Shift")]
+        public void MorningShift()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            var currentTime = new System.TimeSpan(9, 45, 0);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            var canWork = false;
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    if (currentTime >= startTime && currentTime <= endTime)
+                        canWork = true;
+                }
+            }
+
+            Assert.IsTrue(canWork);
+        }
+
+        [TestMethod("Afternoon Break")]
+        public void AfternoonBreak()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            var currentTime = new System.TimeSpan(13, 15, 0);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            var canWork = false;
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    if (currentTime >= startTime && currentTime <= endTime)
+                        canWork = true;
+                }
+            }
+
+            Assert.IsFalse(canWork);
+        }
+
+        [TestMethod("After Work")]
+        public void AfterWork()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
+
+            var currentTime = new System.TimeSpan(18, 00, 1);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            var canWork = false;
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    if (currentTime >= startTime && currentTime <= endTime)
+                        canWork = true;
+                }
+            }
+
+            Assert.IsFalse(canWork);
+        }
     }
 
     [TestClass()]
@@ -176,6 +261,62 @@ namespace HypoERP
             Assert.IsTrue(
                 !tAuth.CanRead(CRMActions.SocialMediaComments)
             );
+        }
+
+        [TestMethod("Work at 20 to 21")]
+        public void WorkTime()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            var currentTime = new System.TimeSpan(20, 15, 0);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            var canWork = false;
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    if (currentTime >= startTime && currentTime <= endTime)
+                        canWork = true;
+                }
+            }
+
+            Assert.IsTrue(canWork);
+        }
+
+        [TestMethod("Can't Work Outside 20 to 21")]
+        public void AfterWork()
+        {
+            var tAuth = Helper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            var currentTime = new System.TimeSpan(17, 0, 0);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            var canWork = false;
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    if (currentTime >= startTime && currentTime <= endTime)
+                        canWork = true;
+                }
+            }
+
+            Assert.IsFalse(canWork);
         }
     }
 
@@ -260,6 +401,67 @@ namespace HypoERP
                 tAuth3.AccessValue(CRMActions.DiscountValue).Equals("2")
             );
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
+
+        [TestMethod("Combined Work Schedule")]
+        public void CombinedWorkSchedule()
+        {
+            var tAuth = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.Affiliates,
+                AccessTreeFiles.CRMAgent,
+
+            }, typeof(SystemActions), typeof(CRMActions));
+
+            var cantWorkAt7 = new System.TimeSpan(7, 0, 0);
+            var canWorkAt9 = new System.TimeSpan(9, 15, 0);
+            var cantWorkAt1350 = new System.TimeSpan(13, 30, 0);
+            var canWorkAt15 = new System.TimeSpan(15, 20, 0);
+            var cantWorkAt19 = new System.TimeSpan(19, 20, 0);
+            var canWorkAt20 = new System.TimeSpan(20, 30, 0);
+            var cantWorkAt22 = new System.TimeSpan(22, 30, 0);
+
+            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+
+            System.Console.WriteLine(schedule);
+
+            var canWork = new Dictionary<System.TimeSpan, bool>
+            {
+                { cantWorkAt7, false },
+                { canWorkAt9, false },
+                { cantWorkAt1350, false },
+                { canWorkAt15, false },
+                { cantWorkAt19, false },
+                { canWorkAt20, false },
+                { cantWorkAt22, false },
+            };
+
+            if (schedule != null)
+            {
+                var timeSlots = schedule.Split(',').Select(x => x.Trim());
+
+                foreach (var slot in timeSlots)
+                {
+                    var startTime = System.TimeSpan.Parse(slot.Split('-')[0].Trim());
+                    var endTime = System.TimeSpan.Parse(slot.Split('-')[1].Trim());
+
+                    foreach (var item in canWork)
+                    {
+                        if (item.Key >= startTime && item.Key <= endTime)
+                            canWork[item.Key] = true;
+                    }
+                }
+            }
+
+            Assert.IsTrue(
+                !canWork[cantWorkAt7] &&
+                canWork[canWorkAt9] &&
+                !canWork[cantWorkAt1350] &&
+                canWork[canWorkAt15] &&
+                !canWork[cantWorkAt19] &&
+                canWork[canWorkAt20] &&
+                !canWork[cantWorkAt22]
+            );
         }
     }
 }

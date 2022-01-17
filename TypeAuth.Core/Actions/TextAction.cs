@@ -14,19 +14,19 @@
         /// </summary>
         public string? MinimumAccess { get; set; }
 
-        public Func<string?, string?, string?>? SortFunction { get; set; }
+        public Func<string?, string?, string?>? Comparer { get; set; }
 
         public TextAction()
         {
 
         }
 
-        public TextAction(string? name, string? description = null, string? maximumAccess = null, string? minimumAccess = null, Func<string?, string?, string?>? winner = null) 
+        public TextAction(string? name, string? description = null, string? minimumAccess = null, string? maximumAccess = null, Func<string?, string?, string?>? comparer = null) 
             : base(name, ActionType.Text, description)
         {
-            this.MaximumAccess = maximumAccess;
             this.MinimumAccess = minimumAccess;
-            this.SortFunction = winner;
+            this.MaximumAccess = maximumAccess;
+            this.Comparer = comparer;
         }
     }
 }

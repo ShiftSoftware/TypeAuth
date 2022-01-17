@@ -4,6 +4,7 @@
     "DiscountVouchers": [ 1, 2 ],
     "DiscountValue": "10",
     "Tickets": [ 1, 2 ],
-    "SocialMediaComments": [ 1 ]
+    "SocialMediaComments": [ 1 ],
+    "WorkSchedule": "08:00:00 - 13:00:00, 14:00:00 - 18:00:00"
   }
 }

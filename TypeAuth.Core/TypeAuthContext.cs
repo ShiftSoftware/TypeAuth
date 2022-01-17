@@ -105,8 +105,8 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (i > 0)
                 {
-                    if (action.SortFunction != null)
-                        thisAccess = action.SortFunction(access, thisAccess);
+                    if (action.Comparer != null)
+                        thisAccess = action.Comparer(access, thisAccess);
                 }
 
                 if (thisAccess != null)
