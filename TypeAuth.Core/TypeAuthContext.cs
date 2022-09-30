@@ -31,8 +31,12 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             var actionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList());
 
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented));
-            //Console.WriteLine();
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            }));
+
+            Console.WriteLine();
 
             foreach (var accessTreeJSONString in accessTreeJSONStrings)
             {
@@ -113,20 +117,12 @@ namespace ShiftSoftware.TypeAuth.Core
                     access = thisAccess;
             }
 
-            //if (actionMatches.Count == 1 && actionMatches.First().AccessValue != null)
-            //{
-            //    access = actionMatches.First().AccessValue;
-            //}
-            //else
-            //{
-
-            //}
-
-            //actionMatches.Sort((a, b) => ((TextAction)a.Action).SortFunction(a.AccessValue, b.AccessValue));
-
-            //access = actionMatches.First().AccessValue;
-
             return access;
+        }
+
+        public void OverwriteAccessTree(string accessTree)
+        {
+
         }
 
         //public Dictionary<string, List<Access>> AllItems(List<DynamicAction> dataList)

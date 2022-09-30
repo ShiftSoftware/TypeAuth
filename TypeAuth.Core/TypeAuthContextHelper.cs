@@ -29,19 +29,24 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 tree.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).ToList().ForEach(y =>
                 {
-                    var value = (Action?)y.GetValue(y);
+                    var value = y.GetValue(y);
 
-                    if (value !=  null)
+                    if (value != null && (value as Action) != null)
+                        treeDictionary[y.Name] = (Action)value;
+
+                    else if (value != null && (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)))
+                    {
                         treeDictionary[y.Name] = value;
+                    }
                 });
 
-                tree.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Where(y => y.ReturnType == typeof(List<DynamicAction>)).ToList().ForEach(y =>
-                {
-                    var invoked = (y.Invoke(y, new object[] { this }) as List<DynamicAction>);
+                //tree.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Where(y => y.ReturnType == typeof(DynamicActionList<Action>)).ToList().ForEach(y =>
+                //{
+                //    var invoked = (y.Invoke(y, new object[] { }) as DynamicActionList<Action>);
 
-                    if (invoked != null)
-                        treeDictionary[y.Name] = invoked.ToDictionary(z => z.Id.ToString(), z => (object)new DynamicAction(z.Id.ToString(), z.Name, z.Type));
-                });
+                //    if (invoked != null)
+                //        treeDictionary[y.Name] = invoked.ToDictionary(z => z.Id?.ToString(), z => z);
+                //});
             }
 
             return rootDictionary;

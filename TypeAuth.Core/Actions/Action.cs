@@ -7,6 +7,12 @@
     public  class Action
     {
         /// <summary>
+        /// The unique identifier for the data item (or Row). This is useful for Dynamic Actions
+        /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
+        public string Id { get; set; }
+
+        /// <summary>
         /// Friendly name for identifying the Action.
         /// </summary>
         public string? Name { get; set; }
@@ -31,6 +37,11 @@
             this.Name = name;
             this.Description = description;
             this.Type = actionType;
+        }
+
+        public Dictionary<string, T> Dynamic<T>(Func<Dictionary<string, T>> function) where T : Action
+        {
+            return function.Invoke();
         }
     }
 }

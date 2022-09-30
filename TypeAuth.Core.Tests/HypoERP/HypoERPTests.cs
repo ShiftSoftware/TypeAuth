@@ -16,9 +16,9 @@ namespace HypoERP
 
     class Helper
     {
-        public static TypeAuthContext GetTypeAuthContext(string file)
+        public static TypeAuthContext GetTypeAuthContext(string jsonAccessTree)
         {
-            return new TypeAuthContext(file, typeof(SystemActions), typeof(CRMActions));
+            return new TypeAuthContext(jsonAccessTree, typeof(SystemActions));
         }
     }
 
@@ -409,9 +409,16 @@ namespace HypoERP
             var tAuth = new TypeAuthContext(new List<string>
             {
                 AccessTreeFiles.Affiliates,
-                AccessTreeFiles.CRMAgent,
-
+                AccessTreeFiles.CRMAgent
             }, typeof(SystemActions), typeof(CRMActions));
+
+
+            var tAuth2 = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.Affiliates,
+                AccessTreeFiles.CRMAgent
+            }, typeof(SystemActions), typeof(CRMActions))
+                .AccessValue(CRMActions.DiscountValue);
 
             var cantWorkAt7 = new System.TimeSpan(7, 0, 0);
             var canWorkAt9 = new System.TimeSpan(9, 15, 0);

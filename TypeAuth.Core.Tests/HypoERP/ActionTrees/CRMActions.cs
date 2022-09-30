@@ -1,5 +1,6 @@
 ﻿using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Core.Actions;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TypeAuthTests.HypoERP.ActionTrees
@@ -47,5 +48,33 @@ namespace TypeAuthTests.HypoERP.ActionTrees
                 return string.Join(", ", joined);
             }
         );
+
+        //public static DynamicActionList<Action> Departments()
+        //{
+        //    var a = new DynamicActionList<Action>();
+
+        //    a.Add(new ReadWriteDeleteAction("Marketing") { Id = "1" });
+        //    a.Add(new ReadWriteDeleteAction("IT") { Id = "2" });
+        //    a.Add(new ReadWriteDeleteAction("Finance") { Id = "3" });
+        //    a.Add(new ReadWriteDeleteAction("HR") { Id = "4" });
+
+        //    a.AddSlefReference("Self Department");
+
+        //    return a;
+        //}
+
+        public readonly static Dictionary<string, ReadWriteDeleteAction> Departments = new ReadWriteDeleteAction("Departments").Dynamic(() =>
+        {
+            var a = new DynamicActionList<ReadWriteDeleteAction>();
+
+            a.Add(new ReadWriteDeleteAction("Marketing") { Id = "1" });
+            a.Add(new ReadWriteDeleteAction("IT") { Id = "2" });
+            a.Add(new ReadWriteDeleteAction("Finance") { Id = "3" });
+            a.Add(new ReadWriteDeleteAction("HR") { Id = "4" });
+
+            a.AddSlefReference("Self Department");
+
+            return a.ToDictionary(x => x.Id, x => x);
+        });
     }
 }

@@ -14,6 +14,7 @@
         /// </summary>
         public string? MinimumAccess { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
         public Func<string?, string?, string?>? Comparer { get; set; }
 
         public TextAction()
