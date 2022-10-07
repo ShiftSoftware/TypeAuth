@@ -23,16 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="HypoERP\AccessTrees\Affiliates.json">
+    <None Update="ERP\AccessTrees\Affiliates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="HypoERP\AccessTrees\SalesAdmin.json">
+    <None Update="ERP\AccessTrees\SalesAdmin.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="HypoERP\AccessTrees\CRMAgent.json">
+    <None Update="ERP\AccessTrees\CRMAgent.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="HypoERP\AccessTrees\SuperAdmin.json">
+    <None Update="ERP\AccessTrees\SuperAdmin.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
