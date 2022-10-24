@@ -20,7 +20,15 @@ namespace TypeAuthTests
     {
         public static TypeAuthContext GetTypeAuthContext(string jsonAccessTree)
         {
-            return new TypeAuthContext(jsonAccessTree, typeof(SystemActions), typeof(CRMActions));
+            var typeAuthContext = new TypeAuthContextBuilder()
+                .AddAccessTree(jsonAccessTree)
+                .AddActionTree<SystemActions>()
+                .AddActionTree<CRMActions>()
+                .Build();
+
+            return typeAuthContext;
+
+            //return new TypeAuthContext(jsonAccessTree, typeof(SystemActions), typeof(CRMActions));
         }
     }
 }
