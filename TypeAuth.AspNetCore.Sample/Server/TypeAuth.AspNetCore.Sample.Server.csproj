@@ -8,9 +8,17 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\TypeAuth.Core\TypeAuth.Core.csproj" />
     <ProjectReference Include="..\Client\TypeAuth.AspNetCore.Sample.Client.csproj" />
     <ProjectReference Include="..\Shared\TypeAuth.AspNetCore.Sample.Shared.csproj" />
   </ItemGroup>
