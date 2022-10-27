@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using TypeAuth.AspNetCore.Sample.Server.Data;
+using TypeAuth.AspNetCore.Sample.Server.Repos;
+using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
+using TypeAuth.AspNetCore.Sample.Server.Services;
+using TypeAuth.AspNetCore.Sample.Server.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddDbContext<TypeAuthDbContext>(options =>
                 options.UseSqlServer("Data Source=127.0.0.1; Initial Catalog=TypeAuth; Integrated Security=True"));
+
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+
+builder.Services.AddScoped<IHashService, HashService>();
 
 var app = builder.Build();
 
