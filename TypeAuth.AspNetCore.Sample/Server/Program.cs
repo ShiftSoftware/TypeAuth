@@ -34,8 +34,10 @@ builder.Services.AddDbContext<TypeAuthDbContext>(options =>
                 options.UseSqlServer("Data Source=127.0.0.1; Initial Catalog=TypeAuth; Integrated Security=True"));
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IHashService, HashService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
