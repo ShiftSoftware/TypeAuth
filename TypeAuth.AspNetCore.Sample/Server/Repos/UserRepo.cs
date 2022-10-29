@@ -34,19 +34,20 @@ namespace TypeAuth.AspNetCore.Sample.Server.Repos
 
         public async Task<List<UserDto>> GetUsersAsync()
         {
-            return await db.Users.ProjectTo<UserDto>(mapper.ConfigurationProvider).ToListAsync();
+            return await db.Users.AsNoTracking()
+                .ProjectTo<UserDto>(mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<User> GetUserAsync(int id)
         {
             return await db.Users.Include(x => x.UserInRoles).ThenInclude(x => x.Role).
-                SingleAsync(x => x.Id == id);
+                SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<User> GetUserByUserNameAsync(string username)
         {
             return await db.Users.Include(x => x.UserInRoles).ThenInclude(x => x.Role).
-                SingleAsync(x => x.Username.ToLower() == username.ToLower());
+                SingleOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
         }
     }
 }
