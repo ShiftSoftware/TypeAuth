@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using TypeAuth.AspNetCore.Sample.Server.Data;
 using TypeAuth.AspNetCore.Sample.Server.Repos;
 using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
@@ -13,6 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddSwaggerGen(o =>
+{
+    o.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "JWT token",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    o.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<TypeAuthDbContext>(options =>
@@ -23,6 +38,9 @@ builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IHashService, HashService>();
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
