@@ -19,7 +19,7 @@ namespace TypeAuth.AspNetCore.Sample.Client.Services
             using var response = await http.PostAsJsonAsync(url, value);
 
             if (response.StatusCode != HttpStatusCode.OK)
-                return default;
+                return default(TResult);
 
             return await response.Content.ReadFromJsonAsync<TResult>();
         }

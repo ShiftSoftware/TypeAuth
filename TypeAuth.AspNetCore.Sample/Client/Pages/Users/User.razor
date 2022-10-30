@@ -1,0 +1,41 @@
+﻿@page "/User"
+@inject IUserService UserService
+
+<h3>Users</h3>
+
+<a href="User/CreateUser" class="btn btn-link btn-primary">Create New User</a>
+
+@if (users is not null)
+{
+    <ul>
+        @foreach (var user in users)
+        {
+            <li>
+                @user.Username
+                <a href="User/UpdateUser/@user.Id" class="btn btn-link">
+                    <span class="oi oi-pencil"></span>
+                </a>
+                <span class="btn btn-link" @onclick="@(()=> RemoveUser(user.Id))">
+                    <span class="oi oi-trash"></span>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<UserDto> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetUsersAsync();
+    }
+
+    private async Task RemoveUser(int userId)
+    {
+        var result = await UserService.RemoveUserAsync(userId);
+
+        if (result)
+            users.RemoveAll(x => x.Id == userId);
+    }
+}
