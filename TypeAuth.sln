@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.Core", "TypeAuth.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuthTests", "TypeAuth.Core.Tests\TypeAuthTests.csproj", "{3842FD5D-B148-4CEA-AC4B-647D762923D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAuth.AspNetCore", "TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj", "{E92B7249-CD5F-4336-B306-F8EEFA44C5DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore", "TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj", "{E92B7249-CD5F-4336-B306-F8EEFA44C5DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAuth.AspNetCore.Sample.Server", "TypeAuth.AspNetCore.Sample\Server\TypeAuth.AspNetCore.Sample.Server.csproj", "{E157DA93-8EDD-40F9-8148-8F97D1AE4F0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore.Sample.Server", "TypeAuth.AspNetCore.Sample\Server\TypeAuth.AspNetCore.Sample.Server.csproj", "{E157DA93-8EDD-40F9-8148-8F97D1AE4F0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAuth.AspNetCore.Sample.Client", "TypeAuth.AspNetCore.Sample\Client\TypeAuth.AspNetCore.Sample.Client.csproj", "{349E902B-852D-4236-94B5-11227ABE12FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore.Sample.Client", "TypeAuth.AspNetCore.Sample\Client\TypeAuth.AspNetCore.Sample.Client.csproj", "{349E902B-852D-4236-94B5-11227ABE12FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAuth.AspNetCore.Sample.Shared", "TypeAuth.AspNetCore.Sample\Shared\TypeAuth.AspNetCore.Sample.Shared.csproj", "{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore.Sample.Shared", "TypeAuth.AspNetCore.Sample\Shared\TypeAuth.AspNetCore.Sample.Shared.csproj", "{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
