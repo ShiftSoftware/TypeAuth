@@ -8,6 +8,6 @@ namespace TypeAuth.AspNetCore.Sample.Server.ActionTreeModels
 
         public string Name { get; set; }
 
-        public CRMActionModel AccessTree { get; set; }
+        public ActionTreeModel AccessTree { get; set; }
     }
 }

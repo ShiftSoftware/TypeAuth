@@ -17,9 +17,11 @@ namespace TypeAuth.AspNetCore.Sample.Server.Mapping
             CreateMap<CRMActionModel, CRMActionDto>()
                 .ForMember(x=> x.Sales,s=> s.MapFrom(x=> ConvertArrayToReadWriteDeledteActionDto(x.Sales)));
             CreateMap<Role, RoleModel>()
-                .ForMember(x => x.AccessTree, s => s.MapFrom(x => JsonSerializer.Deserialize<CRMActionModel>(x.AccessTree,
+                .ForMember(x => x.AccessTree, s => s.MapFrom(x => JsonSerializer.Deserialize<ActionTreeModel>(x.AccessTree,
                 new JsonSerializerOptions())));
             CreateMap<RoleModel, RoleDto>();
+            CreateMap<ActionTreeModel, ActionTreeDto>();
+
 
             CreateMap<CRMActionDto, CRMActionModel>()
                 .ForMember(x => x.Sales, s => s.MapFrom(x => ConvertReadWriteDelecteActionDtoToArray(x.Sales)));
@@ -27,6 +29,7 @@ namespace TypeAuth.AspNetCore.Sample.Server.Mapping
             CreateMap<UpdateRoleModel, Role>()
                 .ForMember(x => x.AccessTree, s => s.MapFrom(x => JsonSerializer.Serialize(x.AccessTree,
                 new JsonSerializerOptions())));
+            CreateMap<ActionTreeDto, ActionTreeModel>();
         }
 
         private int[] ConvertReadWriteDelecteActionDtoToArray(ReadWriteDeleteActionDto action)

@@ -13,6 +13,6 @@ namespace TypeAuth.AspNetCore.Sample.Shared.RoleDtos
 
         public string Name { get; set; }
 
-        public CRMActionDto AccessTree { get; set; }
+        public ActionTreeDto AccessTree { get; set; }
     }
 }

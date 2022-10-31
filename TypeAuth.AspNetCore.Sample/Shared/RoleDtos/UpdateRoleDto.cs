@@ -14,6 +14,6 @@ namespace TypeAuth.AspNetCore.Sample.Shared.RoleDtos
         [MaxLength(50)]
         public string Name { get; set; }
 
-        public CRMActionDto? AccessTree { get; set; }
+        public ActionTreeDto? AccessTree { get; set; }
     }
 }
