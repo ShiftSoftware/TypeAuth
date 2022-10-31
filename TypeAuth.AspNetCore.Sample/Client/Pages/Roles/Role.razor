@@ -1,0 +1,43 @@
+﻿@page "/Role"
+@inject IRoleService RoleService
+
+<h3>Role</h3>
+
+<a href="Role/CreateRole" class="btn btn-link btn-primary">Create New Role</a>
+
+@if (roles is not null)
+{
+    <ul>
+        @foreach (var role in roles)
+        {
+            <li>
+                <a href="Role/RoleDetails/@role.Id">@role.Name</a>
+
+                <a href="Role/UpdateRole/@role.Id" class="btn btn-link">
+                    <span class="oi oi-pencil"></span>
+                </a>
+
+                <span class="btn btn-link" @onclick="@(()=> RemoveRole(role.Id))">
+                    <span class="oi oi-trash"></span>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<RoleDto> roles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await RoleService.GetRolesAsync();
+    }
+
+    private async Task RemoveRole(int roleId)
+    {
+        var result = await RoleService.RemoveRoleAsync(roleId);
+
+        if (result)
+            roles.RemoveAll(x => x.Id == roleId);
+    }
+}

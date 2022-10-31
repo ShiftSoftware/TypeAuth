@@ -9,5 +9,10 @@ namespace TypeAuth.AspNetCore.Sample.Shared.ActionTreeDtos
     public class ActionTreeDto
     {
         public CRMActionDto CRMActions{ get; set; }
+
+        public ActionTreeDto()
+        {
+            CRMActions = new();
+        }
     }
 }

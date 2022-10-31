@@ -15,5 +15,10 @@ namespace TypeAuth.AspNetCore.Sample.Shared.RoleDtos
         public string Name { get; set; }
 
         public ActionTreeDto? AccessTree { get; set; }
+
+        public UpdateRoleDto()
+        {
+            AccessTree = new();
+        }
     }
 }

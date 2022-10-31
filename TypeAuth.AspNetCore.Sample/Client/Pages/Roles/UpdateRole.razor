@@ -1,0 +1,67 @@
+﻿@page "/Role/UpdateRole/{Id:int}"
+@inject IRoleService RoleService
+@inject NavigationManager Navigation
+
+<h3>Update Role</h3>
+
+@if (notFoundError)
+{
+    <p class="alert alert-danger">Not Found</p>
+}
+
+@if (role is not null)
+{
+    <EditForm Model="role" OnValidSubmit=Save>
+        <DataAnnotationsValidator />
+
+        <div class="mb-3">
+            <label class="form-label">
+                Role Name
+                <InputText class="form-control" placeholder="Role Name" @bind-Value=role.Name />
+            </label>
+            <ValidationMessage For="()=> role.Name" />
+        </div>
+
+        <ActionTrees AccessTree="role.AccessTree"></ActionTrees>
+
+        @if (operationError)
+        {
+            <p class="alert alert-danger">The operation was not succeeded</p>
+        }
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private bool notFoundError = false;
+    private bool operationError = false;
+
+    private UpdateRoleDto role;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var roleDto = await RoleService.GetRoleAsync(Id);
+
+        role = new UpdateRoleDto
+            {
+                AccessTree = roleDto.AccessTree,
+                Name = roleDto.Name
+            };
+    }
+
+    private async Task Save()
+    {
+        operationError = false;
+
+        var updatedRole = await RoleService.UpdateRoleAsync(Id, role);
+
+        if (updatedRole is not null)
+            Navigation.NavigateTo("Role");
+
+        operationError = true;
+    }
+}

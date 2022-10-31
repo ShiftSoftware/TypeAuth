@@ -11,5 +11,10 @@ namespace TypeAuth.AspNetCore.Sample.Shared.ActionTreeDtos
         public ReadWriteDeleteActionDto Sales { get; set; }
 
         public string SalesDiscountValue { get; set; }
+
+        public CRMActionDto()
+        {
+            Sales = new();
+        }
     }
 }
