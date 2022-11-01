@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using TypeAuth.AspNetCore.Sample.Server.Models;
 using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
 using TypeAuth.AspNetCore.Sample.Server.Services.Interfaces;
 using TypeAuth.AspNetCore.Sample.Shared.UserDtos;
@@ -52,6 +53,27 @@ namespace TypeAuth.AspNetCore.Sample.Server.Controllers
             var user = await userService.RegisterUserAsync(userDto);
 
             await unitOfWork.SaveChangesAsync();
+
+            return Ok(mapper.Map<UserDto>(user));
+        }
+
+        [HttpPut("SetUserInRole/{userId:int}")]
+        public async Task<IActionResult> SetUserInRoleAsync(int userId, [FromBody] int[] roleIds)
+        {
+            var user = await userService.GetUserAsync(userId);
+
+            if (user is null)
+                return NotFound();
+
+            //Remove all previous roles for this user
+            user.UserInRoles.RemoveAll(x=> true);
+
+            //Set the roles for this user
+            user.UserInRoles.AddRange(roleIds.Select(x => new UserInRole { RoleId=x }));
+
+            await unitOfWork.SaveChangesAsync();
+
+            user = await userService.GetUserAsync(userId);
 
             return Ok(mapper.Map<UserDto>(user));
         }

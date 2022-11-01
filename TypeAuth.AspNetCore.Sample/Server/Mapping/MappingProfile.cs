@@ -12,7 +12,12 @@ namespace TypeAuth.AspNetCore.Sample.Server.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(x=> x.Roles, s=> s.MapFrom(x=> x.UserInRoles.Select(uir=> new RoleDto
+                {
+                    Id=uir.Role.Id,
+                    Name=uir.Role.Name
+                })));
             CreateMap<Role, RoleDto>();
             CreateMap<CRMActionModel, CRMActionDto>()
                 .ForMember(x=> x.Sales,s=> s.MapFrom(x=> ConvertArrayToReadWriteDeledteActionDto(x.Sales)));
