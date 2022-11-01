@@ -24,6 +24,16 @@ namespace TypeAuth.AspNetCore.Sample.Client.Services
             return await response.Content.ReadFromJsonAsync<TResult>();
         }
 
+        public async Task<string> PostAsync<TValue>(string url, TValue value)
+        {
+            using var response = await http.PostAsJsonAsync(url, value);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+                return null;
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
         public async Task<TResult> GetAsync<TResult>(string url, object query = null)
         {
             var queryString = query?.ToQueryString() ?? null;

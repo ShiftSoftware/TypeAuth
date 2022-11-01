@@ -1,0 +1,65 @@
+﻿@page "/Login"
+@inject IUserManagerService UserManagerService
+@inject IClipboardService ClipboardService
+
+<h3>Login</h3>
+
+<EditForm Model="login" OnValidSubmit=Submit>
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">
+            Username
+            <InputText class="form-control" placeholder="Username" @bind-Value=login.Username />
+        </label>
+        <ValidationMessage For="()=> login.Username" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">
+            Password
+            <InputText type="password" class="form-control" placeholder="Password" @bind-Value=login.Password />
+        </label>
+        <ValidationMessage For="()=> login.Password" />
+    </div>
+
+    @if (showError)
+    {
+        <p class="alert alert-danger">Username or password is incorrect</p>
+    }
+
+    <button type="submit" class="btn btn-primary">Login</button>
+    <button type="button" class="btn btn-secondary" onclick="@CopyTokenToClipboard">Copy Token</button>
+</EditForm>
+
+@if (token is not null)
+{
+    <div class="token alert alert-info">
+        <p class="text-wrap">@token</p>
+    </div>
+}
+
+@code {
+    private LoginDto login = new LoginDto
+        {
+            Username = "Nahro",
+            Password = "1"
+        };
+    private bool showError = false;
+    private string token;
+
+    private async Task Submit()
+    {
+        showError = false;
+
+        token = await UserManagerService.LoginAsync(login);
+
+        if (token is null)
+            showError = true;
+    }
+
+    private void CopyTokenToClipboard(){
+        Console.WriteLine(token);
+        ClipboardService.CopyToClipboard(token);
+    }
+}
