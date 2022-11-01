@@ -7,20 +7,38 @@
 
 @if (users is not null)
 {
-    <ul>
-        @foreach (var user in users)
-        {
-            <li>
-                @user.Username
-                <a href="User/UpdateUser/@user.Id" class="btn btn-link">
-                    <span class="oi oi-pencil"></span>
-                </a>
-                <span class="btn btn-link" @onclick="@(()=> RemoveUser(user.Id))">
-                    <span class="oi oi-trash"></span>
-                </span>
-            </li>
-        }
-    </ul>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Roles</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>
+                        <a href="User/SetUserInRole/@user.Id">
+                            @user.Username
+                        </a>
+                    </td>
+                    <td>
+                        @String.Join(',' , user.Roles.Select(x=> x.Name))
+                    </td>
+                    <td>
+                        <a href="User/UpdateUser/@user.Id" class="btn btn-link">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <span class="btn btn-link" @onclick="@(()=> RemoveUser(user.Id))">
+                            <span class="oi oi-trash"></span>
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {

@@ -9,5 +9,6 @@ namespace TypeAuth.AspNetCore.Sample.Client.Services.Interfaces
         Task<bool> RemoveUserAsync(int userId);
         Task<UserDto> UpdateUserAsync(int userId, RegisterUserDto user);
         Task<UserDto> GetUserAsync(int userId);
+        Task<UserDto> SetUserInRoleAsync(int userId, int[] roleIds);
     }
 }

@@ -37,5 +37,10 @@ namespace TypeAuth.AspNetCore.Sample.Client.Services
         {
             return await http.GetAsync<UserDto>($"{url}/{userId}");
         }
+
+        public async Task<UserDto> SetUserInRoleAsync(int userId, int[] roleIds)
+        {
+            return await http.PutAsync<UserDto, int[]>($"{url}/SetUserInRole/{userId}", roleIds);
+        }
     }
 }

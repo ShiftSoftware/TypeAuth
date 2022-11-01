@@ -1,0 +1,54 @@
+﻿@page "/User/SetUserInRole/{UserId:int}"
+@inject IUserService UserService
+@inject IRoleService RoleService
+@inject NavigationManager Navigation
+
+<h2>Set User In Role</h2>
+
+@if (user is not null && userInRoles is not null)
+{
+    <h3>@user.Username</h3>
+
+    <ul>
+        @foreach (var role in userInRoles)
+        {
+            <li>
+                <label>
+                    @role.RoleName
+                    <input type="checkbox" @bind-value=role.Granted
+                        checked="@role.Granted" />
+                </label>
+            </li>
+        }
+    </ul>
+
+        <button type="button" class="btn btn-primary" onclick="@SaveAsync">Save</button>
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private UserDto user;
+    private List<UserInRoleModel> userInRoles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserService.GetUserAsync(UserId);
+        var roles = await RoleService.GetRolesAsync();
+        userInRoles = roles.Select(r => new UserInRoleModel
+            {
+                RoleName = r.Name,
+                RoleId = r.Id,
+                Granted = user.Roles.Any(u => u.Id == r.Id)
+            }).ToList();    
+    }
+
+    private async Task SaveAsync(){
+        var result = await UserService
+            .SetUserInRoleAsync(UserId, userInRoles.Where(x=> x.Granted).Select(x=> x.RoleId).ToArray());
+
+        if (result is not null)
+            Navigation.NavigateTo("User");
+    }
+}
