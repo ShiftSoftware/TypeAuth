@@ -39,6 +39,8 @@ builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserManagerService, UserManagerService>();
 
 var app = builder.Build();
 

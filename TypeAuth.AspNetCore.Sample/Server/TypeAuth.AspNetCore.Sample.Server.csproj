@@ -23,7 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" />
     <ProjectReference Include="..\..\TypeAuth.Core\TypeAuth.Core.csproj" />
-    <ProjectReference Include="..\Client\TypeAuth.AspNetCore.Sample.Client.csproj" />
     <ProjectReference Include="..\Shared\TypeAuth.AspNetCore.Sample.Shared.csproj" />
   </ItemGroup>
 
