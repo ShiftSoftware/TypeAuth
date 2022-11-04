@@ -16,25 +16,8 @@ public static class IServiceCollectionExtensions
     /// And must add AddHttpContextAccessor to the service collection to make this work correctly
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="actionTrees">Type of action tree classes</param>
+    /// <param name="options"></param>
     /// <returns></returns>
-    public static IServiceCollection AddTypeAuth(this IServiceCollection services,params Type[] actionTrees)
-    {
-        //Create custom TypeAuthContextBuilder with action trees for dependency injection
-        services.AddScoped<TypeAuthContextBuilder>(x =>
-        {
-            var typeAuthContext = new TypeAuthContextBuilder();
-
-            if (actionTrees is not null)
-                foreach (var actionTree in actionTrees)
-                    typeAuthContext.AddActionTree(actionTree);
-
-            return typeAuthContext;
-        });
-
-        return services.AddScoped<TypeAuthService>();
-    }
-
     public static IServiceCollection AddTypeAuth(this IServiceCollection services,Action<TypeAuthOptions> options)
     {
         TypeAuthOptions typeAuthOptions = new();
