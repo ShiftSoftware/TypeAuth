@@ -11,7 +11,6 @@ using TypeAuth.AspNetCore.Sample.Server.Repos;
 using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
 using TypeAuth.AspNetCore.Sample.Server.Services;
 using TypeAuth.AspNetCore.Sample.Server.Services.Interfaces;
-using TypeAuth.AspNetCore.Sample.Shared.ActionTrees;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +50,8 @@ builder.Services.AddAuthentication(a =>
         ValidAudience = "TypeAuth",
         ValidIssuer = "TypeAuth",
         RequireExpirationTime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VerySecretKeyVerySecretKeyVerySecretKeyVerySecretKeyVerySecretKey")),
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes("VerySecretKeyVerySecretKeyVerySecretKeyVerySecretKeyVerySecretKey")),
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
     };
@@ -65,6 +65,8 @@ builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserManagerService, UserManagerService>();
+
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
@@ -91,6 +93,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
