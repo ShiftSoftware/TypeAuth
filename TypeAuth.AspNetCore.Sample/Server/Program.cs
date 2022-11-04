@@ -11,6 +11,7 @@ using TypeAuth.AspNetCore.Sample.Server.Repos;
 using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
 using TypeAuth.AspNetCore.Sample.Server.Services;
 using TypeAuth.AspNetCore.Sample.Server.Services.Interfaces;
+using TypeAuth.AspNetCore.Sample.Shared.ActionTrees;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IUserManagerService, UserManagerService>();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddTypeAuth(o => o.AddActionTree<CRMActions>());
 
 var app = builder.Build();
 
