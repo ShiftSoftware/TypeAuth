@@ -1,12 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
+using TypeAuth.AspNetCore.Extensions;
 using TypeAuth.AspNetCore.Sample.Server.Data;
 using TypeAuth.AspNetCore.Sample.Server.Repos;
 using TypeAuth.AspNetCore.Sample.Server.Repos.Interfaces;
 using TypeAuth.AspNetCore.Sample.Server.Services;
 using TypeAuth.AspNetCore.Sample.Server.Services.Interfaces;
+using TypeAuth.AspNetCore.Sample.Shared.ActionTrees;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +38,25 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddDbContext<TypeAuthDbContext>(options =>
                 options.UseSqlServer("Data Source=127.0.0.1; Initial Catalog=TypeAuth; Integrated Security=True"));
 
+builder.Services.AddAuthentication(a =>
+{
+    a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = "TypeAuth",
+        ValidIssuer = "TypeAuth",
+        RequireExpirationTime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VerySecretKeyVerySecretKeyVerySecretKeyVerySecretKeyVerySecretKey")),
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+    };
+});
+
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
@@ -41,6 +65,7 @@ builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserManagerService, UserManagerService>();
+
 
 var app = builder.Build();
 
