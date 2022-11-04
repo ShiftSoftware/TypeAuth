@@ -29,6 +29,13 @@ namespace ShiftSoftware.TypeAuth.Core
             return this;
         }
 
+        public TypeAuthContextBuilder AddActionTree(Type actionTreeType)
+        {
+            this.ActionTrees.Add(actionTreeType);
+
+            return this;
+        }
+
         public TypeAuthContext Build()
         {
             return new TypeAuthContext(this.AccessTrees, this.ActionTrees.ToArray());
