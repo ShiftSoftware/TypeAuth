@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TypeAuth.AspNetCore.Extensions;
+namespace TypeAuth.AspNetCore;
 
-public class TypeAuthOptions
+public class TypeAuthAspNetCoreOptions
 {
     internal List<Type> ActionTrees { get; private set; }
 
-    public TypeAuthOptions()
+    public TypeAuthAspNetCoreOptions()
     {
         ActionTrees = new();
     }
 
-    public TypeAuthOptions AddActionTree<T>()
+    public TypeAuthAspNetCoreOptions AddActionTree<T>()
     {
         ActionTrees.Add(typeof(T));
 

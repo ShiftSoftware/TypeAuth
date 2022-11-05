@@ -18,22 +18,15 @@ public static class IServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IServiceCollection AddTypeAuth(this IServiceCollection services,Action<TypeAuthOptions> options)
+    public static IServiceCollection AddTypeAuth(this IServiceCollection services,Action<TypeAuthAspNetCoreOptions> options)
     {
-        TypeAuthOptions typeAuthOptions = new();
-
-        options.Invoke(typeAuthOptions);
-
-        //Create custom TypeAuthContextBuilder with action trees for dependency injection
-        services.AddScoped<TypeAuthContextBuilder>(x =>
+        //Create custom TypeAuthOptions with action trees for dependency injection
+        services.AddScoped<TypeAuthAspNetCoreOptions>(x =>
         {
-            var typeAuthContext = new TypeAuthContextBuilder();
+            TypeAuthAspNetCoreOptions typeAuthOptions = new();
+            options.Invoke(typeAuthOptions);
 
-            if (typeAuthOptions.ActionTrees is not null)
-                foreach (var actionTree in typeAuthOptions.ActionTrees)
-                    typeAuthContext.AddActionTree(actionTree);
-
-            return typeAuthContext;
+            return typeAuthOptions;
         });
 
         return services.AddScoped<TypeAuthService>();

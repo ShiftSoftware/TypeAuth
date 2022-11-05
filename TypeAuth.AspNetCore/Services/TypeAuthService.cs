@@ -11,37 +11,38 @@ namespace TypeAuth.AspNetCore.Services
     public class TypeAuthService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly TypeAuthContextBuilder typeAuthContextBuilder;
+        private readonly TypeAuthAspNetCoreOptions options;
 
         public TypeAuthContext TypeAuthContext { get; private set; }
 
-        public TypeAuthService(IHttpContextAccessor httpContextAccessor, TypeAuthContextBuilder typeAuthContextBuilder)
+        public TypeAuthService(IHttpContextAccessor httpContextAccessor, TypeAuthAspNetCoreOptions options)
         {
             this.httpContextAccessor = httpContextAccessor;
-            this.typeAuthContextBuilder = typeAuthContextBuilder;
+            this.options = options;
 
             BuildTypeAuthConext();
         }
 
         private void BuildTypeAuthConext()
         {
+            TypeAuthContextBuilder builder = new();
+
+            //Set action trees to context builder
+            if (options.ActionTrees is not null)
+                foreach (var actionTree in options.ActionTrees)
+                    builder.AddActionTree(actionTree);
+
             //Get the access trees from the token
             var accessTrees = httpContextAccessor.HttpContext.User?.Claims?
                 .Where(c => c.Type == TypeAuthClaimTypes.AccessTree).ToList();
 
-            var test = httpContextAccessor.HttpContext.User?.Claims?
-                .FirstOrDefault(c => c.Type == TypeAuthClaimTypes.AccessTree);
-
-            //Check if the access trees form the toke is null abort the operation
-            if (accessTrees is null)
-                return;
-
             //Add access trees to TypeAuthContextBuilder
-            foreach (var accessTree in accessTrees)
-                typeAuthContextBuilder.AddAccessTree(accessTree.Value);
+            if (accessTrees is not null)
+                foreach (var accessTree in accessTrees)
+                    builder.AddAccessTree(accessTree.Value);
 
             //Build TypeAuthContext
-            TypeAuthContext = typeAuthContextBuilder.Build();
+            TypeAuthContext = builder.Build();
         }
     }
 }
