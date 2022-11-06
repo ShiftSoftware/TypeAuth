@@ -67,8 +67,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserManagerService, UserManagerService>();
 
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddTypeAuth(o => o.AddActionTree<CRMActions>());
 
 var app = builder.Build();
