@@ -15,6 +15,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore.Sample.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.AspNetCore.Sample.Shared", "TypeAuth.AspNetCore.Sample\Shared\TypeAuth.AspNetCore.Sample.Shared.csproj", "{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "Docs\", "{29B21FB3-0E29-4E83-A74A-06B7AE3096ED}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_49517"
+		Debug.AspNetCompiler.PhysicalPath = "Docs\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_49517\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_49517"
+		Release.AspNetCompiler.PhysicalPath = "Docs\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_49517\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "49517"
+		SlnRelativePath = "Docs\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +66,10 @@ Global
 		{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCB6B813-0EF7-4FDF-AA54-644ABAF2933A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29B21FB3-0E29-4E83-A74A-06B7AE3096ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29B21FB3-0E29-4E83-A74A-06B7AE3096ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29B21FB3-0E29-4E83-A74A-06B7AE3096ED}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{29B21FB3-0E29-4E83-A74A-06B7AE3096ED}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

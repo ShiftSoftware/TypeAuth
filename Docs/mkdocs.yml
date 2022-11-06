@@ -1,0 +1,47 @@
+﻿site_name: TypeAuth
+repo_url: https://github.com/ShiftSoftware/TypeAuth
+repo_name: ShiftSoftware/TypeAuth
+site_author: Shift Software
+edit_uri: edit/master/ShiftGrid/Docs/docs/
+site_description: >-
+  TypeAuth
+copyright: Copyright &copy; 2022 Shift Software
+default: getting-started
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/images/logo.png
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+nav:
+    - Home: 'index.md'
+    - Docs: 
+        - Getting Started: 'getting-started.md'
+        - Reference: 'reference.md'
+        - Methods: 'methods.md'
+        - Philosophy: 'philosophy.md'
+extra_css:
+  - overrides/css/extra.css
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/ShiftSoftware
+    - icon: fontawesome/brands/instagram 
+      link: https://www.instagram.com/shift.software
+    - icon: fontawesome/brands/linkedin 
+      link: https://www.linkedin.com/company/shift-software
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - pymdownx.mark
+  - toc:
+      permalink: true
+  - pymdownx.tabbed:
+      alternate_style: true
