@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShiftSoftware.TypeAuth.Core;
 using System;
 using System.Collections.Generic;
@@ -12,16 +13,24 @@ namespace TypeAuth.AspNetCore.Extensions;
 public static class IServiceCollectionExtensions
 {
     /// <summary>
-    /// Set dependency injections for TypeAuth,
-    /// And must add AddHttpContextAccessor to the service collection to make this work correctly
+    /// Set dependency injections for TypeAuth
     /// </summary>
     /// <param name="services"></param>
     /// <param name="options"></param>
-    /// <returns></returns>
+    /// <returns>The service collection</returns>
     public static IServiceCollection AddTypeAuth(this IServiceCollection services,Action<TypeAuthAspNetCoreOptions> options)
     {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        //Register HttpContextAccessor for dependency injection,
+        //because TypeAuthService need it
+        services.AddHttpContextAccessor();
+
         //Create custom TypeAuthOptions with action trees for dependency injection
-        services.AddScoped<TypeAuthAspNetCoreOptions>(x =>
+        services.TryAddScoped<TypeAuthAspNetCoreOptions>(x =>
         {
             TypeAuthAspNetCoreOptions typeAuthOptions = new();
             options.Invoke(typeAuthOptions);
@@ -29,6 +38,8 @@ public static class IServiceCollectionExtensions
             return typeAuthOptions;
         });
 
-        return services.AddScoped<TypeAuthService>();
+        services.TryAddScoped<TypeAuthService>();
+
+        return services;
     }
 }
