@@ -16,7 +16,7 @@ This library helps you to bring **TypeAuth.Core** into asp.net core easily, and 
 
 As we said this is works on top of asp.net core authentication for this purpose register some asp.net core authentication services is required.
 
-First you must register **Authentication** and \***\*JwtBearer**
+First you must register **Authentication** and **JwtBearer**
 
 ```C#
 builder.Services.AddAuthentication(a =>
