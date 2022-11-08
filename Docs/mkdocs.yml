@@ -22,6 +22,10 @@ nav:
         - Reference: 'reference.md'
         - Methods: 'methods.md'
         - Philosophy: 'philosophy.md'
+        - Asp.net Core:
+          - Getting Started: 'TypeAuth.AspNetCore/getting-started.md'
+          - TypeAuth Service: 'TypeAuth.AspNetCore/typeauth-service.md'
+          - TypeAuth Attribute: 'TypeAuth.AspNetCore/typeauth-attribute.md'
 extra_css:
   - overrides/css/extra.css
 extra:
