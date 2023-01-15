@@ -17,7 +17,7 @@
         [Newtonsoft.Json.JsonIgnore]
         public Func<string?, string?, string?>? Comparer { get; set; }
 
-        public TextAction()
+        public TextAction() : base(ActionType.Text)
         {
 
         }

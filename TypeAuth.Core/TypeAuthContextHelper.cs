@@ -1,11 +1,12 @@
 ﻿using ShiftSoftware.TypeAuth.Core.Actions;
+using System.Collections;
 using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
     internal class TypeAuthContextHelper
     {
-        List<ActionBankItem> ActionBank { get; set; }
+        internal List<ActionBankItem> ActionBank { get; set; }
 
         public TypeAuthContextHelper()
         {
@@ -34,9 +35,11 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (value != null && (value as Action) != null)
                         treeDictionary[y.Name] = (Action)value;
 
-                    else if (value != null && (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)))
+                    else if (value != null && value.GetType().GetGenericTypeDefinition() == typeof(DynamicActionDictionary<>))
                     {
-                        treeDictionary[y.Name] = value;
+                        var dict = value as DynamicActionDictionaryBase;
+
+                        treeDictionary[y.Name] = dict!.Dictionary;
                     }
                 });
 
@@ -50,6 +53,14 @@ namespace ShiftSoftware.TypeAuth.Core
             }
 
             return rootDictionary;
+        }
+
+        private IEnumerable<DictionaryEntry> CastDict(IDictionary dictionary)
+        {
+            foreach (DictionaryEntry entry in dictionary)
+            {
+                yield return entry;
+            }
         }
 
         internal void PopulateActionBank(object actionCursor, object? accessCursor)
@@ -71,17 +82,17 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            if (actionCursor.GetType() == typeof(Dictionary<string, object>))
+            if (actionCursor.GetType().IsGenericType && actionCursor.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var theDictionary = (Dictionary<string, object>)actionCursor;
+                var dictionaryEntries = CastDict((IDictionary)actionCursor); //(Dictionary<string, object>)actionCursor;
 
-                foreach (var key in theDictionary.Keys)
+                foreach (var entry in dictionaryEntries)
                 {
                     //Wild Card: Access already provided at this Level of the Access Tree. But the action tree has more child nodes.
                     //The current Access is simply passed to every child node of the the current Action Node
                     if (accessTypes.Count > 0 || accessValue != null)
                     {
-                        this.PopulateActionBank(theDictionary[key], accessCursor);
+                        this.PopulateActionBank(entry.Value, accessCursor);
                     }
                     else
                     {
@@ -89,7 +100,7 @@ namespace ShiftSoftware.TypeAuth.Core
                         {
                             var accessCursorDictionary = (Newtonsoft.Json.Linq.JObject)accessCursor;
 
-                            PopulateActionBank(theDictionary[key], accessCursorDictionary[key]);
+                            PopulateActionBank(entry.Value, accessCursorDictionary[entry.Key]);
                         }
                     }
 

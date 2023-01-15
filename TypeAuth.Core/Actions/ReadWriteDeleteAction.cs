@@ -2,7 +2,7 @@
 {
     public class ReadWriteDeleteAction : Action
     {
-        public ReadWriteDeleteAction()
+        public ReadWriteDeleteAction() : base(ActionType.ReadWriteDelete)
         {
         }
 

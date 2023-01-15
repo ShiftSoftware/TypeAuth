@@ -2,7 +2,7 @@
 {
     public class BooleanAction : Action
     {
-        public BooleanAction()
+        public BooleanAction() : base(ActionType.Boolean)
         {
 
         }

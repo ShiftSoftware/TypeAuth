@@ -8,7 +8,7 @@ namespace ShiftSoftware.TypeAuth.Core
     public class TypeAuthContext
     {
         private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
-        public const string SelfRererenceKey = "shift-software:type-auth-core:self-reference";
+        public const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
 
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {
@@ -31,6 +31,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             var actionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList());
 
+            Console.WriteLine("Action Trees Are:");
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -81,18 +82,47 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.CheckActionBank(action, access);
         }
 
-        public bool CanRead(ReadAction action)
+        #region Read
+        private bool CanRead(Actions.Action action)
         {
             return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+        }
+        public bool CanRead(ReadAction action)
+        {
+            return this.CanRead((Actions.Action)action);
         }
         public bool CanRead(ReadWriteAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+            return this.CanRead((Actions.Action)action);
         }
         public bool CanRead(ReadWriteDeleteAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+            return this.CanRead((Actions.Action)action);
         }
+        #endregion
+
+        #region Read Dynamic
+
+        public bool CanRead(DynamicActionDictionary<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        {
+            return this.CanRead(dynamicActionDictionary.Dictionary, key, selfReference);
+        }
+
+        private bool CanRead(Dictionary<string, Actions.Action> dynamicActionDictionary, string key, string? selfReference = null)
+        {
+            var action = dynamicActionDictionary[key];
+
+            var actionAccess = this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+
+            if (!actionAccess && selfReference == key && dynamicActionDictionary.Keys.Contains(SelfRererenceKey))
+            {
+                actionAccess = this.TypeAuthContextHelper.CheckActionBank(dynamicActionDictionary[SelfRererenceKey], Access.Read);
+            }
+
+            return actionAccess;
+        }
+
+        #endregion
 
         public bool CanWrite(ReadWriteAction action)
         {
@@ -140,21 +170,5 @@ namespace ShiftSoftware.TypeAuth.Core
 
         }
 
-        //public Dictionary<string, List<Access>> AllItems(List<DynamicAction> dataList)
-        //{
-        //    return dataList.Select(x => new { x.Id, AccessTypes = ActionAccessTypes(x) }).ToDictionary(x => x.Id, x => x.AccessTypes);
-        //}
-        public List<string> ReadableItems(List<DynamicAction> dataList)
-        {
-            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Read)).Select(x => x.Id).ToList();
-        }
-        public List<string> WritableItems(List<DynamicAction> dataList)
-        {
-            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Write)).Select(x => x.Id).ToList();
-        }
-        public List<string> DeletableItems(List<DynamicAction> dataList)
-        {
-            return dataList.Where(x => this.TypeAuthContextHelper.CheckActionBank(x, Access.Delete)).Select(x => x.Id).ToList();
-        }
     }
 }

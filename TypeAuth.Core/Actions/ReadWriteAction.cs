@@ -2,7 +2,7 @@
 {
     public class ReadWriteAction : Action
     {
-        public ReadWriteAction()
+        public ReadWriteAction() : base(ActionType.ReadWrite)
         {
         }
 

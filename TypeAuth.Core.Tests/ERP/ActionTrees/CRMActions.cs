@@ -48,19 +48,5 @@ namespace TypeAuthTests.HypoERP.ActionTrees
                 return string.Join(", ", joined);
             }
         );
-
-        public readonly static Dictionary<string, ReadWriteDeleteAction> Departments = new ReadWriteDeleteAction("Departments").Dynamic(() =>
-        {
-            var a = new DynamicActionList<ReadWriteDeleteAction>();
-
-            a.Add(new ReadWriteDeleteAction("Marketing") { Id = "1" });
-            a.Add(new ReadWriteDeleteAction("IT") { Id = "2" });
-            a.Add(new ReadWriteDeleteAction("Finance") { Id = "3" });
-            a.Add(new ReadWriteDeleteAction("HR") { Id = "4" });
-
-            a.AddSlefReference("Self Department");
-
-            return a.ToDictionary(x => x.Id, x => x);
-        });
     }
 }

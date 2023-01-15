@@ -18,7 +18,7 @@ namespace ShiftSoftware.TypeAuth.Core
         /// <param name="name">Friendly name for identifying the Action.</param>
         /// <param name="actionType">Sets the ActionType of this Dynamic Action.</param>
         /// <param name="description">Additional description about the Action.</param>
-        public DynamicAction(string id, string? name, ActionType actionType, string? description = null)
+        public DynamicAction(string id, string? name, ActionType actionType, string? description = null) : base(name,actionType, description)
         {
             this.Id = id;
             this.Name = name;

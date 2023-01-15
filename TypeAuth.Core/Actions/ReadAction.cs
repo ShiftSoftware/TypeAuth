@@ -2,7 +2,7 @@
 {
     public class ReadAction : Action
     {
-        public ReadAction()
+        public ReadAction() : base(ActionType.Read)
         {
 
         }
