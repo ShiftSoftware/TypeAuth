@@ -2,15 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ShiftSoftware.TypeAuth.Core;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TypeAuth.AspNetCore.Services;
+using ShiftSoftware.TypeAuth.AspNetCore.Services;
 
-namespace TypeAuth.AspNetCore
+namespace ShiftSoftware.TypeAuth.AspNetCore
 {
     public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
     {
@@ -27,7 +21,15 @@ namespace TypeAuth.AspNetCore
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var typeAuthService = (TypeAuthService)context?.HttpContext?.RequestServices.GetService(typeof(TypeAuthService));
+            var service = context.HttpContext.RequestServices.GetService(typeof(TypeAuthService));
+
+            if(service == null)
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            var typeAuthService = (TypeAuthService)service;
             
             //Check for authrization
             if (!(context.HttpContext.User.Identity?.IsAuthenticated ?? false))

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TypeAuth.AspNetCore
+﻿namespace ShiftSoftware.TypeAuth.AspNetCore
 {
     /// <summary>
     /// Contains TypeAuth spesific claim types
@@ -14,6 +8,6 @@ namespace TypeAuth.AspNetCore
         /// <summary>
         /// Default TypeAuth calim type for access tree, Shift/Software/TypeAuth/Claims/AccessTree.
         /// </summary>
-        public const string AccessTree = "Shift/Software/TypeAuth/Claims/AccessTree";
+        public const string AccessTree = "ShiftSoftware/TypeAuth/Claims/AccessTree";
     }
 }

@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using ShiftSoftware.TypeAuth.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TypeAuth.AspNetCore.Services
+namespace ShiftSoftware.TypeAuth.AspNetCore.Services
 {
     public class TypeAuthService
     {
@@ -20,10 +15,10 @@ namespace TypeAuth.AspNetCore.Services
             this.httpContextAccessor = httpContextAccessor;
             this.options = options;
 
-            BuildTypeAuthConext();
+            TypeAuthContext = BuildTypeAuthConext();
         }
 
-        private void BuildTypeAuthConext()
+        private TypeAuthContext BuildTypeAuthConext()
         {
             TypeAuthContextBuilder builder = new();
 
@@ -42,7 +37,7 @@ namespace TypeAuth.AspNetCore.Services
                     builder.AddAccessTree(accessTree.Value);
 
             //Build TypeAuthContext
-            TypeAuthContext = builder.Build();
+            return builder.Build();
         }
     }
 }

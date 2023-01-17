@@ -1,14 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using ShiftSoftware.TypeAuth.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TypeAuth.AspNetCore.Services;
+using ShiftSoftware.TypeAuth.AspNetCore.Services;
 
-namespace TypeAuth.AspNetCore.Extensions;
+namespace ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 
 public static class IServiceCollectionExtensions
 {
