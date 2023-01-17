@@ -35,7 +35,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (value != null && (value as Action) != null)
                         treeDictionary[y.Name] = (Action)value;
 
-                    else if (value != null && value.GetType().GetGenericTypeDefinition() == typeof(DynamicActionDictionary<>))
+                    else if (value != null && value.GetType().GetGenericTypeDefinition() == typeof(DynamicAction<>))
                     {
                         var dict = value as DynamicActionDictionaryBase;
 
@@ -107,7 +107,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            if ((actionCursor.GetType() == typeof(Action) || actionCursor.GetType().BaseType == typeof(Action) || actionCursor.GetType() == typeof(DynamicAction)) && (accessTypes.Count > 0 || accessValue != null))
+            if ((actionCursor.GetType() == typeof(Action) || actionCursor.GetType().BaseType == typeof(Action)) && (accessTypes.Count > 0 || accessValue != null))
             {
                 var theAction = (Action)actionCursor;
 
@@ -128,14 +128,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            var theDynamicAction = actionToCheck as DynamicAction;
-
-            if (theDynamicAction != null)
-            {
-                actionMatches = this.ActionBank.Where(x => x.Action.GetType() == typeof(DynamicAction)).Where(x => ((DynamicAction)x.Action).Id.Equals(theDynamicAction.Id)).ToList();
-            }
-            else
-                actionMatches = this.ActionBank.Where(x => x.Action == actionToCheck).ToList();
+            actionMatches = this.ActionBank.Where(x => x.Action == actionToCheck).ToList();
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionMatches, Newtonsoft.Json.Formatting.Indented));
 

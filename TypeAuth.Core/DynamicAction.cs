@@ -1,29 +1,98 @@
-﻿using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
+﻿using ShiftSoftware.TypeAuth.Core.Actions;
+
 namespace ShiftSoftware.TypeAuth.Core
 {
-    /// <summary>
-    /// An action that's dynamically generated from data. This is used for handling Data Level (Or Row-Level) Access Control.
-    /// </summary>
-    public class DynamicAction : Action
+    public class DynamicActionDictionaryBase
     {
-        /// <summary>
-        /// The unique identifier for the data item (or Row).
-        /// </summary>
-        public string Id { get; set; }
+        internal Dictionary<string, Actions.Action> Dictionary { get; set; } = new Dictionary<string, Actions.Action>();
+    }
 
-        /// <summary>
-        /// Constructs an action from data.
-        /// </summary>
-        /// <param name="id">The unique identifier for the data item (or Row)</param>
-        /// <param name="name">Friendly name for identifying the Action.</param>
-        /// <param name="actionType">Sets the ActionType of this Dynamic Action.</param>
-        /// <param name="description">Additional description about the Action.</param>
-        public DynamicAction(string id, string? name, ActionType actionType, string? description = null) : base(name,actionType, description)
+    public class DynamicAction<T> : DynamicActionDictionaryBase where T : Actions.Action, new()
+    {
+        private Func<Dictionary<string, string>>? ExpandFunction { get; set; }
+        private Func<Task<Dictionary<string, string>>>? ExpandFunctionAsync { get; set; }
+        private Func<string?, string?, string?>? Comparer { get;set; }
+
+        public DynamicAction() { }
+
+        public DynamicAction(string selfActionName)
         {
-            this.Id = id;
-            this.Name = name;
-            this.Type = actionType;
-            this.Description = description;
+            var action = new T();
+
+            action.Name = selfActionName;
+
+            this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
+        }
+
+        public DynamicAction(string selfActionName, Func<string?, string?, string?>? comparer)
+        {
+            this.Comparer = comparer;
+
+            var action = new T();
+
+            action.Name = selfActionName;
+
+            if (typeof(T) == typeof(TextAction))
+            {
+                ((TextAction)(object)action).Comparer = this.Comparer;
+            }
+
+            this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
+        }
+
+        public DynamicAction(Func<string?, string?, string?>? comparer)
+        {
+            this.Comparer = comparer;
+        }
+
+        private DynamicAction<T> ExpandWith(Dictionary<string, string> dynamicEntries)
+        {
+            foreach (var entry in dynamicEntries)
+            {
+                var action = new T();
+
+                action.Name = entry.Value;
+
+                if (typeof(T) == typeof(TextAction))
+                {
+                    ((TextAction)(object)action).Comparer = this.Comparer;
+                }
+
+                this.Dictionary[entry.Key] = action;
+            }
+
+            return this;
+        }
+
+        public async Task ExpandAsync(Func<Task<Dictionary<string, string>>> expandFunctionAsync)
+        {
+            this.ExpandFunctionAsync = expandFunctionAsync;
+            this.ExpandWith(await this.ExpandFunctionAsync.Invoke());
+        }
+
+        public void Expand(Func<Dictionary<string, string>> expandFunction)
+        {
+            this.ExpandFunction = expandFunction;
+            this.ExpandWith(this.ExpandFunction.Invoke());
+        }
+
+        internal void ReExpand()
+        {
+            this.ExpandWith(this.ExpandFunction!.Invoke());
+        }
+
+        internal async Task ReExpandAsync()
+        {
+            this.ExpandWith(await this.ExpandFunctionAsync!.Invoke());
+        }
+
+        public T this[string key]
+        {
+            get
+            {
+                return (T)Dictionary[key];
+            }
+            set { Dictionary.Add(key, value); }
         }
     }
 }
