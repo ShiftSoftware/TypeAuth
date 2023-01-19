@@ -1,4 +1,6 @@
 ﻿using ShiftSoftware.TypeAuth.AspNetCore.Sample;
+using ShiftSoftware.TypeAuth.Core;
+using ShiftSoftware.TypeAuth.Shared;
 using Xunit.Abstractions;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
@@ -120,6 +122,23 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
             Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/write")).StatusCode);
 
             Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/delete")).StatusCode);
+        }
+
+        [Fact(DisplayName = "05. Read Nested")]
+        public async Task _05_ReadNested()
+        {
+            var token = await Common.GetTokenAsync(_client, new List<dynamic>
+            {
+                new {
+                    SystemActions = new {
+                        UserModule = new List<Access> { Access.Read }
+                    }
+                }
+            });
+
+            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read-nested")).StatusCode);
         }
     }
 }

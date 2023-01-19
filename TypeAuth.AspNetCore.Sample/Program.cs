@@ -33,6 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddTypeAuth(o => o
     .AddActionTree<CRMActions>()
     .AddActionTree<DataLevel>()
+    .AddActionTree<SystemActions>()
 );
 
 var app = builder.Build();
