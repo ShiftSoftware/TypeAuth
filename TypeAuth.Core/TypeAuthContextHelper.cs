@@ -98,6 +98,9 @@ namespace ShiftSoftware.TypeAuth.Core
                     //}
                 });
 
+                //Reset the json path after all recursive calls
+                jsonPath = null;
+
                 //tree.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Where(y => y.ReturnType == typeof(DynamicActionList<Action>)).ToList().ForEach(y =>
                 //{
                 //    var invoked = (y.Invoke(y, new object[] { }) as DynamicActionList<Action>);

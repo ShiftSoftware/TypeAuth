@@ -465,5 +465,27 @@ namespace TypeAuthTests.ERP
             Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
 
         }
+
+        [TestMethod("Multiple Action Trees")]
+        public void MultipleActionTrees()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
+                    }
+                }))
+                .AddActionTree<CRMActions>()
+                .AddActionTree<DataLevel>()
+                .AddActionTree<SystemActions>()
+                .Build();
+
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2"));
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3"));
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_4"));
+        }
     }
 }

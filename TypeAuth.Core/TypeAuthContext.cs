@@ -8,10 +8,10 @@ namespace ShiftSoftware.TypeAuth.Core
     public class TypeAuthContext
     {
         private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
-        public const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
-
-        public List<string> AccessTreeJsonStrings { get; set; } = default!;
-        public Type[] ActionTrees { get; set; } = default!;
+        internal const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
+        
+        internal List<string> AccessTreeJsonStrings { get; set; } = default!;
+        internal Type[] ActionTrees { get; set; } = default!;
 
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {
@@ -36,7 +36,6 @@ namespace ShiftSoftware.TypeAuth.Core
             this.ActionTrees = actionTrees;
 
             var actionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings);
-
 
             //Console.WriteLine("Action Trees Are:");
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
@@ -74,7 +73,7 @@ namespace ShiftSoftware.TypeAuth.Core
         //    return accessTypes;
         //}
 
-        public bool Can(Type actionTreeType, string actionName, Access access)
+        internal bool Can(Type actionTreeType, string actionName, Access access)
         {
             var instance = Activator.CreateInstance(actionTreeType);
 
