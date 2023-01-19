@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using ShiftSoftware.TypeAuth.Shared;
 
-namespace TypeAuthTests.ERP
+namespace ShiftSoftware.TypeAuth.Tests.ERP
 {
     [TestClass()]
     public class DynamicActions

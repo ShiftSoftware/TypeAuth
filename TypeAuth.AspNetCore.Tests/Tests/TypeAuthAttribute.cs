@@ -1,8 +1,7 @@
-﻿using ShiftSoftware.TypeAuth.Shared;
-using TypeAuth.AspNetCore.Sample;
+﻿using ShiftSoftware.TypeAuth.AspNetCore.Sample;
 using Xunit.Abstractions;
 
-namespace TypeAuth.AspNetCore.Tests.Tests
+namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
 {
     [Collection("API Collection")]
     public class TypeAuthAttribute
@@ -23,7 +22,7 @@ namespace TypeAuth.AspNetCore.Tests.Tests
             {
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> { ShiftSoftware.TypeAuth.Core.Access.Read }
+                        Tickets = new List<Core.Access> { Core.Access.Read }
                     }
                 }
             });

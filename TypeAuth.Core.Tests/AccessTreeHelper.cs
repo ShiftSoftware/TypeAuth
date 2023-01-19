@@ -1,7 +1,7 @@
 ﻿using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Shared;
 
-namespace TypeAuthTests
+namespace ShiftSoftware.TypeAuth.Tests
 {
     class AccessTreeFiles
     {

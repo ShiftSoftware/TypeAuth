@@ -1,8 +1,8 @@
 ﻿using ShiftSoftware.TypeAuth.Core;
-using TypeAuth.AspNetCore.Sample;
+using ShiftSoftware.TypeAuth.AspNetCore.Sample;
 using Xunit.Abstractions;
 
-namespace TypeAuth.AspNetCore.Tests.Tests
+namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
 {
     [Collection("API Collection")]
     public class DynamicAction

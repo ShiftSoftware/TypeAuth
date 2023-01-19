@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace TypeAuth.AspNetCore.Tests
+namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
 {
     internal class Common
     {

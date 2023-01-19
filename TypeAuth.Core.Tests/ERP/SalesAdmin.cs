@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ShiftSoftware.TypeAuth.Shared;
 
-namespace TypeAuthTests.ERP
+namespace ShiftSoftware.TypeAuth.Tests.ERP
 {
     [TestClass()]
     public class SalesAdmin

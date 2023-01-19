@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using TypeAuth.AspNetCore.Sample;
+using ShiftSoftware.TypeAuth.AspNetCore.Sample;
 
-namespace TypeAuth.AspNetCore.Tests
+namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {

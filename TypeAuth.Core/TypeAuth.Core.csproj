@@ -1,25 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-	  <LangVersion>10.0</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RootNamespace>ShiftSoftware.TypeAuth.Core</RootNamespace>
-    <PackageId>ShiftSoftware.TypeAuth.Core</PackageId>
-    <Authors>Shift Software</Authors>
-    <Product>TypeAuth Core</Product>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>10.0</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<RootNamespace>ShiftSoftware.TypeAuth.Core</RootNamespace>
+		<PackageId>ShiftSoftware.TypeAuth.Core</PackageId>
+		<Authors>Shift Software</Authors>
+		<Product>TypeAuth Core</Product>
+		<AssemblyName>ShiftSoftware.TypeAuth.Core</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	  <InternalsVisibleTo Include="TypeAuth.AspNetCore" />
-	  <InternalsVisibleTo Include="TypeAuthTests" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<InternalsVisibleTo Include="ShiftSoftware.TypeAuth.AspNetCore" />
+		<InternalsVisibleTo Include="ShiftSoftware.TypeAuth.Tests" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Docs\Philosophy\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Docs\Philosophy\" />
+	</ItemGroup>
 
 </Project>

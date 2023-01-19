@@ -2,7 +2,7 @@
 using System;
 using ShiftSoftware.TypeAuth.Shared;
 
-namespace TypeAuthTests.ERP
+namespace ShiftSoftware.TypeAuth.Tests.ERP
 {
     [TestClass()]
     public class Affiliate

@@ -14,7 +14,7 @@ namespace ShiftSoftware.TypeAuth.Shared
        
         public readonly static TextAction DiscountValue = new TextAction("Sale Discount", "", "0", "100", (a, b) =>
         {
-            var numbers = new System.Collections.Generic.List<int>();
+            var numbers = new List<int>();
 
             if (a != null)
                 numbers.Add(int.Parse(a));
@@ -37,7 +37,7 @@ namespace ShiftSoftware.TypeAuth.Shared
             "00:00:00 - 23:59:59",
             (a, b) =>
             {
-                var joined = new System.Collections.Generic.List<string>();
+                var joined = new List<string>();
 
                 if (a != null)
                     joined.AddRange(a.Split(',').Select(x => x.Trim()).ToList());

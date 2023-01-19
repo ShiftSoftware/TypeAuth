@@ -2,7 +2,7 @@
 using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Shared;
 
-namespace TypeAuthTests.ERP
+namespace ShiftSoftware.TypeAuth.Tests.ERP
 {
     [TestClass()]
     public class SuperAdmin

@@ -12,7 +12,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace TypeAuth.AspNetCore.Sample.Controllers
+namespace ShiftSoftware.TypeAuth.AspNetCore.Sample.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

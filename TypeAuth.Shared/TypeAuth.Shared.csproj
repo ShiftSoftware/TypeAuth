@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 	  <RootNamespace>ShiftSoftware.TypeAuth.Shared</RootNamespace>
+	  <AssemblyName>ShiftSoftware.TypeAuth.Shared</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
