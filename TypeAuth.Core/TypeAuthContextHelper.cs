@@ -1,4 +1,5 @@
-﻿using ShiftSoftware.TypeAuth.Core.Actions;
+﻿using Newtonsoft.Json.Linq;
+using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Collections;
 using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
 
@@ -13,10 +14,13 @@ namespace ShiftSoftware.TypeAuth.Core
             ActionBank = new List<ActionBankItem>();
         }
 
-        internal Dictionary<string, object> GenerateActionTree(List<Type> actionTrees, Dictionary<string, object>? rootDictionary = null)
+        internal Dictionary<string, object> GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, Dictionary<string, object>? rootDictionary = null, string? jsonPath = null)
         {
             if (rootDictionary is null)
                 rootDictionary = new Dictionary<string, object>();
+
+            if (jsonPath is null)
+                jsonPath = "";
 
             foreach (var tree in actionTrees)
             {
@@ -24,9 +28,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 rootDictionary[tree.Name] = treeDictionary;
 
+                jsonPath += tree.Name + ".";
+
                 var childTress = tree.GetNestedTypes().ToList().Where(x => x.GetCustomAttributes(typeof(ActionTree), false) != null).ToList();
 
-                GenerateActionTree(childTress, treeDictionary);
+                GenerateActionTree(childTress, accessTreeJSONStrings, treeDictionary, jsonPath);
 
                 tree.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).ToList().ForEach(y =>
                 {
@@ -35,12 +41,61 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (value != null && (value as Action) != null)
                         treeDictionary[y.Name] = (Action)value;
 
-                    else if (value != null && value.GetType().GetGenericTypeDefinition() == typeof(DynamicAction<>))
+                    else if (value != null && (value as DynamicActionBase) != null)
                     {
-                        var dict = value as DynamicActionDictionaryBase;
+                        var dynamicAction = (DynamicActionBase)value;
 
-                        treeDictionary[y.Name] = dict!.Dictionary;
+                        var fullName = jsonPath + y.Name;
+
+                        var keys = new List<string>();
+
+                        foreach (var key in fullName.Split('.'))
+                        {
+                            keys.Add(key);
+
+                            var path = string.Join(".", keys);
+
+                            foreach (var jsonString in accessTreeJSONStrings)
+                            {
+                                var accessTree = JObject.Parse(jsonString);
+
+                                var access = accessTree.SelectToken(path);
+
+                                if (access != null && access.GetType() == typeof(JArray))
+                                {
+                                    dynamicAction.UnderlyingAction = dynamicAction.GenerateAction();
+
+                                    dynamicAction.Dictionary[$"{Guid.NewGuid()}-{Guid.NewGuid()}"] = dynamicAction.UnderlyingAction;
+                                }
+                            }
+                        }
+
+                        foreach (var jsonString in accessTreeJSONStrings)
+                        {
+                            var accessTree = JObject.Parse(jsonString);
+
+                            var access = accessTree.SelectToken(fullName);
+
+                            if (access != null && access.GetType() == typeof(JObject))
+                            {
+                                var jobject = (access as JObject)!;
+
+                                foreach (var key in jobject)
+                                {
+                                    dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction();
+                                }
+                            }
+                        }
+
+                        treeDictionary[y.Name] = dynamicAction.Dictionary;
                     }
+
+                    //else if (value != null && value.GetType().GetGenericTypeDefinition() == typeof(DynamicAction<>))
+                    //{
+                    //    var dict = (value as DynamicActionBase)!;
+
+                    //    treeDictionary[y.Name] = dict!.Dictionary;
+                    //}
                 });
 
                 //tree.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Where(y => y.ReturnType == typeof(DynamicActionList<Action>)).ToList().ForEach(y =>

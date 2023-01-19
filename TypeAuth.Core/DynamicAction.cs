@@ -2,16 +2,18 @@
 
 namespace ShiftSoftware.TypeAuth.Core
 {
-    public class DynamicActionDictionaryBase
+    public abstract class DynamicActionBase
     {
         internal Dictionary<string, Actions.Action> Dictionary { get; set; } = new Dictionary<string, Actions.Action>();
+       
+        internal abstract Actions.Action GenerateAction();
+
+        internal Actions.Action? UnderlyingAction { get; set; }
     }
 
-    public class DynamicAction<T> : DynamicActionDictionaryBase where T : Actions.Action, new()
+    public class DynamicAction<T> : DynamicActionBase where T : Actions.Action, new()
     {
-        private Func<Dictionary<string, string>>? ExpandFunction { get; set; }
-        private Func<Task<Dictionary<string, string>>>? ExpandFunctionAsync { get; set; }
-        private Func<string?, string?, string?>? Comparer { get;set; }
+        internal Func<string?, string?, string?>? Comparer { get;set; }
 
         public DynamicAction() { }
 
@@ -24,6 +26,11 @@ namespace ShiftSoftware.TypeAuth.Core
             this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
         }
 
+        internal override Actions.Action GenerateAction()
+        {
+            return new T();
+        }
+
         public DynamicAction(string selfActionName, Func<string?, string?, string?>? comparer)
         {
             this.Comparer = comparer;
@@ -31,11 +38,6 @@ namespace ShiftSoftware.TypeAuth.Core
             var action = new T();
 
             action.Name = selfActionName;
-
-            if (typeof(T) == typeof(TextAction))
-            {
-                ((TextAction)(object)action).Comparer = this.Comparer;
-            }
 
             this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
         }
@@ -45,7 +47,7 @@ namespace ShiftSoftware.TypeAuth.Core
             this.Comparer = comparer;
         }
 
-        private DynamicAction<T> ExpandWith(Dictionary<string, string> dynamicEntries)
+        public DynamicAction<T> ExpandWith(Dictionary<string, string> dynamicEntries)
         {
             foreach (var entry in dynamicEntries)
             {
@@ -62,28 +64,6 @@ namespace ShiftSoftware.TypeAuth.Core
             }
 
             return this;
-        }
-
-        public async Task ExpandAsync(Func<Task<Dictionary<string, string>>> expandFunctionAsync)
-        {
-            this.ExpandFunctionAsync = expandFunctionAsync;
-            this.ExpandWith(await this.ExpandFunctionAsync.Invoke());
-        }
-
-        public void Expand(Func<Dictionary<string, string>> expandFunction)
-        {
-            this.ExpandFunction = expandFunction;
-            this.ExpandWith(this.ExpandFunction.Invoke());
-        }
-
-        internal void ReExpand()
-        {
-            this.ExpandWith(this.ExpandFunction!.Invoke());
-        }
-
-        internal async Task ReExpandAsync()
-        {
-            this.ExpandWith(await this.ExpandFunctionAsync!.Invoke());
         }
 
         public T this[string key]

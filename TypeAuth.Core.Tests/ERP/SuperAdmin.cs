@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ShiftSoftware.TypeAuth.Core;
-using TypeAuthTests.HypoERP.ActionTrees;
+using ShiftSoftware.TypeAuth.Shared;
 
 namespace TypeAuthTests.ERP
 {

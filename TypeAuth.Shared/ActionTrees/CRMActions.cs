@@ -3,7 +3,7 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TypeAuthTests.HypoERP.ActionTrees
+namespace ShiftSoftware.TypeAuth.Shared
 {
 
     [ActionTree("CRM Actions", "Actions Related to the CRM Module.")]

@@ -2,50 +2,16 @@
 using ShiftSoftware.TypeAuth.Core;
 using System.Collections.Generic;
 using System.Text.Json;
-using TypeAuthTests.ERP.ActionTrees;
+using ShiftSoftware.TypeAuth.Shared;
 
 namespace TypeAuthTests.ERP
 {
     [TestClass()]
     public class DynamicActions
     {
-        Dictionary<string, string> DynamicCities = new Dictionary<string, string> {
-            { "_1", "Paris" },
-            { "_2", "Erbil" },
-            { "_3", "Tokyo" },
-            { "_4", "London" },
-        };
-
-        Dictionary<string, string> DynamicCountries = new Dictionary<string, string> {
-            { "_1", "USA" },
-            { "_2", "Kurdistan" },
-            { "_3", "Japan" },
-            { "_4", "England" },
-        };
-
-        Dictionary<string, string> DynamicCompanies = new Dictionary<string, string> {
-            { "_1", "Apple" },
-            { "_2", "Google" },
-            { "_3", "Microsoft" },
-            { "_4", "Shift Software" },
-            { "_5", "Meta" },
-        };
-
-        Dictionary<string, string> DynamicDepartments = new Dictionary<string, string> {
-            { "_1", "Marketting" },
-            { "_2", "Sales" },
-            { "_3", "CRM" },
-            { "_4", "Finance" },
-            { "_5", "IT" },
-        };
-
         public DynamicActions()
         {
-            DataLevel.Cities.Expand(() => DynamicCities);
-            DataLevel.Countries.Expand(() => DynamicCountries);
-            DataLevel.Companies.Expand(() => DynamicCompanies);
-            DataLevel.Departments.Expand(() => DynamicDepartments);
-            DataLevel.DiscountByDepartment.Expand(() => DynamicDepartments);
+           
         }
 
         [TestMethod("Full Access On All Cities")]
@@ -381,27 +347,6 @@ namespace TypeAuthTests.ERP
 
         }
 
-        [TestMethod("Re Expansion Test")]
-        public void ReExpansionTest()
-        {
-            var typeAuth = new TypeAuthContextBuilder()
-                .AddAccessTree(JsonSerializer.Serialize(new
-                {
-                    DataLevel = new
-                    {
-                        Cities = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
-                    }
-                }))
-                .AddActionTree<DataLevel>()
-                .Build();
-
-            DynamicCities["_5"] = "New York";
-
-            typeAuth.Refresh(DataLevel.Cities);
-
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_5"));
-        }
-
         [TestMethod("Multiple Access Trees")]
         public void MultipleAccessTress()
         {
@@ -477,6 +422,48 @@ namespace TypeAuthTests.ERP
             Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_2", "_2"));
             Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_3", "_3"));
             Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_4", "_4"));
+        }
+
+        [TestMethod("Wild Card And Normal Access Tree")]
+        public void WildCardAndNormalAccessTree()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new List<Access> { Access.Read }
+                }))
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new List<Access> { Access.Read, Access.Write }
+                    }
+                }))
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                            _1 = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_2"));
+
+            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
+
+            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_2"));
+            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_2"));
+
+            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
+
         }
     }
 }

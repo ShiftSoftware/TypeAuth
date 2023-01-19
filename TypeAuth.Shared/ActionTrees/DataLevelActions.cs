@@ -2,7 +2,7 @@
 using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Linq;
 
-namespace TypeAuthTests.ERP.ActionTrees
+namespace ShiftSoftware.TypeAuth.Shared
 {
     [ActionTree("Data Level Actions", "Actions Data Level Access.")]
     public class DataLevel
