@@ -13,6 +13,8 @@ namespace ShiftSoftware.TypeAuth.Core
         internal List<string> AccessTreeJsonStrings { get; set; } = default!;
         internal Type[] ActionTrees { get; set; } = default!;
 
+        public ActionTreeItem ActionTree { get; set; } = default!;
+
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {
             this.TypeAuthContextHelper = new TypeAuthContextHelper();
@@ -35,10 +37,10 @@ namespace ShiftSoftware.TypeAuth.Core
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
 
-            var actionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings);
+            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree2(actionTrees.ToList(), accessTreeJSONStrings);
 
             //Console.WriteLine("Action Trees Are:");
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.ActionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
             //{
             //    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             //}));
@@ -50,7 +52,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
 
                 //Console.WriteLine(accessTree.ToString());
-                this.TypeAuthContextHelper.PopulateActionBank(actionTree, accessTree);
+                this.TypeAuthContextHelper.PopulateActionBank2(this.ActionTree, accessTree);
             }
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
@@ -73,6 +75,11 @@ namespace ShiftSoftware.TypeAuth.Core
         //    return accessTypes;
         //}
 
+        public bool Can(Actions.Action action, Access access)
+        {
+            return this.TypeAuthContextHelper.Can(action, access);
+        }
+
         internal bool Can(Type actionTreeType, string actionName, Access access)
         {
             var instance = Activator.CreateInstance(actionTreeType);
@@ -85,13 +92,13 @@ namespace ShiftSoftware.TypeAuth.Core
             if (action == null)
                 throw new Exception($"No Such Action ({actionTreeType.FullName}.{actionName})");
 
-            return this.TypeAuthContextHelper.CheckActionBank(action, access);
+            return this.TypeAuthContextHelper.Can(action, access);
         }
 
         #region Read
         private bool CanRead(Actions.Action action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+            return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         public bool CanRead(ReadAction action)
         {
@@ -187,11 +194,11 @@ namespace ShiftSoftware.TypeAuth.Core
                 action = dynamicActionDictionary[key];
 
             if (action != null)
-                actionAccess = this.TypeAuthContextHelper.CheckActionBank(action, access);
+                actionAccess = this.TypeAuthContextHelper.Can(action, access);
 
             if (!actionAccess && selfReference == key && dynamicActionDictionary.Keys.Contains(SelfRererenceKey))
             {
-                actionAccess = this.TypeAuthContextHelper.CheckActionBank(dynamicActionDictionary[SelfRererenceKey], access);
+                actionAccess = this.TypeAuthContextHelper.Can(dynamicActionDictionary[SelfRererenceKey], access);
             }
 
             return actionAccess;
@@ -201,22 +208,22 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public bool CanWrite(ReadWriteAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Write);
+            return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
         public bool CanWrite(ReadWriteDeleteAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Write);
+            return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
         public bool CanDelete(ReadWriteDeleteAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Delete);
+            return this.TypeAuthContextHelper.Can(action, Access.Delete);
         }
 
         public bool CanAccess(BooleanAction action)
         {
-            return this.TypeAuthContextHelper.CheckActionBank(action, Access.Read);
+            return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
 
         public string? AccessValue(TextAction action)
@@ -240,6 +247,65 @@ namespace ShiftSoftware.TypeAuth.Core
             }
 
             return access;
+        }
+
+        public void SetAccessValue(TextAction theAction, string? value, string? maximumValue)
+        {
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction);
+
+            if (actionMatches.Count == 0)
+            {
+                var actionBankItem = new ActionBankItem(theAction, new List<Access>());
+
+                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+
+                actionMatches.Add(actionBankItem);
+            }
+
+            foreach (var action in actionMatches)
+            {
+                if (theAction.Comparer != null)
+                {
+                    var assignableMaximumWinner = theAction.Comparer(maximumValue, theAction.MaximumAccess);
+
+                    if (assignableMaximumWinner == theAction.MaximumAccess)
+                        assignableMaximumWinner = maximumValue;
+
+                    var actionMaximumWinner = theAction.Comparer(value, assignableMaximumWinner);
+
+                    if (actionMaximumWinner == value)
+                        value = assignableMaximumWinner;
+
+                    var minimumWinner = theAction.Comparer(value, theAction.MinimumAccess);
+
+                    if (minimumWinner == theAction.MinimumAccess)
+                        value = theAction.MinimumAccess;
+                }
+
+                action.AccessValue = value;
+            }
+        }
+
+        public void ToggleAccess(Actions.Action theAction, Access access)
+        {
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction);
+
+            if (actionMatches.Count == 0)
+            {
+                var actionBankItem = new ActionBankItem(theAction, new List<Access>());
+
+                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+
+                actionMatches.Add(actionBankItem);
+            }
+
+            foreach (var action in actionMatches)
+            {
+                if (action.AccessList.Contains(access))
+                    action.AccessList.Remove(access);
+                else
+                    action.AccessList.Add(access);
+            }
         }
     }
 }

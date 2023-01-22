@@ -15,9 +15,12 @@ namespace ShiftSoftware.TypeAuth.Core
             this.ActionTrees = new List<Type>();
         }
 
-        public TypeAuthContextBuilder AddAccessTree(string accessTree)
+        public TypeAuthContextBuilder AddAccessTree(string accessTreeJSONString = "{}")
         {
-            this.AccessTrees.Add(accessTree);
+            if(accessTreeJSONString == null)
+                accessTreeJSONString = "{}";
+
+            this.AccessTrees.Add(accessTreeJSONString);
 
             return this;
         }
