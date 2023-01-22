@@ -39,7 +39,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore
             }
 
             //Check for authentication
-            if (!typeAuthService.TypeAuthContext.Can(actionTreeType, actionName, access))
+            if (!typeAuthService.Can(actionTreeType, actionName, access))
             {
                 context.Result = new ForbidResult();
                 return;

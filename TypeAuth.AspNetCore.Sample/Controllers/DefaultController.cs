@@ -98,7 +98,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Sample.Controllers
         [HttpGet("can-access-city/{key}")]
         public ActionResult CanAccessDepartment(string key)
         {
-            if (this.typeAuthService.TypeAuthContext.CanAccess(DataLevel.Cities, key))
+            if (this.typeAuthService.CanAccess(DataLevel.Cities, key))
                 return Ok();
 
             return Forbid();
