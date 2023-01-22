@@ -68,7 +68,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Sample.Controllers
         }
 
         [HttpGet("read")]
-        [TypeAuth(typeof(CRMActions), nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Read)]
+        [TypeAuth<CRMActions>(nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Read)]
         public ActionResult Read()
         {
             return Ok();
