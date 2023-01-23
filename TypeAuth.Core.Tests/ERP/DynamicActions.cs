@@ -208,8 +208,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                     {
                         Cities = new
                         {
-                            _2 = new List<Access> { Access.Read },
-                            _3 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Maximum },
+                            _3 = new List<Access> { Access.Maximum },
                         }
                     }
                 }))
@@ -232,9 +232,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                     {
                         Cities = new
                         {
-                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Read },
-                            _2 = new List<Access> { Access.Read },
-                            _3 = new List<Access> { Access.Read },
+                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Maximum },
+                            _2 = new List<Access> { Access.Maximum },
+                            _3 = new List<Access> { Access.Maximum },
                         }
                     }
                 }))

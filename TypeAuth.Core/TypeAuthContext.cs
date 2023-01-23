@@ -118,7 +118,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public bool CanAccess(DynamicAction<BooleanAction> dynamicActionDictionary, string key, string? selfReference = null)
         {
-            return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
+            return this.Can(dynamicActionDictionary, Access.Maximum, key, selfReference);
         }
 
         public bool CanRead(DynamicAction<ReadAction> dynamicActionDictionary, string key, string? selfReference = null)
@@ -223,7 +223,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public bool CanAccess(BooleanAction action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Read);
+            return this.TypeAuthContextHelper.Can(action, Access.Maximum);
         }
 
         public string? AccessValue(TextAction action)

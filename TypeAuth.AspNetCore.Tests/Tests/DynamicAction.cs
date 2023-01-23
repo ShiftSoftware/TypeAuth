@@ -32,7 +32,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
                     DataLevel = new
                     {
                         Cities = new { 
-                            _1 = new List<Access> { Access.Read }
+                            _1 = new List<Access> { Access.Maximum }
                         }
                     }
                 }
