@@ -75,21 +75,21 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Sample.Controllers
         }
 
         [HttpGet("read-nested")]
-        [TypeAuth(typeof(SystemActions.UserModule), nameof(SystemActions.UserModule.Users), ShiftSoftware.TypeAuth.Core.Access.Read)]
+        [TypeAuth<SystemActions.UserModule>(nameof(SystemActions.UserModule.Users), ShiftSoftware.TypeAuth.Core.Access.Read)]
         public ActionResult ReadNested()
         {
             return Ok();
         }
 
         [HttpGet("write")]
-        [TypeAuth(typeof(CRMActions), nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Write)]
+        [TypeAuth<CRMActions>(nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Write)]
         public ActionResult Write()
         {
             return Ok();
         }
 
         [HttpGet("delete")]
-        [TypeAuth(typeof(CRMActions), nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Delete)]
+        [TypeAuth<CRMActions>(nameof(CRMActions.Tickets), ShiftSoftware.TypeAuth.Core.Access.Delete)]
         public ActionResult Delete()
         {
             return Ok();
