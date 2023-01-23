@@ -32,7 +32,7 @@ namespace ShiftSoftware.TypeAuth.Core
             this.Init(accessTreeJSONStrings, actionTrees);
         }
 
-        public void Init(List<string> accessTreeJSONStrings, params Type[] actionTrees)
+        internal void Init(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
