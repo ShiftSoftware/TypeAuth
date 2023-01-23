@@ -14,6 +14,8 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Services
         {
             this.httpContextAccessor = httpContextAccessor;
             this.options = options;
+
+            this.BuildTypeAuthConext();
         }
 
         private void BuildTypeAuthConext()
