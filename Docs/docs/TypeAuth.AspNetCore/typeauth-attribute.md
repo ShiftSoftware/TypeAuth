@@ -29,6 +29,17 @@ public IActionResult Post([FromBody] int discount)
 }
 ```
 
+Or the action-tree can be used as generic
+
+```C#
+[HttpPost]
+[TypeAuth<CRMActions>(nameof(CRMActions.Sales), Access.Write)]
+public IActionResult Post([FromBody] int discount)
+{
+    //Code
+}
+```
+
 Can be used mixed with asp.net core **Authorize** attribute
 
 ```C#
