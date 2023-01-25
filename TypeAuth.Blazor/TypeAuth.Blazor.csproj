@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AssemblyName>ShiftSoftware.TypeAuth.Blazor</AssemblyName>
+	  <RootNamespace>ShiftSoftware.TypeAuth.Blazor</RootNamespace>
+	  <PackageId>ShiftSoftware.TypeAuth.Blazor</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
+  </ItemGroup>
+
+</Project>
