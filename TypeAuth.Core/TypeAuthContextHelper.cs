@@ -126,7 +126,7 @@ namespace ShiftSoftware.TypeAuth.Core
             {
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
-                var actionTreeItem = new ActionTreeItem() { TypeName = tree.Name };
+                var actionTreeItem = new ActionTreeItem() { TypeName = tree.Name, Type = tree };
 
                 if (treeAttribute != null)
                 {
@@ -155,7 +155,8 @@ namespace ShiftSoftware.TypeAuth.Core
                             TypeName = y.Name,
                             Action = action,
                             DisplayName = action.Name,
-                            DisplayDescription = action.Description
+                            DisplayDescription = action.Description,
+                            Type = y.FieldType
                         });
                     }
 
@@ -322,6 +323,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     //The current Access is simply passed to every child node of the the current Action Node
                     if (accessTypes.Count > 0 || accessValue != null)
                     {
+                        actionCursor.WildCardAccess = accessTypes;
                         this.PopulateActionBank2(entry, accessCursor);
                     }
                     else
