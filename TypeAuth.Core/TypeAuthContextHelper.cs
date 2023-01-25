@@ -15,7 +15,7 @@ namespace ShiftSoftware.TypeAuth.Core
             ActionBank = new List<ActionBankItem>();
         }
 
-        internal ActionTreeItem GenerateActionTree2(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree = null, string? jsonPath = null)
+        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree = null, string? jsonPath = null)
         {
             if (rootActionTree is null)
                 rootActionTree = new ActionTreeItem() { TypeName = "Root" };
@@ -41,7 +41,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 var childTress = tree.GetNestedTypes().ToList().Where(x => x.GetCustomAttributes(typeof(ActionTree), false) != null).ToList();
 
-                GenerateActionTree2(childTress, accessTreeJSONStrings, actionTreeItem, jsonPath);
+                GenerateActionTree(childTress, accessTreeJSONStrings, actionTreeItem, jsonPath);
 
                 tree.GetFields(BindingFlags.Public | BindingFlags.Static).ToList().ForEach(y =>
                 {
@@ -126,7 +126,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return rootActionTree;
         }
 
-        internal void PopulateActionBank2(ActionTreeItem actionCursor, object? accessCursor)
+        internal void PopulateActionBank(ActionTreeItem actionCursor, object? accessCursor)
         {
             var accessTypes = new List<Access>();
             string? accessValue = null;
@@ -156,7 +156,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (accessTypes.Count > 0 || accessValue != null)
                     {
                         actionCursor.WildCardAccess = accessTypes;
-                        this.PopulateActionBank2(entry, accessCursor);
+                        this.PopulateActionBank(entry, accessCursor);
                     }
                     else
                     {
@@ -164,7 +164,7 @@ namespace ShiftSoftware.TypeAuth.Core
                         {
                             var accessCursorDictionary = (JObject) accessCursor;
 
-                            PopulateActionBank2(entry, accessCursorDictionary[entry.TypeName]);
+                            PopulateActionBank(entry, accessCursorDictionary[entry.TypeName]);
                         }
                     }
 

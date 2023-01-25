@@ -37,7 +37,7 @@ namespace ShiftSoftware.TypeAuth.Core
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
 
-            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree2(actionTrees.ToList(), accessTreeJSONStrings);
+            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings);
 
             //Console.WriteLine("Action Trees Are:");
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.ActionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
@@ -52,7 +52,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
 
                 //Console.WriteLine(accessTree.ToString());
-                this.TypeAuthContextHelper.PopulateActionBank2(this.ActionTree, accessTree);
+                this.TypeAuthContextHelper.PopulateActionBank(this.ActionTree, accessTree);
             }
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
