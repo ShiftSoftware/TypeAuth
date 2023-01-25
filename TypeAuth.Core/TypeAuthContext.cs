@@ -9,7 +9,7 @@ namespace ShiftSoftware.TypeAuth.Core
     {
         private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
         internal const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
-        
+
         internal List<string> AccessTreeJsonStrings { get; set; } = default!;
         internal Type[] ActionTrees { get; set; } = default!;
 
@@ -37,7 +37,7 @@ namespace ShiftSoftware.TypeAuth.Core
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
 
-            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree2(actionTrees.ToList(), accessTreeJSONStrings);
+            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings);
 
             //Console.WriteLine("Action Trees Are:");
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.ActionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
@@ -52,7 +52,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
 
                 //Console.WriteLine(accessTree.ToString());
-                this.TypeAuthContextHelper.PopulateActionBank2(this.ActionTree, accessTree);
+                this.TypeAuthContextHelper.PopulateActionBank(this.ActionTree, accessTree);
             }
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
@@ -182,7 +182,7 @@ namespace ShiftSoftware.TypeAuth.Core
         private bool Can(DynamicActionBase dynamicAction, Access access, string key, string? selfReference = null)
         {
             Actions.Action? action = null;
-            
+
             var actionAccess = false;
 
             var dynamicActionDictionary = dynamicAction.Dictionary;
@@ -266,6 +266,10 @@ namespace ShiftSoftware.TypeAuth.Core
             {
                 if (theAction.Comparer != null)
                 {
+                    //Only used to parse the value.
+                    //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
+                    value = theAction.Comparer(value, value);
+
                     var assignableMaximumWinner = theAction.Comparer(maximumValue, theAction.MaximumAccess);
 
                     if (assignableMaximumWinner == theAction.MaximumAccess)
