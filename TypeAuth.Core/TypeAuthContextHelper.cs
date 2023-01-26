@@ -83,9 +83,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
                                 if (access != null && access.GetType() == typeof(JArray))
                                 {
-                                    dynamicAction.UnderlyingAction = dynamicAction.GenerateAction();
+                                    var id = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
 
-                                    dynamicAction.Dictionary[$"{Guid.NewGuid()}-{Guid.NewGuid()}"] = dynamicAction.UnderlyingAction;
+                                    dynamicAction.UnderlyingAction = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + id);
+
+                                    dynamicAction.Dictionary[id] = dynamicAction.UnderlyingAction;
                                 }
                             }
                         }
@@ -102,7 +104,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                                 foreach (var key in jobject)
                                 {
-                                    dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction();
+                                    dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + key.Key);
                                 }
                             }
                         }
@@ -192,7 +194,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            actionMatches = this.ActionBank.Where(x => x.Action == actionToCheck).ToList();
+            actionMatches = this.ActionBank.Where(x => x.Action == actionToCheck || (x.Action.Id != null && x.Action.Id == actionToCheck.Id)).ToList();
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionMatches, Newtonsoft.Json.Formatting.Indented));
 

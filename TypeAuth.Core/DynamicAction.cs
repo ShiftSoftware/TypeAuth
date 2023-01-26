@@ -6,7 +6,7 @@ namespace ShiftSoftware.TypeAuth.Core
     {
         internal Dictionary<string, Actions.Action> Dictionary { get; set; } = new Dictionary<string, Actions.Action>();
        
-        internal abstract Actions.Action GenerateAction();
+        internal abstract Actions.Action GenerateAction(string Id);
 
         internal Actions.Action? UnderlyingAction { get; set; }
     }
@@ -23,12 +23,24 @@ namespace ShiftSoftware.TypeAuth.Core
 
             action.Name = selfActionName;
 
+            if (action.Type == ActionType.Text)
+            {
+                ((action) as TextAction)!.Comparer = Comparer;
+            }
+
             this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
         }
 
-        internal override Actions.Action GenerateAction()
+        internal override Actions.Action GenerateAction(string id)
         {
-            return new T();
+            var action = new T() { Id = id };
+
+            if (action.Type == ActionType.Text)
+            {
+                ((action) as TextAction)!.Comparer = Comparer;
+            }
+
+            return action;
         }
 
         public DynamicAction(string selfActionName, Func<string?, string?, string?>? comparer)

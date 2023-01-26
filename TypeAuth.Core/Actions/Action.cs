@@ -9,8 +9,7 @@
         /// <summary>
         /// The unique identifier for the data item (or Row). This is useful for Dynamic Actions
         /// </summary>
-        //[Newtonsoft.Json.JsonIgnore]
-        //public string Id { get; set; }
+        internal string Id { get; set; }
 
         /// <summary>
         /// Friendly name for identifying the Action.
