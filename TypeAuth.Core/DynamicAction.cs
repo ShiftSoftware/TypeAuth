@@ -13,50 +13,55 @@ namespace ShiftSoftware.TypeAuth.Core
 
     public class DynamicAction<T> : DynamicActionBase where T : Actions.Action, new()
     {
+        private string? MaxAccess { get; set; }
+        private string? MinAccess { get; set; }
+
         internal Func<string?, string?, string?>? Comparer { get;set; }
-
-        public DynamicAction() { }
-
-        public DynamicAction(string selfActionName)
-        {
-            var action = new T();
-
-            action.Name = selfActionName;
-
-            if (action.Type == ActionType.Text)
-            {
-                ((action) as TextAction)!.Comparer = Comparer;
-            }
-
-            this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
-        }
-
+        
         internal override Actions.Action GenerateAction(string id)
         {
             var action = new T() { Id = id };
 
             if (action.Type == ActionType.Text)
             {
-                ((action) as TextAction)!.Comparer = Comparer;
+                var textAccess = ((action) as TextAction)!;
+
+                textAccess.Comparer = Comparer;
+
+                textAccess.MinimumAccess = this.MinAccess;
+                
+                textAccess.MaximumAccess = this.MaxAccess;
             }
 
             return action;
         }
+        
+        public DynamicAction() { }
 
-        public DynamicAction(string selfActionName, Func<string?, string?, string?>? comparer)
+        public DynamicAction(string? selfActionName = null, Func<string?, string?, string?>? comparer = null, string? minAccess = null, string? maxAccess = null)
         {
             this.Comparer = comparer;
+
+            this.MinAccess = minAccess;
+
+            this.MaxAccess = maxAccess;
 
             var action = new T();
 
             action.Name = selfActionName;
 
-            this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
-        }
+            if (typeof(T) == typeof(TextAction))
+            {
+                var textAction = ((TextAction)(object)action);
 
-        public DynamicAction(Func<string?, string?, string?>? comparer)
-        {
-            this.Comparer = comparer;
+                textAction.Comparer = this.Comparer;
+
+                textAction.MinimumAccess = this.MinAccess;
+
+                textAction.MaximumAccess = this.MaxAccess;
+            }
+
+            this.Dictionary[TypeAuthContext.SelfRererenceKey] = action;
         }
 
         public DynamicAction<T> ExpandWith(Dictionary<string, string> dynamicEntries)

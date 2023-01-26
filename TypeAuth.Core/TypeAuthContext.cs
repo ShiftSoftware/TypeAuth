@@ -180,6 +180,35 @@ namespace ShiftSoftware.TypeAuth.Core
             return actionAccess;
         }
 
+        public void SetAccessValue(DynamicAction<TextAction> dynamicAction, string key, string? value, string? maximumValue)
+        {
+            TextAction? action = null;
+
+            if (dynamicAction.UnderlyingAction != null)
+                action = (TextAction)dynamicAction.UnderlyingAction;
+
+            if (dynamicAction.Dictionary.Keys.Contains(key))
+                action = dynamicAction[key];
+
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action!);
+
+            if (actionMatches.Count == 0)
+            {
+                var actionBankItem = new ActionBankItem(action!, new List<Access>());
+
+                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+
+                actionMatches.Add(actionBankItem);
+            }
+
+            foreach (var item in actionMatches)
+            {
+                value = ReduceValue((item.Action as TextAction)!, value, maximumValue);
+
+                item.AccessValue = value;
+            }
+        }
+
         private bool Can(DynamicActionBase dynamicAction, Access access, string key, string? selfReference = null)
         {
             Actions.Action? action = null;

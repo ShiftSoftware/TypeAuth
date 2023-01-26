@@ -496,6 +496,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 {
                     DataLevel = new
                     {
+                        Cities = new List<Access> { Access.Maximum },
                         Departments = new
                         {
                             _1 = new List<Access> { Access.Read, Access.Write, Access.Delete },
@@ -512,6 +513,12 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                {
                    DataLevel = new
                    {
+                       Cities = new
+                       {
+                           _1 = new List<Access> { Access.Maximum },
+                           _10 = new List<Access> { Access.Maximum },
+                           _20 = new List<Access> { Access.Maximum },
+                       },
                        Departments = new
                        {
                            _1 = new List<Access> { Access.Read, Access.Write },
@@ -520,6 +527,10 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                }))
                .AddActionTree<DataLevel>()
                .Build();
+
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_10"));
+            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_20"));
 
             Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
             Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
