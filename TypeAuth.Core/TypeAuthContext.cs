@@ -1,4 +1,5 @@
-﻿using ShiftSoftware.TypeAuth.Core.Actions;
+﻿using Newtonsoft.Json.Linq;
+using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -267,30 +268,37 @@ namespace ShiftSoftware.TypeAuth.Core
 
             foreach (var action in actionMatches)
             {
-                if (theAction.Comparer != null)
-                {
-                    //Only used to parse the value.
-                    //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
-                    value = theAction.Comparer(value, value);
-
-                    var assignableMaximumWinner = theAction.Comparer(maximumValue, theAction.MaximumAccess);
-
-                    if (assignableMaximumWinner == theAction.MaximumAccess)
-                        assignableMaximumWinner = maximumValue;
-
-                    var actionMaximumWinner = theAction.Comparer(value, assignableMaximumWinner);
-
-                    if (actionMaximumWinner == value)
-                        value = assignableMaximumWinner;
-
-                    var minimumWinner = theAction.Comparer(value, theAction.MinimumAccess);
-
-                    if (minimumWinner == theAction.MinimumAccess)
-                        value = theAction.MinimumAccess;
-                }
+                value = ReduceValue(theAction, value, maximumValue);
 
                 action.AccessValue = value;
             }
+        }
+
+        private string? ReduceValue(TextAction theAction, string? value, string? maximumValue)
+        {
+            if (theAction.Comparer != null)
+            {
+                //Only used to parse the value.
+                //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
+                value = theAction.Comparer(value, value);
+
+                var assignableMaximumWinner = theAction.Comparer(maximumValue, theAction.MaximumAccess);
+
+                if (assignableMaximumWinner == theAction.MaximumAccess)
+                    assignableMaximumWinner = maximumValue;
+
+                var actionMaximumWinner = theAction.Comparer(value, assignableMaximumWinner);
+
+                if (actionMaximumWinner == value)
+                    value = assignableMaximumWinner;
+
+                var minimumWinner = theAction.Comparer(value, theAction.MinimumAccess);
+
+                if (minimumWinner == theAction.MinimumAccess)
+                    value = theAction.MinimumAccess;
+            }
+
+            return value;
         }
 
         public void ToggleAccess(Actions.Action theAction, Access access)
@@ -313,6 +321,117 @@ namespace ShiftSoftware.TypeAuth.Core
                 else
                     action.AccessList.Add(access);
             }
+        }
+
+        public string GenerateAccessTree(TypeAuthContext reducer)
+        {
+            var flattenedActionTreeItems = new List<ActionTreeItem>();
+
+            this.FlattenActionTree(flattenedActionTreeItems, reducer.ActionTree);
+
+            var accessTree = this.TraverseActionTree(this.ActionTree, new JObject(), reducer, flattenedActionTreeItems);
+
+            if (accessTree == null)
+                accessTree = new JObject(); //To return an empty json {}
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(accessTree);
+        }
+
+        private void FlattenActionTree(List<ActionTreeItem> flattenedActionTreeItems, ActionTreeItem root)
+        {
+            foreach (var item in root.ActionTreeItems)
+            {
+                FlattenActionTree(flattenedActionTreeItems, item);
+            }
+
+            flattenedActionTreeItems.Add(root);
+        }
+
+        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems)
+        {
+            if (actionTreeItem.WildCardAccess.Count > 0)
+            {
+                var reducerActionTreeItem = reducedActionTreeItems.FirstOrDefault(
+                    x => x.Type == actionTreeItem.Type
+                );
+
+                var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x));
+
+                if (access.Count() == 0)
+                    return null;
+
+                return new JArray(access);
+            }
+
+            foreach (var subActionTreeItem in actionTreeItem.ActionTreeItems)
+            {
+                var value = this.TraverseActionTree(subActionTreeItem, new JObject(), reducer, reducedActionTreeItems);
+
+                if (value != null)
+                    accessTree[subActionTreeItem.TypeName] = value;
+            }
+
+            if (actionTreeItem.Action != null)
+            {
+                if (actionTreeItem.Action.Type == ActionType.Text)
+                {
+                    var textAction = (actionTreeItem.Action as TextAction)!;
+
+                    string? value = null;
+
+                    if (actionTreeItem.DynamicAction != null)
+                        value = this.AccessValue((actionTreeItem.DynamicAction as DynamicAction<TextAction>)!, actionTreeItem.TypeName);
+                    else
+                        value = this.AccessValue(textAction);
+
+                    string? reducedValue = null;
+
+                    if (actionTreeItem.DynamicAction != null)
+                        reducedValue = reducer.AccessValue((actionTreeItem.DynamicAction as DynamicAction<TextAction>)!, actionTreeItem.TypeName);
+                    else
+                        reducedValue = reducer.AccessValue(textAction);
+
+                    value = ReduceValue(textAction, value, reducedValue);
+
+                    if (reducedValue == "85" || value == "100")
+                    {
+                        //throw new Exception(value);
+                    }
+
+                    if (value == null || value == textAction.MinimumAccess)
+                        return null;
+
+                    return new JValue(value);
+                }
+                else
+                {
+                    var accesses = new List<Access>();
+
+                    foreach (var access in Enum.GetValues(typeof(Access)).Cast<Access>())
+                    {
+                        if (actionTreeItem.DynamicAction != null)
+                        {
+                            if (this.Can(actionTreeItem.DynamicAction, access, actionTreeItem.TypeName) && reducer.Can(actionTreeItem.DynamicAction!, access, actionTreeItem.TypeName))
+                                accesses.Add(access);
+                        }
+                        else
+                        {
+                            if (this.Can(actionTreeItem.Action, access) && reducer.Can(actionTreeItem.Action, access))
+                                accesses.Add(access);
+                        }
+                    }
+
+                    if (accesses.Count > 0)
+                        return new JArray(accesses);
+                    else
+                        return null;
+                }
+            }
+
+            if (accessTree.Count() == 0)
+                return null;
+
+            return accessTree;
         }
     }
 }

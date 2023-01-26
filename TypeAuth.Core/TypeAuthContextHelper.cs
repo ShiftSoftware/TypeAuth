@@ -109,13 +109,29 @@ namespace ShiftSoftware.TypeAuth.Core
                             }
                         }
 
-                        var dynamicRoot = new ActionTreeItem() { TypeName = y.Name };
+                        var dynamicRoot = new ActionTreeItem()
+                        {
+                            TypeName = y.Name,
+                            Action = dynamicAction.UnderlyingAction,
+                            DisplayName = dynamicAction.UnderlyingAction?.Name,
+                            DisplayDescription = dynamicAction.UnderlyingAction?.Description,
+                            DynamicAction = dynamicAction,
+                            Type = dynamicAction.GetType(),
+                        };
 
                         actionTreeItem.ActionTreeItems.Add(dynamicRoot);
 
                         foreach (var item in dynamicAction.Dictionary)
                         {
-                            dynamicRoot.ActionTreeItems.Add(new ActionTreeItem { TypeName = item.Key, Action = item.Value });
+                            dynamicRoot.ActionTreeItems.Add(new ActionTreeItem
+                            {
+                                TypeName = item.Key,
+                                Action = item.Value,
+                                DisplayName = item.Value.Name,
+                                DisplayDescription = item.Value.Description,
+                                DynamicAction = dynamicAction,
+                                Type = item.Value.GetType()
+                            });
                         }
                     }
 
