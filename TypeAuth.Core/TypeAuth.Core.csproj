@@ -16,6 +16,7 @@
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<InternalsVisibleTo Include="ShiftSoftware.TypeAuth.AspNetCore" />
+		<InternalsVisibleTo Include="ShiftSoftware.TypeAuth.Blazor" />
 		<InternalsVisibleTo Include="ShiftSoftware.TypeAuth.Tests" />
 	</ItemGroup>
 
