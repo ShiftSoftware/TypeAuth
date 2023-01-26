@@ -16,18 +16,23 @@
 
         [Newtonsoft.Json.JsonIgnore]
         public Func<string?, string?, string?>? Comparer { get; set; }
+        public Func<string?, string?, string?>? Merger { get; set; }
 
         public TextAction() : base(ActionType.Text)
         {
 
         }
 
-        public TextAction(string? name, string? description = null, string? minimumAccess = null, string? maximumAccess = null, Func<string?, string?, string?>? comparer = null) 
+        public TextAction(string? name, string? description = null, string? minimumAccess = null, string? maximumAccess = null, Func<string?, string?, string?>? comparer = null, Func<string?, string?, string?>? merger = null) 
             : base(name, ActionType.Text, description)
         {
             this.MinimumAccess = minimumAccess;
             this.MaximumAccess = maximumAccess;
             this.Comparer = comparer;
+            this.Merger = merger;
+
+            if (this.Merger != null && this.Comparer != null)
+                throw new Exception("Comparer and Merger can not be specified for the same action. Only one is allowed at a time.");
         }
     }
 }

@@ -35,6 +35,7 @@ namespace ShiftSoftware.TypeAuth.Shared
             "One or more time slots allowed for operation. Certain actions are not allowed outside work schedule.",
             null,
             "00:00:00 - 23:59:59",
+            null,
             (a, b) =>
             {
                 var joined = new List<string>();

@@ -240,6 +240,9 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     if (action.Comparer != null)
                         thisAccess = action.Comparer(access, thisAccess);
+
+                    if (action.Merger != null)
+                        thisAccess = action.Merger(access, thisAccess);
                 }
 
                 if (thisAccess != null)
