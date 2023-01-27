@@ -7,6 +7,12 @@
 	<AssemblyName>ShiftSoftware.TypeAuth.Blazor</AssemblyName>
 	  <RootNamespace>ShiftSoftware.TypeAuth.Blazor</RootNamespace>
 	  <PackageId>ShiftSoftware.TypeAuth.Blazor</PackageId>
+
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <Version>1.0.0-alpha</Version>
+	  <PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
+	  <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

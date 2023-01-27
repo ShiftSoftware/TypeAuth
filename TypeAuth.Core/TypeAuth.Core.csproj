@@ -8,9 +8,13 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RootNamespace>ShiftSoftware.TypeAuth.Core</RootNamespace>
 		<PackageId>ShiftSoftware.TypeAuth.Core</PackageId>
-		<Authors>Shift Software</Authors>
+		<Authors>aza.asim,Shift Software</Authors>
 		<Product>TypeAuth Core</Product>
 		<AssemblyName>ShiftSoftware.TypeAuth.Core</AssemblyName>
+		<Version>1.0.0-alpha</Version>
+		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
