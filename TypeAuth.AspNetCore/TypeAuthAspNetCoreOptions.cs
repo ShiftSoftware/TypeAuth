@@ -15,4 +15,11 @@ public class TypeAuthAspNetCoreOptions
 
         return this;
     }
+
+    public TypeAuthAspNetCoreOptions AddActionTree(Type t)
+    {
+        ActionTrees.Add(t);
+
+        return this;
+    }
 }
