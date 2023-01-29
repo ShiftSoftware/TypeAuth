@@ -21,7 +21,7 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
             //Get the access trees from the token
             var state = await authStateProvider.GetAuthenticationStateAsync();
             var accessTrees = state.User?.Claims?
-                .Where(c => c.Type == "ShiftSoftware/TypeAuth/Claims/AccessTree")
+                .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
                 .Select(x => x.Value).ToList();
 
             foreach (var tree in accessTrees)

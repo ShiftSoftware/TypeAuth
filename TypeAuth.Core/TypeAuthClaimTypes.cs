@@ -1,4 +1,4 @@
-﻿namespace ShiftSoftware.TypeAuth.AspNetCore
+﻿namespace ShiftSoftware.TypeAuth.Core
 {
     /// <summary>
     /// Contains TypeAuth spesific claim types
