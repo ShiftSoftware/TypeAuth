@@ -6,11 +6,11 @@ pool:
 
 steps:
 
- - script: rm -r TypeAuthTests; rm -r TypeAuth.Shared; rm -r TypeAuth.Docs; rm -r TypeAuth.AspNetCore.Tests; rm -r TypeAuth.AspNetCore.Sample
-   displayName: 'remove unused projects'
+ - script: dotnet build TypeAuth.Core --configuration release
+   displayName: 'dotnet build TypeAuth.Core'
 
- - script: dotnet build --configuration release
-   displayName: 'dotnet build'
+ - script: dotnet build TypeAuth.Blazor --configuration release
+   displayName: 'dotnet build TypeAuth.Blazor'
 
  - script: dotnet pack TypeAuth.Blazor --configuration release --output $(Build.ArtifactStagingDirectory)
    displayName: 'dotnet pack'
