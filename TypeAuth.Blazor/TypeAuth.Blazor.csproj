@@ -1,28 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<AssemblyName>ShiftSoftware.TypeAuth.Blazor</AssemblyName>
-	  <RootNamespace>ShiftSoftware.TypeAuth.Blazor</RootNamespace>
-	  <PackageId>ShiftSoftware.TypeAuth.Blazor</PackageId>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>ShiftSoftware.TypeAuth.Blazor</AssemblyName>
+		<RootNamespace>ShiftSoftware.TypeAuth.Blazor</RootNamespace>
+		<PackageId>ShiftSoftware.TypeAuth.Blazor</PackageId>
 
-	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <Version>1.0.0-alpha</Version>
-	  <PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
-	  <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-  </PropertyGroup>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>1.0.1-alpha</Version>
+		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Images\icon.png" Pack="true" PackagePath="\" />
+		<Folder Include="Images\" />
+	</ItemGroup>
 
 </Project>
