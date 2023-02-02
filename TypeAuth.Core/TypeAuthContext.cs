@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using ShiftSoftware.TypeAuth.Core.Actions;
-using System.Diagnostics;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -60,6 +59,8 @@ namespace ShiftSoftware.TypeAuth.Core
             }
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
+
+            this.TypeAuthContextHelper.ExpandDynamicActions(this.ActionTree);
         }
 
         public bool Can(ActionBase action, Access access)
@@ -190,22 +191,24 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public void SetAccessValue(TextAction theAction, string? value, string? maximumValue)
         {
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction);
+            SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer);
+        }
 
-            if (actionMatches.Count == 0)
-            {
-                var actionBankItem = new ActionBankItem(theAction, new List<Access>());
+        public void SetAccessValue(DynamicTextAction theAction, string? Id, string? value, string? maximumValue)
+        {
+            SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer, Id);
+        }
 
-                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
-
-                actionMatches.Add(actionBankItem);
-            }
+        private void SetTextAccessValue(ActionBase theAction, string? actionMin, string? actionMax, string? valueToSet, string? maxAllowed, Func<string?, string?, string?>? comparer, string? Id = null)
+        {
+           
+            var actionMatches = this.FindOrAddInActionBank(theAction, Id);
 
             foreach (var action in actionMatches)
             {
-                value = ReduceValue(theAction.Comparer, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue);
+                valueToSet = ReduceValue(comparer, actionMin, actionMax, valueToSet, maxAllowed);
 
-                action.AccessValue = value;
+                action.AccessValue = valueToSet;
             }
         }
 
@@ -238,6 +241,19 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public void ToggleAccess(ActionBase theAction, Access access, string? Id = null)
         {
+            var actionMatches = this.FindOrAddInActionBank(theAction, Id);
+
+            foreach (var action in actionMatches)
+            {
+                if (action.AccessList.Contains(access))
+                    action.AccessList.Remove(access);
+                else
+                    action.AccessList.Add(access);
+            }
+        }
+
+        private List<ActionBankItem> FindOrAddInActionBank(ActionBase theAction, string? Id)
+        {
             var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
 
             if (actionMatches.Count == 0 && theAction.GetType().BaseType == typeof(Actions.Action))
@@ -255,6 +271,8 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     var actionBankItem = new ActionBankItem(theAction, new List<Access>());
 
+                    actionBankItem.SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id }, new List<Access> { }));  
+
                     this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
                     actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
@@ -269,13 +287,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            foreach (var action in actionMatches.Where(x => x.Action.GetType().BaseType == typeof(DynamicAction) ? (x.Action as DynamicAction)!.Id == Id : true))
-            {
-                if (action.AccessList.Contains(access))
-                    action.AccessList.Remove(access);
-                else
-                    action.AccessList.Add(access);
-            }
+            return actionMatches;
         }
 
         public string GenerateAccessTree(TypeAuthContext reducer)

@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using ShiftSoftware.TypeAuth.Core.Actions;
-using System.Collections;
+﻿using ShiftSoftware.TypeAuth.Core.Actions;
+
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -57,26 +54,6 @@ namespace ShiftSoftware.TypeAuth.Core
                         };
 
                         actionTreeItem.ActionTreeItems.Add(thisActionTreeItem);
-
-                        if (action.GetType().BaseType == typeof(DynamicAction))
-                        {
-                            var dynamicAction = action as DynamicAction;
-
-                            foreach (var item in dynamicAction!.Items)
-                            {
-                                var actionTreeItem = new ActionTreeItem
-                                {
-                                    Action = action,
-                                    DisplayName = item.Value,
-                                    TypeName = item.Key,
-                                    Type = action.GetType(),
-                                    WildCardAccess = new List<Access>(),
-                                    DynamicSubitem = true
-                                };
-
-                                thisActionTreeItem.ActionTreeItems.Add(actionTreeItem);
-                            }
-                        }
                     }
                 });
             }
@@ -86,6 +63,9 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal void PopulateActionBank(ActionTreeItem actionCursor, object? accessCursor)
         {
+            if (actionCursor.DynamicSubitem)
+                return;
+
             AccessTreeNode node = new AccessTreeNode(accessCursor);
 
             if (actionCursor.ActionTreeItems.Count > 0)
@@ -132,13 +112,46 @@ namespace ShiftSoftware.TypeAuth.Core
             }
         }
 
+        internal void ExpandDynamicActions(ActionTreeItem actionTreeItem)
+        {
+            foreach (var item in actionTreeItem.ActionTreeItems)
+            {
+                ExpandDynamicActions(item);
+            }
+
+            var action = actionTreeItem.Action;
+
+            if (action == null)
+                return;
+
+            if (action.GetType().BaseType == typeof(DynamicAction))
+            {
+                var dynamicAction = action as DynamicAction;
+
+                foreach (var item in dynamicAction!.Items)
+                {
+                    var newTreeItem = new ActionTreeItem
+                    {
+                        Action = action,
+                        DisplayName = item.Value,
+                        TypeName = item.Key,
+                        Type = action.GetType(),
+                        WildCardAccess = new List<Access>(),
+                        DynamicSubitem = true
+                    };
+
+                    actionTreeItem.ActionTreeItems.Add(newTreeItem);
+                }
+            }
+        }
+
         internal List<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, string? selfId = null)
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
             foreach (var item in this.ActionBank.Where(x => x.Action == actionToCheck).ToList())
             {
-                actionMatches.Add(item);
+                    actionMatches.Add(item);
 
                 if (actionToCheck.GetType().BaseType == typeof(DynamicAction))
                 {
@@ -153,7 +166,16 @@ namespace ShiftSoftware.TypeAuth.Core
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionMatches, Newtonsoft.Json.Formatting.Indented));
 
-            return actionMatches;
+            return actionMatches
+                .Where(x =>
+                {
+                    var dynamicAction = x.Action as DynamicAction;
+
+                    if (Id != null && dynamicAction != null && dynamicAction.Id == null && x.AccessList.Count == 0)
+                        return false;
+
+                    return true;
+                }).ToList();
         }
 
         internal bool Can(ActionBase actionToCheck, Access accessTypeToCheck, string? Id = null, string? selfId = null)

@@ -11,7 +11,21 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
     {
         public DynamicActions()
         {
-           
+            var data = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("_1", "One"),
+                new KeyValuePair<string, string>("_2", "Two"),
+                new KeyValuePair<string, string>("_3", "Three"),
+                new KeyValuePair<string, string>("_4", "Four"),
+                new KeyValuePair<string, string>("_5", "Five"),
+                new KeyValuePair<string, string>("_6", "Six"),
+            };
+
+            DataLevel.Cities.Expand(data);
+            DataLevel.Countries.Expand(data);
+            DataLevel.Companies.Expand(data);
+            DataLevel.Departments.Expand(data);
+            DataLevel.DiscountByDepartment.Expand(data);
         }
 
         [TestMethod("Full Access On All Cities")]
