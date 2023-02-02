@@ -6,10 +6,10 @@ using ShiftSoftware.TypeAuth.AspNetCore.Services;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore;
 
-public class TypeAuthAttribute<T> : TypeAuthAttribute
+public class TypeAuthAttribute<TActionTree> : TypeAuthAttribute
 {
     public TypeAuthAttribute(string actionName, Access access) :
-        base(typeof(T), actionName, access)
+        base(typeof(TActionTree), actionName, access)
     {
 
     }
