@@ -12,4 +12,17 @@
 
         }
     }
+
+    public class DynamicBooleanAction : DynamicAction
+    {
+        public DynamicBooleanAction() : base(ActionType.Boolean)
+        {
+
+        }
+
+        public DynamicBooleanAction(string? name, string? description = null) : base(name, ActionType.Boolean, description)
+        {
+
+        }
+    }
 }

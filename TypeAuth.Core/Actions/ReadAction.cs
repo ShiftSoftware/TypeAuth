@@ -7,7 +7,20 @@
 
         }
 
-        public ReadAction(string? name, string? description = null): base(name, ActionType.Read, description)
+        public ReadAction(string? name, string? description = null) : base(name, ActionType.Read, description)
+        {
+
+        }
+    }
+
+    public class DynamicReadAction : DynamicAction
+    {
+        public DynamicReadAction() : base(ActionType.Read)
+        {
+
+        }
+
+        public DynamicReadAction(string? name, string? description = null) : base(name, ActionType.Read, description)
         {
 
         }

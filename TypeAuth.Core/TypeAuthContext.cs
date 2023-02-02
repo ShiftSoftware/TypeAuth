@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using ShiftSoftware.TypeAuth.Core.Actions;
+using System.Diagnostics;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -81,6 +82,11 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access);
         }
 
+        public bool Can(Actions.DynamicAction action, Access access, string Id)
+        {
+            return this.TypeAuthContextHelper.Can(action, access, Id);
+        }
+
         internal bool Can(Type actionTreeType, string actionName, Access access)
         {
             var instance = Activator.CreateInstance(actionTreeType);
@@ -101,144 +107,165 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
+        private bool CanRead(Actions.DynamicAction action, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
+        }
         public bool CanRead(ReadAction action)
         {
             return this.CanRead((Actions.Action)action);
+        }
+        public bool CanRead(DynamicReadAction action, string Id, string? selfId = null)
+        {
+            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
         }
         public bool CanRead(ReadWriteAction action)
         {
             return this.CanRead((Actions.Action)action);
         }
+        public bool CanRead(DynamicReadWriteAction action, string Id, string? selfId = null)
+        {
+            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
+        }
         public bool CanRead(ReadWriteDeleteAction action)
         {
             return this.CanRead((Actions.Action)action);
         }
+        public bool CanRead(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        {
+            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
+        }
         #endregion
 
-        #region Dynamic
+        //#region Dynamic
 
-        public bool CanAccess(DynamicAction<BooleanAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Maximum, key, selfReference);
-        }
+        //public bool CanAccess(DynamicAction<BooleanAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Maximum, key, selfReference);
+        //}
 
-        public bool CanRead(DynamicAction<ReadAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        }
+        //public bool CanRead(DynamicAction<ReadAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
+        //}
 
-        public bool CanRead(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        }
+        //public bool CanRead(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
+        //}
 
-        public bool CanWrite(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
-        }
+        //public bool CanWrite(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
+        //}
 
-        public bool CanRead(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        }
+        //public bool CanRead(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
+        //}
 
-        public bool CanWrite(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
-        }
+        //public bool CanWrite(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
+        //}
 
-        public bool CanDelete(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        {
-            return this.Can(dynamicActionDictionary, Access.Delete, key, selfReference);
-        }
+        //public bool CanDelete(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
+        //{
+        //    return this.Can(dynamicActionDictionary, Access.Delete, key, selfReference);
+        //}
 
-        public string? AccessValue(DynamicAction<TextAction> dynamicAction, string key, string? selfReference = null)
-        {
-            string? actionAccess = null;
+        //public string? AccessValue(DynamicAction<TextAction> dynamicAction, string key, string? selfReference = null)
+        //{
+        //    string? actionAccess = null;
 
-            TextAction? action = null;
+        //    TextAction? action = null;
 
-            if (dynamicAction.UnderlyingAction != null)
-                action = (TextAction)dynamicAction.UnderlyingAction;
+        //    if (dynamicAction.UnderlyingAction != null)
+        //        action = (TextAction)dynamicAction.UnderlyingAction;
 
-            if (dynamicAction.Dictionary.Keys.Contains(key))
-                action = dynamicAction[key];
+        //    if (dynamicAction.Dictionary.Keys.Contains(key))
+        //        action = dynamicAction[key];
 
-            if(action != null)
-                actionAccess = AccessValue(action);
+        //    if(action != null)
+        //        actionAccess = AccessValue(action);
 
-            if (selfReference == key && dynamicAction.Dictionary.Keys.Contains(SelfRererenceKey))
-            {
-                var selfActionAccess = AccessValue(dynamicAction[SelfRererenceKey]);
+        //    if (selfReference == key && dynamicAction.Dictionary.Keys.Contains(SelfRererenceKey))
+        //    {
+        //        var selfActionAccess = AccessValue(dynamicAction[SelfRererenceKey]);
 
-                if (dynamicAction.Comparer != null)
-                {
-                    actionAccess = dynamicAction.Comparer(actionAccess, selfActionAccess);
-                }
-            }
+        //        if (dynamicAction.Comparer != null)
+        //        {
+        //            actionAccess = dynamicAction.Comparer(actionAccess, selfActionAccess);
+        //        }
+        //    }
 
-            return actionAccess;
-        }
+        //    return actionAccess;
+        //}
 
-        public void SetAccessValue(DynamicAction<TextAction> dynamicAction, string key, string? value, string? maximumValue)
-        {
-            TextAction? action = null;
+        //public void SetAccessValue(DynamicAction<TextAction> dynamicAction, string key, string? value, string? maximumValue)
+        //{
+        //    TextAction? action = null;
 
-            if (dynamicAction.UnderlyingAction != null)
-                action = (TextAction)dynamicAction.UnderlyingAction;
+        //    if (dynamicAction.UnderlyingAction != null)
+        //        action = (TextAction)dynamicAction.UnderlyingAction;
 
-            if (dynamicAction.Dictionary.Keys.Contains(key))
-                action = dynamicAction[key];
+        //    if (dynamicAction.Dictionary.Keys.Contains(key))
+        //        action = dynamicAction[key];
 
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action!);
+        //    var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action!);
 
-            if (actionMatches.Count == 0)
-            {
-                var actionBankItem = new ActionBankItem(action!, new List<Access>());
+        //    if (actionMatches.Count == 0)
+        //    {
+        //        var actionBankItem = new ActionBankItem(action!, new List<Access>());
 
-                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+        //        this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
-                actionMatches.Add(actionBankItem);
-            }
+        //        actionMatches.Add(actionBankItem);
+        //    }
 
-            foreach (var item in actionMatches)
-            {
-                value = ReduceValue((item.Action as TextAction)!, value, maximumValue);
+        //    foreach (var item in actionMatches)
+        //    {
+        //        value = ReduceValue((item.Action as TextAction)!, value, maximumValue);
 
-                item.AccessValue = value;
-            }
-        }
+        //        item.AccessValue = value;
+        //    }
+        //}
 
-        private bool Can(DynamicActionBase dynamicAction, Access access, string key, string? selfReference = null)
-        {
-            Actions.Action? action = null;
+        //private bool Can(DynamicActionBase dynamicAction, Access access, string key, string? selfReference = null)
+        //{
+        //    Actions.Action? action = null;
 
-            var actionAccess = false;
+        //    var actionAccess = false;
 
-            var dynamicActionDictionary = dynamicAction.Dictionary;
+        //    var dynamicActionDictionary = dynamicAction.Dictionary;
 
-            if (dynamicAction.UnderlyingAction != null)
-                action = dynamicAction.UnderlyingAction;
+        //    if (dynamicAction.UnderlyingAction != null)
+        //        action = dynamicAction.UnderlyingAction;
 
-            if (dynamicActionDictionary.Keys.Contains(key))
-                action = dynamicActionDictionary[key];
+        //    if (dynamicActionDictionary.Keys.Contains(key))
+        //        action = dynamicActionDictionary[key];
 
-            if (action != null)
-                actionAccess = this.TypeAuthContextHelper.Can(action, access);
+        //    if (action != null)
+        //        actionAccess = this.TypeAuthContextHelper.Can(action, access);
 
-            if (!actionAccess && selfReference == key && dynamicActionDictionary.Keys.Contains(SelfRererenceKey))
-            {
-                actionAccess = this.TypeAuthContextHelper.Can(dynamicActionDictionary[SelfRererenceKey], access);
-            }
+        //    if (!actionAccess && selfReference == key && dynamicActionDictionary.Keys.Contains(SelfRererenceKey))
+        //    {
+        //        actionAccess = this.TypeAuthContextHelper.Can(dynamicActionDictionary[SelfRererenceKey], access);
+        //    }
 
-            return actionAccess;
-        }
+        //    return actionAccess;
+        //}
 
-        #endregion
+        //#endregion
 
         public bool CanWrite(ReadWriteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write);
+        }
+
+        public bool CanWrite(DynamicReadWriteAction action, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
         }
 
         public bool CanWrite(ReadWriteDeleteAction action)
@@ -246,9 +273,19 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
+        public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
+        }
+
         public bool CanDelete(ReadWriteDeleteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Delete);
+        }
+
+        public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, Access.Delete, Id, selfId);
         }
 
         public bool CanAccess(BooleanAction action)
@@ -256,11 +293,42 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Maximum);
         }
 
+        public bool CanAccess(DynamicBooleanAction action, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id, selfId);
+        }
+
         public string? AccessValue(TextAction action)
         {
             var access = action.MinimumAccess;
 
             var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action);
+
+            for (int i = 0; i < actionMatches.Count; i++)
+            {
+                string? thisAccess = actionMatches[i].AccessValue;
+
+                if (i > 0)
+                {
+                    if (action.Comparer != null)
+                        thisAccess = action.Comparer(access, thisAccess);
+
+                    if (action.Merger != null)
+                        thisAccess = action.Merger(access, thisAccess);
+                }
+
+                if (thisAccess != null)
+                    access = thisAccess;
+            }
+
+            return access;
+        }
+
+        public string? AccessValue(DynamicTextAction action, string? Id, string? selfId = null)
+        {
+            var access = action.MinimumAccess;
+
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId);
 
             for (int i = 0; i < actionMatches.Count; i++)
             {
@@ -297,34 +365,34 @@ namespace ShiftSoftware.TypeAuth.Core
 
             foreach (var action in actionMatches)
             {
-                value = ReduceValue(theAction, value, maximumValue);
+                value = ReduceValue(theAction.Comparer, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue);
 
                 action.AccessValue = value;
             }
         }
 
-        private string? ReduceValue(TextAction theAction, string? value, string? maximumValue)
+        private string? ReduceValue(Func<string?, string?, string?>? comparer, string? actionMinimum, string? actionMaximum, string? value, string? maximumValue)
         {
-            if (theAction.Comparer != null)
+            if (comparer != null)
             {
                 //Only used to parse the value.
                 //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
-                value = theAction.Comparer(value, value);
+                value = comparer(value, value);
 
-                var assignableMaximumWinner = theAction.Comparer(maximumValue, theAction.MaximumAccess);
+                var assignableMaximumWinner = comparer(maximumValue, actionMaximum);
 
-                if (assignableMaximumWinner == theAction.MaximumAccess)
+                if (assignableMaximumWinner == actionMaximum)
                     assignableMaximumWinner = maximumValue;
 
-                var actionMaximumWinner = theAction.Comparer(value, assignableMaximumWinner);
+                var actionMaximumWinner = comparer(value, assignableMaximumWinner);
 
                 if (actionMaximumWinner == value)
                     value = assignableMaximumWinner;
 
-                var minimumWinner = theAction.Comparer(value, theAction.MinimumAccess);
+                var minimumWinner = comparer(value, actionMinimum);
 
-                if (minimumWinner == theAction.MinimumAccess)
-                    value = theAction.MinimumAccess;
+                if (minimumWinner == actionMinimum)
+                    value = actionMinimum;
             }
 
             return value;
@@ -376,7 +444,7 @@ namespace ShiftSoftware.TypeAuth.Core
             flattenedActionTreeItems.Add(root);
         }
 
-        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems)
+        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false)
         {
             if (actionTreeItem.WildCardAccess.Count > 0)
             {
@@ -402,50 +470,95 @@ namespace ShiftSoftware.TypeAuth.Core
 
             if (actionTreeItem.Action != null)
             {
+                var dynamicAction = actionTreeItem.Action as DynamicAction;
+
+                if (dynamicAction != null && !stopTraversing)
+                {
+                    var actionBanks = TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+
+                    var subItems = actionBanks.SelectMany(x => x.SubActionBankItems.ToList());
+
+                    if (subItems.Count() > 0)
+                    {
+                        //var a = new HashSet<ActionTreeItem>();
+
+                        accessTree[actionTreeItem.TypeName] = new JObject();
+
+                        foreach (var item in subItems)
+                        {
+                            var subActionTreeItem = new ActionTreeItem
+                            {
+                                Action = actionTreeItem.Action,
+                                TypeName = (item.Action as DynamicAction)!.Id!,
+                                Type = null
+                            };
+
+                            var value = this.TraverseActionTree(subActionTreeItem, accessTree[actionTreeItem.TypeName]!, reducer, reducedActionTreeItems, true);
+
+                            if (value != null)
+                                accessTree[actionTreeItem.TypeName]![subActionTreeItem.TypeName] = value;
+                        }
+
+                        return accessTree[actionTreeItem.TypeName];
+                    }
+                }
+
                 if (actionTreeItem.Action.Type == ActionType.Text)
                 {
-                    var textAction = (actionTreeItem.Action as TextAction)!;
+                    var textAction = actionTreeItem.Action as TextAction;
+                    var dynamicTextAction = actionTreeItem.Action as DynamicTextAction;
 
                     string? value = null;
 
-                    if (actionTreeItem.DynamicAction != null)
-                        value = this.AccessValue((actionTreeItem.DynamicAction as DynamicAction<TextAction>)!, actionTreeItem.TypeName);
-                    else
+                    if (dynamicTextAction != null)
+                        value = this.AccessValue(dynamicTextAction, actionTreeItem.TypeName);
+                    else if (textAction != null)
                         value = this.AccessValue(textAction);
 
                     string? reducedValue = null;
 
-                    if (actionTreeItem.DynamicAction != null)
-                        reducedValue = reducer.AccessValue((actionTreeItem.DynamicAction as DynamicAction<TextAction>)!, actionTreeItem.TypeName);
-                    else
+                    if (dynamicTextAction != null)
+                        reducedValue = reducer.AccessValue(dynamicTextAction, actionTreeItem.TypeName);
+                    else if (textAction != null)
                         reducedValue = reducer.AccessValue(textAction);
 
-                    value = ReduceValue(textAction, value, reducedValue);
+                    if (dynamicTextAction != null)
+                        value = ReduceValue(dynamicTextAction.Comparer, dynamicTextAction.MinimumAccess, dynamicTextAction.MaximumAccess, value, reducedValue);
+                    else if (textAction != null)
+                        value = ReduceValue(textAction.Comparer, textAction.MinimumAccess, textAction.MaximumAccess, value, reducedValue);
 
-                    if (reducedValue == "85" || value == "100")
-                    {
-                        //throw new Exception(value);
-                    }
 
-                    if (value == null || value == textAction.MinimumAccess)
+                    if (value == null || value == textAction?.MinimumAccess || value == dynamicTextAction?.MinimumAccess)
                         return null;
 
                     return new JValue(value);
                 }
+
                 else
                 {
                     var accesses = new List<Access>();
 
                     foreach (var access in Enum.GetValues(typeof(Access)).Cast<Access>())
                     {
-                        if (actionTreeItem.DynamicAction != null)
+                        //if (actionTreeItem.DynamicAction != null)
+                        //{
+                        //    if (this.Can(actionTreeItem.DynamicAction, access, actionTreeItem.TypeName) && reducer.Can(actionTreeItem.DynamicAction!, access, actionTreeItem.TypeName))
+                        //        accesses.Add(access);
+                        //}
+                        //else
+                        //{
+                        //    if (this.Can(actionTreeItem.Action, access) && reducer.Can(actionTreeItem.Action, access))
+                        //        accesses.Add(access);
+                        //}
+
+                        if (dynamicAction != null)
                         {
-                            if (this.Can(actionTreeItem.DynamicAction, access, actionTreeItem.TypeName) && reducer.Can(actionTreeItem.DynamicAction!, access, actionTreeItem.TypeName))
+                            if (this.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
                                 accesses.Add(access);
                         }
-                        else
+                        else if (actionTreeItem.Action.GetType().BaseType == typeof(Actions.Action))
                         {
-                            if (this.Can(actionTreeItem.Action, access) && reducer.Can(actionTreeItem.Action, access))
+                            if (this.Can((actionTreeItem.Action as Actions.Action)!, access) && reducer.Can((actionTreeItem.Action as Actions.Action)!, access))
                                 accesses.Add(access);
                         }
                     }

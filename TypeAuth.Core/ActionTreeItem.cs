@@ -7,8 +7,8 @@ public class ActionTreeItem
     public string? DisplayDescription { get; set; }
     public dynamic? AdditionalData { get; set; }
     public List<Access> WildCardAccess { get; set; }
-    public Actions.Action? Action { get; set; }
-    public DynamicActionBase? DynamicAction { get; set; }
+    public Actions.ActionBase? Action { get; set; }
+    //public DynamicActionBase? DynamicAction { get; set; }
     public Type? Type { get; set; }
     public HashSet<ActionTreeItem> ActionTreeItems { get; set; }
 

@@ -1,16 +1,7 @@
 ﻿namespace ShiftSoftware.TypeAuth.Core.Actions
 {
-
-    /// <summary>
-    /// Action is the smallest unit that can be used in the TypeAuth Access Control System
-    /// </summary>
-    public class Action
+    public class ActionBase
     {
-        /// <summary>
-        /// The unique identifier for the data item (or Row). This is useful for Dynamic Actions
-        /// </summary>
-        internal string? Id { get; set; }
-
         /// <summary>
         /// Friendly name for identifying the Action.
         /// </summary>
@@ -26,23 +17,53 @@
         /// </summary>
         public ActionType Type { get; set; }
 
-        public Action() { }
+        public ActionBase() { }
 
-        public Action(ActionType actionType)
+        public ActionBase(ActionType actionType)
         {
             this.Type = actionType;
         }
 
-        public Action(string? name, ActionType actionType, string? description = null)
+        public ActionBase(string? name, ActionType actionType, string? description = null)
         {
             this.Name = name;
             this.Description = description;
             this.Type = actionType;
         }
+    }
 
-        //public Dictionary<string, T> Dynamic<T>(Func<DynamicActionList<T>, DynamicActionList<T>> function) where T : Action, new()
-        //{
-        //    return function.Invoke(new DynamicActionList<T>()).ActionList.ToDictionary(x => x.Id, x => x);
-        //}
+    /// <summary>
+    /// Action is the smallest unit that can be used in the TypeAuth Access Control System
+    /// </summary>
+    public class Action : ActionBase
+    {
+        public Action() { }
+
+        public Action(ActionType actionType) : base(actionType)
+        {
+        }
+
+        public Action(string? name, ActionType actionType, string? description = null) : base(name, actionType, description)
+        {
+        }
+    }
+
+    public class DynamicAction : ActionBase
+    {
+        /// <summary>
+        /// The unique identifier for the data item (or Row). This is useful for Dynamic Actions
+        /// </summary>
+        public string? Id { get; set; }
+
+        public DynamicAction() : base() { }
+
+        public DynamicAction(ActionType actionType) : base (actionType)
+        {
+        }
+
+        public DynamicAction(string? name, ActionType actionType, string? description = null) : base(name, actionType, description)
+        {
+
+        }
     }
 }

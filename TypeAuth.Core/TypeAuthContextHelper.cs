@@ -2,6 +2,7 @@
 using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Collections;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Action = ShiftSoftware.TypeAuth.Core.Actions.Action;
 
 namespace ShiftSoftware.TypeAuth.Core
@@ -47,9 +48,9 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     var value = y.GetValue(y);
 
-                    if (value != null && (value as Action) != null)
+                    if (value != null && (value as ActionBase) != null)
                     {
-                        var action = (Action)value;
+                        var action = (ActionBase)value;
 
                         actionTreeItem.ActionTreeItems.Add(new ActionTreeItem
                         {
@@ -61,79 +62,79 @@ namespace ShiftSoftware.TypeAuth.Core
                         });
                     }
 
-                    else if (value != null && (value as DynamicActionBase) != null)
-                    {
-                        var dynamicAction = (DynamicActionBase)value;
+                    //else if (value != null && (value as DynamicActionBase) != null)
+                    //{
+                    //    var dynamicAction = (DynamicActionBase)value;
 
-                        var fullName = jsonPath + y.Name;
+                    //    var fullName = jsonPath + y.Name;
 
-                        var keys = new List<string>();
+                    //    var keys = new List<string>();
 
-                        foreach (var key in fullName.Split('.'))
-                        {
-                            keys.Add(key);
+                    //    foreach (var key in fullName.Split('.'))
+                    //    {
+                    //        keys.Add(key);
 
-                            var path = string.Join(".", keys);
+                    //        var path = string.Join(".", keys);
 
-                            foreach (var jsonString in accessTreeJSONStrings)
-                            {
-                                var accessTree = JObject.Parse(jsonString);
+                    //        foreach (var jsonString in accessTreeJSONStrings)
+                    //        {
+                    //            var accessTree = JObject.Parse(jsonString);
 
-                                var access = accessTree.SelectToken(path);
+                    //            var access = accessTree.SelectToken(path);
 
-                                if (access != null && access.GetType() == typeof(JArray))
-                                {
-                                    var id = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
+                    //            if (access != null && access.GetType() == typeof(JArray))
+                    //            {
+                    //                var id = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
 
-                                    dynamicAction.UnderlyingAction = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + id);
+                    //                dynamicAction.UnderlyingAction = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + id);
 
-                                    dynamicAction.Dictionary[id] = dynamicAction.UnderlyingAction;
-                                }
-                            }
-                        }
+                    //                dynamicAction.Dictionary[id] = dynamicAction.UnderlyingAction;
+                    //            }
+                    //        }
+                    //    }
 
-                        foreach (var jsonString in accessTreeJSONStrings)
-                        {
-                            var accessTree = JObject.Parse(jsonString);
+                    //    foreach (var jsonString in accessTreeJSONStrings)
+                    //    {
+                    //        var accessTree = JObject.Parse(jsonString);
 
-                            var access = accessTree.SelectToken(fullName);
+                    //        var access = accessTree.SelectToken(fullName);
 
-                            if (access != null && access.GetType() == typeof(JObject))
-                            {
-                                var jobject = (access as JObject)!;
+                    //        if (access != null && access.GetType() == typeof(JObject))
+                    //        {
+                    //            var jobject = (access as JObject)!;
 
-                                foreach (var key in jobject)
-                                {
-                                    dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + key.Key);
-                                }
-                            }
-                        }
+                    //            foreach (var key in jobject)
+                    //            {
+                    //                dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + key.Key);
+                    //            }
+                    //        }
+                    //    }
 
-                        var dynamicRoot = new ActionTreeItem()
-                        {
-                            TypeName = y.Name,
-                            Action = dynamicAction.UnderlyingAction,
-                            DisplayName = dynamicAction.UnderlyingAction?.Name,
-                            DisplayDescription = dynamicAction.UnderlyingAction?.Description,
-                            DynamicAction = dynamicAction,
-                            Type = dynamicAction.GetType(),
-                        };
+                    //    var dynamicRoot = new ActionTreeItem()
+                    //    {
+                    //        TypeName = y.Name,
+                    //        Action = dynamicAction.UnderlyingAction,
+                    //        DisplayName = dynamicAction.UnderlyingAction?.Name,
+                    //        DisplayDescription = dynamicAction.UnderlyingAction?.Description,
+                    //        DynamicAction = dynamicAction,
+                    //        Type = dynamicAction.GetType(),
+                    //    };
 
-                        actionTreeItem.ActionTreeItems.Add(dynamicRoot);
+                    //    actionTreeItem.ActionTreeItems.Add(dynamicRoot);
 
-                        foreach (var item in dynamicAction.Dictionary)
-                        {
-                            dynamicRoot.ActionTreeItems.Add(new ActionTreeItem
-                            {
-                                TypeName = item.Key,
-                                Action = item.Value,
-                                DisplayName = item.Value.Name,
-                                DisplayDescription = item.Value.Description,
-                                DynamicAction = dynamicAction,
-                                Type = item.Value.GetType()
-                            });
-                        }
-                    }
+                    //    foreach (var item in dynamicAction.Dictionary)
+                    //    {
+                    //        dynamicRoot.ActionTreeItems.Add(new ActionTreeItem
+                    //        {
+                    //            TypeName = item.Key,
+                    //            Action = item.Value,
+                    //            DisplayName = item.Value.Name,
+                    //            DisplayDescription = item.Value.Description,
+                    //            DynamicAction = dynamicAction,
+                    //            Type = item.Value.GetType()
+                    //        });
+                    //    }
+                    //}
 
                 });
 
@@ -146,22 +147,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal void PopulateActionBank(ActionTreeItem actionCursor, object? accessCursor)
         {
-            var accessTypes = new List<Access>();
-            string? accessValue = null;
-
-            if (accessCursor != null)
-            {
-                if (accessCursor.GetType() == typeof(Newtonsoft.Json.Linq.JValue))
-                {
-                    accessValue = accessCursor.ToString();
-                }
-                else if (accessCursor.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                {
-                    var theArray = ((Newtonsoft.Json.Linq.JArray)accessCursor).Select(x => x.ToObject<Access>()).ToList();
-
-                    accessTypes.AddRange(theArray);
-                }
-            }
+            AccessTreeNode node = new AccessTreeNode(accessCursor);
 
             if (actionCursor.ActionTreeItems.Count > 0)
             {
@@ -171,57 +157,70 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     //Wild Card: Access already provided at this Level of the Access Tree. But the action tree has more child nodes.
                     //The current Access is simply passed to every child node of the the current Action Node
-                    if (accessTypes.Count > 0 || accessValue != null)
+                    if (node.AccessArray.Count > 0 || node.AccessValue != null)
                     {
-                        actionCursor.WildCardAccess = accessTypes;
+                        actionCursor.WildCardAccess = node.AccessArray;
                         this.PopulateActionBank(entry, accessCursor);
                     }
                     else
                     {
                         if (accessCursor != null)
-                        {
-                            var accessCursorDictionary = (JObject) accessCursor;
-
-                            PopulateActionBank(entry, accessCursorDictionary[entry.TypeName]);
-                        }
+                            PopulateActionBank(entry, node.AccessObject![entry.TypeName]);
                     }
-
                 }
             }
 
-            if (actionCursor.Action != null && (accessTypes.Count > 0 || accessValue != null))
+            if (actionCursor.Action != null && (node.AccessArray.Count > 0 || node.AccessValue != null || (actionCursor.Action.GetType().BaseType == typeof(DynamicAction) &&  node.AccessObject != null)))
             {
-                var theAction = (Action) actionCursor.Action;
+                var theAction = (ActionBase)actionCursor.Action;
 
-                if (theAction.Type == ActionType.Text && accessValue == null)
+                if (theAction.Type == ActionType.Text && node.AccessValue == null)
                 {
-                    var textAction = (TextAction)theAction;
-                    if (accessTypes.Contains(Access.Maximum))
-                        accessValue = textAction.MaximumAccess;
+                    var textAction = theAction as TextAction;
+                    var dynamicTextAction = theAction as DynamicTextAction;
+
+                    var maximumAccess = textAction?.MaximumAccess ?? dynamicTextAction?.MaximumAccess;
+                    var minimumAccess = textAction?.MinimumAccess ?? dynamicTextAction?.MinimumAccess;
+
+                    if (node.AccessArray.Contains(Access.Maximum))
+                        node.AccessValue = maximumAccess;
                     else
-                        accessValue = textAction.MinimumAccess;
+                        node.AccessValue = minimumAccess;
                 }
 
-                this.ActionBank.Add(new ActionBankItem(theAction, accessTypes, accessValue));
+                this.ActionBank.Add(new ActionBankItem(theAction, node.AccessArray, node.AccessValue, node.AccessObject));
             }
         }
 
-        internal List<ActionBankItem> LocateActionInBank(Action actionToCheck)
+        internal List<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, string? selfId = null)
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            actionMatches = this.ActionBank.Where(x => x.Action == actionToCheck || (x.Action.Id != null && x.Action.Id == actionToCheck.Id)).ToList();
+            foreach (var item in this.ActionBank.Where(x => x.Action == actionToCheck).ToList())
+            {
+                actionMatches.Add(item);
+
+                if (actionToCheck.GetType().BaseType == typeof(DynamicAction))
+                {
+                    actionMatches.AddRange(item.SubActionBankItems.Where(x =>
+                    {
+                        var action = (x.Action as DynamicAction)!;
+
+                        return action.Id == Id || (Id == selfId && action.Id == TypeAuthContext.SelfRererenceKey);
+                    }));
+                }
+            }
 
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionMatches, Newtonsoft.Json.Formatting.Indented));
 
             return actionMatches;
         }
 
-        internal bool Can(Action actionToCheck, Access accessTypeToCheck)
+        internal bool Can(ActionBase actionToCheck, Access accessTypeToCheck, string? Id = null, string? selfId = null)
         {
             var access = false;
 
-            var actionMatches = this.LocateActionInBank(actionToCheck);
+            var actionMatches = this.LocateActionInBank(actionToCheck, Id, selfId);
 
             access = actionMatches.Any(actionMatch => actionMatch.AccessList.IndexOf(accessTypeToCheck) > -1);
 

@@ -7,11 +7,11 @@ namespace ShiftSoftware.TypeAuth.Shared
     [ActionTree("Data Level Actions", "Actions Data Level Access.")]
     public class DataLevel
     {
-        public readonly static DynamicAction<BooleanAction> Cities = new DynamicAction<BooleanAction>("Self City");
-        public readonly static DynamicAction<ReadAction> Countries = new DynamicAction<ReadAction>("Self Country");
-        public readonly static DynamicAction<ReadWriteAction> Companies = new DynamicAction<ReadWriteAction>("Self Company");
-        public readonly static DynamicAction<ReadWriteDeleteAction> Departments = new DynamicAction<ReadWriteDeleteAction>("Self Department");
-        public readonly static DynamicAction<TextAction> DiscountByDepartment = new DynamicAction<TextAction>("Self Department", (a, b) =>
+        public readonly static DynamicBooleanAction Cities = new DynamicBooleanAction("Cities");
+        public readonly static DynamicReadAction Countries = new DynamicReadAction("Countries");
+        public readonly static DynamicReadWriteAction Companies = new DynamicReadWriteAction("Companies");
+        public readonly static DynamicReadWriteDeleteAction Departments = new DynamicReadWriteDeleteAction("Departments");
+        public readonly static DynamicTextAction DiscountByDepartment = new DynamicTextAction("Discount", "", "0", "100", (a, b) =>
         {
             var numbers = new System.Collections.Generic.List<int>();
 

@@ -10,4 +10,15 @@
         {
         }
     }
+
+    public class DynamicReadWriteAction : DynamicAction
+    {
+        public DynamicReadWriteAction() : base(ActionType.ReadWrite)
+        {
+        }
+
+        public DynamicReadWriteAction(string? name, string? description = null) : base(name, ActionType.ReadWrite, description)
+        {
+        }
+    }
 }

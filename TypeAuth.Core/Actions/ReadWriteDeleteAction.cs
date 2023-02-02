@@ -10,4 +10,15 @@
         {
         }
     }
+    
+    public class DynamicReadWriteDeleteAction : DynamicAction
+    {
+        public DynamicReadWriteDeleteAction() : base(ActionType.ReadWriteDelete)
+        {
+        }
+
+        public DynamicReadWriteDeleteAction(string? name, string? description = null) : base(name, ActionType.ReadWriteDelete, description)
+        {
+        }
+    }
 }
