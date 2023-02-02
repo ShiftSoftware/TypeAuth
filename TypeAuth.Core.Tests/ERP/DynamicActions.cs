@@ -241,6 +241,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
+            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", null));
+            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, null, null));
+
             Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1"));
             Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1", "_1")); //True
             Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", "_2"));

@@ -206,7 +206,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (x.Action as DynamicAction)!;
 
-                        return action.Id == Id || (Id == selfId && action.Id == TypeAuthContext.SelfRererenceKey);
+                        return action.Id == Id || (Id != null && selfId != null && Id == selfId && action.Id == TypeAuthContext.SelfRererenceKey);
                     }));
                 }
             }
