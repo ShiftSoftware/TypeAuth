@@ -12,6 +12,8 @@ public class ActionTreeItem
     public Type? Type { get; set; }
     public HashSet<ActionTreeItem> ActionTreeItems { get; set; }
 
+    public bool DynamicSubitem { get; set; }
+
     public ActionTreeItem()
     {
         this.ActionTreeItems = new HashSet<ActionTreeItem>();

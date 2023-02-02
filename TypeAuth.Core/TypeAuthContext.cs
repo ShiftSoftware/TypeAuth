@@ -62,6 +62,16 @@ namespace ShiftSoftware.TypeAuth.Core
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
         }
 
+        public bool Can(ActionBase action, Access access)
+        {
+            return this.TypeAuthContextHelper.Can(action, access);
+        }
+
+        public bool Can(ActionBase action, Access access, string Id, string? selfId = null)
+        {
+            return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
+        }
+
         internal bool Can(Type actionTreeType, string actionName, Access access)
         {
             var instance = (Activator.CreateInstance(actionTreeType))!;
@@ -226,11 +236,11 @@ namespace ShiftSoftware.TypeAuth.Core
             return value;
         }
 
-        public void ToggleAccess(Actions.Action theAction, Access access)
+        public void ToggleAccess(ActionBase theAction, Access access, string? Id = null)
         {
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction);
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
 
-            if (actionMatches.Count == 0)
+            if (actionMatches.Count == 0 && theAction.GetType().BaseType == typeof(Actions.Action))
             {
                 var actionBankItem = new ActionBankItem(theAction, new List<Access>());
 
@@ -239,7 +249,27 @@ namespace ShiftSoftware.TypeAuth.Core
                 actionMatches.Add(actionBankItem);
             }
 
-            foreach (var action in actionMatches)
+            if (theAction.GetType().BaseType == typeof(DynamicAction))
+            {
+                if (actionMatches.Count == 0)
+                {
+                    var actionBankItem = new ActionBankItem(theAction, new List<Access>());
+
+                    this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+
+                    actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                }
+
+
+                if (!actionMatches.Any(x => (x.Action as DynamicAction)!.Id == Id))
+                {
+                    actionMatches.First().SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id, Type = theAction.Type }, new List<Access>()));
+
+                    actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                }
+            }
+
+            foreach (var action in actionMatches.Where(x => x.Action.GetType().BaseType == typeof(DynamicAction) ? (x.Action as DynamicAction)!.Id == Id : true))
             {
                 if (action.AccessList.Contains(access))
                     action.AccessList.Remove(access);
@@ -269,7 +299,8 @@ namespace ShiftSoftware.TypeAuth.Core
                 FlattenActionTree(flattenedActionTreeItems, item);
             }
 
-            flattenedActionTreeItems.Add(root);
+            if (!root.DynamicSubitem)
+                flattenedActionTreeItems.Add(root);
         }
 
         private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false)
@@ -308,7 +339,9 @@ namespace ShiftSoftware.TypeAuth.Core
 
                     if (subItems.Count() > 0)
                     {
-                        accessTree[actionTreeItem.TypeName] = new JObject();
+                        var dynamicItems = new JObject();
+
+                        accessTree[actionTreeItem.TypeName] = dynamicItems;
 
                         foreach (var item in subItems)
                         {
@@ -325,7 +358,10 @@ namespace ShiftSoftware.TypeAuth.Core
                                 accessTree[actionTreeItem.TypeName]![subActionTreeItem.TypeName] = value;
                         }
 
-                        return accessTree[actionTreeItem.TypeName];
+                        if (dynamicItems.Count == 0)
+                            return null;
+
+                        return dynamicItems;
                     }
                 }
 

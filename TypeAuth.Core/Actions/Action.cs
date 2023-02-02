@@ -55,15 +55,29 @@
         /// </summary>
         public string? Id { get; set; }
 
-        public DynamicAction() : base() { }
-
-        public DynamicAction(ActionType actionType) : base (actionType)
+        public DynamicAction() : base()
         {
+            Items = new();
+        }
+
+        public DynamicAction(ActionType actionType) : base(actionType)
+        {
+            this.Items = new();
         }
 
         public DynamicAction(string? name, ActionType actionType, string? description = null) : base(name, actionType, description)
         {
+            this.Items = new();
+        }
 
+        internal List<KeyValuePair<string, string>> Items { get; set; }
+
+        public void Expand(List<KeyValuePair<string, string>> items, bool addSelf = false)
+        {
+            this.Items = items.ToList();
+
+            if (addSelf)
+                this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.SelfRererenceKey, "Self"));
         }
     }
 }

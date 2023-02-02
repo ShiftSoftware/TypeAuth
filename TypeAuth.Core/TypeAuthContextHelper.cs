@@ -47,14 +47,36 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (ActionBase)value;
 
-                        actionTreeItem.ActionTreeItems.Add(new ActionTreeItem
+                        var thisActionTreeItem = new ActionTreeItem
                         {
                             TypeName = y.Name,
                             Action = action,
                             DisplayName = action.Name,
                             DisplayDescription = action.Description,
                             Type = y.FieldType
-                        });
+                        };
+
+                        actionTreeItem.ActionTreeItems.Add(thisActionTreeItem);
+
+                        if (action.GetType().BaseType == typeof(DynamicAction))
+                        {
+                            var dynamicAction = action as DynamicAction;
+
+                            foreach (var item in dynamicAction!.Items)
+                            {
+                                var actionTreeItem = new ActionTreeItem
+                                {
+                                    Action = action,
+                                    DisplayName = item.Value,
+                                    TypeName = item.Key,
+                                    Type = action.GetType(),
+                                    WildCardAccess = new List<Access>(),
+                                    DynamicSubitem = true
+                                };
+
+                                thisActionTreeItem.ActionTreeItems.Add(actionTreeItem);
+                            }
+                        }
                     }
                 });
             }
@@ -102,6 +124,9 @@ namespace ShiftSoftware.TypeAuth.Core
                     else
                         node.AccessValue = minimumAccess;
                 }
+
+                if (theAction.GetType().BaseType == typeof(DynamicAction) && node.AccessArray.Count > 0)
+                    actionCursor.WildCardAccess = node.AccessArray;
 
                 this.ActionBank.Add(new ActionBankItem(theAction, node.AccessArray, node.AccessValue, node.AccessObject));
             }
