@@ -10,9 +10,11 @@ namespace ShiftSoftware.TypeAuth.Core
     public class TypeAuthContext
     {
         private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
+
         internal const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
 
         internal List<string> AccessTreeJsonStrings { get; set; } = default!;
+
         internal Type[] ActionTrees { get; set; } = default!;
 
         public ActionTreeItem ActionTree { get; set; } = default!;
@@ -60,41 +62,14 @@ namespace ShiftSoftware.TypeAuth.Core
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
         }
 
-        public static string ReplaceSelfReferenceVariable(string id, string actualValue)
-        {
-            return id == SelfRererenceKey ? actualValue : id;
-        }
-
-        //public List<Access> ActionAccessTypes(Action action)
-        //{
-        //    var accessTypes = new List<Access>();
-
-        //    var actionMatch = this.TypeAuthContextHelper.LocateActionInBank(action);
-
-        //    if (actionMatch != null)
-        //        accessTypes = actionMatch.AccessList;
-
-        //    return accessTypes;
-        //}
-
-        public bool Can(Actions.Action action, Access access)
-        {
-            return this.TypeAuthContextHelper.Can(action, access);
-        }
-
-        public bool Can(Actions.DynamicAction action, Access access, string Id)
-        {
-            return this.TypeAuthContextHelper.Can(action, access, Id);
-        }
-
         internal bool Can(Type actionTreeType, string actionName, Access access)
         {
-            var instance = Activator.CreateInstance(actionTreeType);
+            var instance = (Activator.CreateInstance(actionTreeType))!;
 
             var action = (Actions.Action) actionTreeType
                 .GetFields()
                 .FirstOrDefault(x => x.Name.Equals(actionName, StringComparison.InvariantCultureIgnoreCase))
-                ?.GetValue(instance);
+                ?.GetValue(instance)!;
 
             if (action == null)
                 throw new Exception($"No Such Action ({actionTreeType.FullName}.{actionName})");
@@ -102,161 +77,30 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access);
         }
 
-        #region Read
-        private bool CanRead(Actions.Action action)
+        public bool CanRead(ReadAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
-        private bool CanRead(Actions.DynamicAction action, string Id, string? selfId = null)
+        public bool CanRead(DynamicReadAction action, string Id, string? selfId = null)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
-        public bool CanRead(ReadAction action)
-        {
-            return this.CanRead((Actions.Action)action);
-        }
-        public bool CanRead(DynamicReadAction action, string Id, string? selfId = null)
-        {
-            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
-        }
         public bool CanRead(ReadWriteAction action)
         {
-            return this.CanRead((Actions.Action)action);
+            return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         public bool CanRead(DynamicReadWriteAction action, string Id, string? selfId = null)
         {
-            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
         public bool CanRead(ReadWriteDeleteAction action)
         {
-            return this.CanRead((Actions.Action)action);
+            return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         public bool CanRead(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
         {
-            return this.CanRead((Actions.DynamicAction)action, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
-        #endregion
-
-        //#region Dynamic
-
-        //public bool CanAccess(DynamicAction<BooleanAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Maximum, key, selfReference);
-        //}
-
-        //public bool CanRead(DynamicAction<ReadAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        //}
-
-        //public bool CanRead(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        //}
-
-        //public bool CanWrite(DynamicAction<ReadWriteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
-        //}
-
-        //public bool CanRead(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Read, key, selfReference);
-        //}
-
-        //public bool CanWrite(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Write, key, selfReference);
-        //}
-
-        //public bool CanDelete(DynamicAction<ReadWriteDeleteAction> dynamicActionDictionary, string key, string? selfReference = null)
-        //{
-        //    return this.Can(dynamicActionDictionary, Access.Delete, key, selfReference);
-        //}
-
-        //public string? AccessValue(DynamicAction<TextAction> dynamicAction, string key, string? selfReference = null)
-        //{
-        //    string? actionAccess = null;
-
-        //    TextAction? action = null;
-
-        //    if (dynamicAction.UnderlyingAction != null)
-        //        action = (TextAction)dynamicAction.UnderlyingAction;
-
-        //    if (dynamicAction.Dictionary.Keys.Contains(key))
-        //        action = dynamicAction[key];
-
-        //    if(action != null)
-        //        actionAccess = AccessValue(action);
-
-        //    if (selfReference == key && dynamicAction.Dictionary.Keys.Contains(SelfRererenceKey))
-        //    {
-        //        var selfActionAccess = AccessValue(dynamicAction[SelfRererenceKey]);
-
-        //        if (dynamicAction.Comparer != null)
-        //        {
-        //            actionAccess = dynamicAction.Comparer(actionAccess, selfActionAccess);
-        //        }
-        //    }
-
-        //    return actionAccess;
-        //}
-
-        //public void SetAccessValue(DynamicAction<TextAction> dynamicAction, string key, string? value, string? maximumValue)
-        //{
-        //    TextAction? action = null;
-
-        //    if (dynamicAction.UnderlyingAction != null)
-        //        action = (TextAction)dynamicAction.UnderlyingAction;
-
-        //    if (dynamicAction.Dictionary.Keys.Contains(key))
-        //        action = dynamicAction[key];
-
-        //    var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action!);
-
-        //    if (actionMatches.Count == 0)
-        //    {
-        //        var actionBankItem = new ActionBankItem(action!, new List<Access>());
-
-        //        this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
-
-        //        actionMatches.Add(actionBankItem);
-        //    }
-
-        //    foreach (var item in actionMatches)
-        //    {
-        //        value = ReduceValue((item.Action as TextAction)!, value, maximumValue);
-
-        //        item.AccessValue = value;
-        //    }
-        //}
-
-        //private bool Can(DynamicActionBase dynamicAction, Access access, string key, string? selfReference = null)
-        //{
-        //    Actions.Action? action = null;
-
-        //    var actionAccess = false;
-
-        //    var dynamicActionDictionary = dynamicAction.Dictionary;
-
-        //    if (dynamicAction.UnderlyingAction != null)
-        //        action = dynamicAction.UnderlyingAction;
-
-        //    if (dynamicActionDictionary.Keys.Contains(key))
-        //        action = dynamicActionDictionary[key];
-
-        //    if (action != null)
-        //        actionAccess = this.TypeAuthContextHelper.Can(action, access);
-
-        //    if (!actionAccess && selfReference == key && dynamicActionDictionary.Keys.Contains(SelfRererenceKey))
-        //    {
-        //        actionAccess = this.TypeAuthContextHelper.Can(dynamicActionDictionary[SelfRererenceKey], access);
-        //    }
-
-        //    return actionAccess;
-        //}
-
-        //#endregion
 
         public bool CanWrite(ReadWriteAction action)
         {
@@ -300,33 +144,17 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public string? AccessValue(TextAction action)
         {
-            var access = action.MinimumAccess;
-
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action);
-
-            for (int i = 0; i < actionMatches.Count; i++)
-            {
-                string? thisAccess = actionMatches[i].AccessValue;
-
-                if (i > 0)
-                {
-                    if (action.Comparer != null)
-                        thisAccess = action.Comparer(access, thisAccess);
-
-                    if (action.Merger != null)
-                        thisAccess = action.Merger(access, thisAccess);
-                }
-
-                if (thisAccess != null)
-                    access = thisAccess;
-            }
-
-            return access;
+            return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess);
         }
 
         public string? AccessValue(DynamicTextAction action, string? Id, string? selfId = null)
         {
-            var access = action.MinimumAccess;
+            return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess, Id, selfId);
+        }
+
+        private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, string? selfId = null)
+        {
+            var access = minAccess;
 
             var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId);
 
@@ -336,11 +164,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (i > 0)
                 {
-                    if (action.Comparer != null)
-                        thisAccess = action.Comparer(access, thisAccess);
+                    if (comparer != null)
+                        thisAccess = comparer(access, thisAccess);
 
-                    if (action.Merger != null)
-                        thisAccess = action.Merger(access, thisAccess);
+                    if (merger != null)
+                        thisAccess = merger(access, thisAccess);
                 }
 
                 if (thisAccess != null)
@@ -480,8 +308,6 @@ namespace ShiftSoftware.TypeAuth.Core
 
                     if (subItems.Count() > 0)
                     {
-                        //var a = new HashSet<ActionTreeItem>();
-
                         accessTree[actionTreeItem.TypeName] = new JObject();
 
                         foreach (var item in subItems)
@@ -540,25 +366,14 @@ namespace ShiftSoftware.TypeAuth.Core
 
                     foreach (var access in Enum.GetValues(typeof(Access)).Cast<Access>())
                     {
-                        //if (actionTreeItem.DynamicAction != null)
-                        //{
-                        //    if (this.Can(actionTreeItem.DynamicAction, access, actionTreeItem.TypeName) && reducer.Can(actionTreeItem.DynamicAction!, access, actionTreeItem.TypeName))
-                        //        accesses.Add(access);
-                        //}
-                        //else
-                        //{
-                        //    if (this.Can(actionTreeItem.Action, access) && reducer.Can(actionTreeItem.Action, access))
-                        //        accesses.Add(access);
-                        //}
-
                         if (dynamicAction != null)
                         {
-                            if (this.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
+                            if (this.TypeAuthContextHelper.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.TypeAuthContextHelper.Can(dynamicAction, access, actionTreeItem.TypeName))
                                 accesses.Add(access);
                         }
                         else if (actionTreeItem.Action.GetType().BaseType == typeof(Actions.Action))
                         {
-                            if (this.Can((actionTreeItem.Action as Actions.Action)!, access) && reducer.Can((actionTreeItem.Action as Actions.Action)!, access))
+                            if (this.TypeAuthContextHelper.Can((actionTreeItem.Action as Actions.Action)!, access) && reducer.TypeAuthContextHelper.Can((actionTreeItem.Action as Actions.Action)!, access))
                                 accesses.Add(access);
                         }
                     }

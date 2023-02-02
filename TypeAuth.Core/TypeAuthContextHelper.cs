@@ -16,13 +16,10 @@ namespace ShiftSoftware.TypeAuth.Core
             ActionBank = new List<ActionBankItem>();
         }
 
-        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree = null, string? jsonPath = null)
+        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree = null)
         {
             if (rootActionTree is null)
                 rootActionTree = new ActionTreeItem() { TypeName = "Root" };
-
-            if (jsonPath is null)
-                jsonPath = "";
 
             foreach (var tree in actionTrees)
             {
@@ -38,11 +35,9 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 rootActionTree.ActionTreeItems.Add(actionTreeItem);
                 
-                jsonPath += tree.Name + ".";
-
                 var childTress = tree.GetNestedTypes().ToList().Where(x => x.GetCustomAttributes(typeof(ActionTree), false) != null).ToList();
 
-                GenerateActionTree(childTress, accessTreeJSONStrings, actionTreeItem, jsonPath);
+                GenerateActionTree(childTress, accessTreeJSONStrings, actionTreeItem);
 
                 tree.GetFields(BindingFlags.Public | BindingFlags.Static).ToList().ForEach(y =>
                 {
@@ -61,85 +56,7 @@ namespace ShiftSoftware.TypeAuth.Core
                             Type = y.FieldType
                         });
                     }
-
-                    //else if (value != null && (value as DynamicActionBase) != null)
-                    //{
-                    //    var dynamicAction = (DynamicActionBase)value;
-
-                    //    var fullName = jsonPath + y.Name;
-
-                    //    var keys = new List<string>();
-
-                    //    foreach (var key in fullName.Split('.'))
-                    //    {
-                    //        keys.Add(key);
-
-                    //        var path = string.Join(".", keys);
-
-                    //        foreach (var jsonString in accessTreeJSONStrings)
-                    //        {
-                    //            var accessTree = JObject.Parse(jsonString);
-
-                    //            var access = accessTree.SelectToken(path);
-
-                    //            if (access != null && access.GetType() == typeof(JArray))
-                    //            {
-                    //                var id = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
-
-                    //                dynamicAction.UnderlyingAction = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + id);
-
-                    //                dynamicAction.Dictionary[id] = dynamicAction.UnderlyingAction;
-                    //            }
-                    //        }
-                    //    }
-
-                    //    foreach (var jsonString in accessTreeJSONStrings)
-                    //    {
-                    //        var accessTree = JObject.Parse(jsonString);
-
-                    //        var access = accessTree.SelectToken(fullName);
-
-                    //        if (access != null && access.GetType() == typeof(JObject))
-                    //        {
-                    //            var jobject = (access as JObject)!;
-
-                    //            foreach (var key in jobject)
-                    //            {
-                    //                dynamicAction.Dictionary[key.Key] = dynamicAction.GenerateAction(dynamicAction.GetHashCode() + "." + fullName + "." + key.Key);
-                    //            }
-                    //        }
-                    //    }
-
-                    //    var dynamicRoot = new ActionTreeItem()
-                    //    {
-                    //        TypeName = y.Name,
-                    //        Action = dynamicAction.UnderlyingAction,
-                    //        DisplayName = dynamicAction.UnderlyingAction?.Name,
-                    //        DisplayDescription = dynamicAction.UnderlyingAction?.Description,
-                    //        DynamicAction = dynamicAction,
-                    //        Type = dynamicAction.GetType(),
-                    //    };
-
-                    //    actionTreeItem.ActionTreeItems.Add(dynamicRoot);
-
-                    //    foreach (var item in dynamicAction.Dictionary)
-                    //    {
-                    //        dynamicRoot.ActionTreeItems.Add(new ActionTreeItem
-                    //        {
-                    //            TypeName = item.Key,
-                    //            Action = item.Value,
-                    //            DisplayName = item.Value.Name,
-                    //            DisplayDescription = item.Value.Description,
-                    //            DynamicAction = dynamicAction,
-                    //            Type = item.Value.GetType()
-                    //        });
-                    //    }
-                    //}
-
                 });
-
-                //Reset the json path after all recursive calls
-                jsonPath = null;
             }
 
             return rootActionTree;
@@ -151,8 +68,6 @@ namespace ShiftSoftware.TypeAuth.Core
 
             if (actionCursor.ActionTreeItems.Count > 0)
             {
-                //var dictionaryEntries = CastDict((IDictionary)actionCursor); //(Dictionary<string, object>)actionCursor;
-
                 foreach (var entry in actionCursor.ActionTreeItems)
                 {
                     //Wild Card: Access already provided at this Level of the Access Tree. But the action tree has more child nodes.
