@@ -24,12 +24,6 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
                 .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
                 .Select(x => x.Value).ToList();
 
-            foreach (var tree in accessTrees)
-            {
-                Console.WriteLine(tree);
-            }
-
-
             if (options.ActionTrees is not null && accessTrees is not null)
                 base.Init(accessTrees, options.ActionTrees.ToArray());
         }
