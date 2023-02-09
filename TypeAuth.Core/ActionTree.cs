@@ -6,6 +6,11 @@
     public class ActionTree: Attribute
     {
         /// <summary>
+        /// Optional ID for identifying the Action Tree.
+        /// </summary>
+        public string? ID { get; set; }
+
+        /// <summary>
         /// Friendly name for identifying the Action Tree.
         /// </summary>
         public string? Name { get; set; }
@@ -20,9 +25,10 @@
 
         }
 
-        public ActionTree(string? name, string? description)
+        public ActionTree(string? name, string? description, string? Id = null)
         {
-            this.Name = name; ;
+            this.ID = Id;
+            this.Name = name;
             this.Description = description;
         }
     }
