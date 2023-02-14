@@ -8,7 +8,7 @@
 		<AssemblyName>ShiftSoftware.TypeAuth.AspNetCore</AssemblyName>
 
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>1.0.6-alpha</Version>
+		<Version>1.0.8-alpha</Version>
 		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
