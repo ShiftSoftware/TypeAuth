@@ -13,7 +13,8 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
             this.authStateProvider = authStateProvider;
             this.options = options;
 
-            BuildTypeAuthConext();
+
+            Task.Run(async () => await BuildTypeAuthConext());
         }
 
         private async Task BuildTypeAuthConext()
