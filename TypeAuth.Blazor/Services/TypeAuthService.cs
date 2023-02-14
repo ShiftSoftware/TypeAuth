@@ -14,13 +14,13 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
             this.options = options;
 
 
-            Task.Run(async () => await BuildTypeAuthConext());
+            BuildTypeAuthConext();
         }
 
-        private async Task BuildTypeAuthConext()
+        private void BuildTypeAuthConext()
         {
             //Get the access trees from the token
-            var state = await authStateProvider.GetAuthenticationStateAsync();
+            var state = authStateProvider.GetAuthenticationStateAsync().Result;
             var accessTrees = state.User?.Claims?
                 .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
                 .Select(x => x.Value).ToList();
