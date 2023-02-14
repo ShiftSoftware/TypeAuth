@@ -15,4 +15,11 @@ public class TypeAuthBlazorOptions
 
         return this;
     }
+
+    public TypeAuthBlazorOptions AddActionTree(Type actionTree)
+    {
+        ActionTrees.Add(actionTree);
+
+        return this;
+    }
 }
