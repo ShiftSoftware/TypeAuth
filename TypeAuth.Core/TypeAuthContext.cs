@@ -438,5 +438,10 @@ namespace ShiftSoftware.TypeAuth.Core
 
             return accessTree;
         }
+
+        public Type[] GetRegisteredActionTrees()
+        {
+            return this.ActionTrees.ToArray();
+        }
     }
 }
