@@ -290,13 +290,21 @@ namespace ShiftSoftware.TypeAuth.Core
             return actionMatches;
         }
 
-        public string GenerateAccessTree(TypeAuthContext reducer)
+        public string GenerateAccessTree(TypeAuthContext reducer, TypeAuthContext? preserver = null)
         {
-            var flattenedActionTreeItems = new List<ActionTreeItem>();
+            var reducedActionTreeItems = new List<ActionTreeItem>();
 
-            this.FlattenActionTree(flattenedActionTreeItems, reducer.ActionTree);
+            this.FlattenActionTree(reducedActionTreeItems, reducer.ActionTree);
 
-            var accessTree = this.TraverseActionTree(this.ActionTree, new JObject(), reducer, flattenedActionTreeItems);
+            List<ActionTreeItem>? preservedActionTreeItems = null;
+
+            if (preserver != null)
+            {
+                preservedActionTreeItems = new List<ActionTreeItem>();
+                this.FlattenActionTree(preservedActionTreeItems, preserver.ActionTree);
+            }
+
+            var accessTree = this.TraverseActionTree(this.ActionTree, new JObject(), reducer, reducedActionTreeItems, false, preserver, preservedActionTreeItems);
 
             if (accessTree == null)
                 accessTree = new JObject(); //To return an empty json {}
@@ -315,15 +323,35 @@ namespace ShiftSoftware.TypeAuth.Core
                 flattenedActionTreeItems.Add(root);
         }
 
-        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false)
+        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeItem>? preservedActionTreeItems = null)
         {
-            if (actionTreeItem.WildCardAccess.Count > 0)
+            ActionTreeItem? preserverActionTreeItem = null;
+
+            if (preservedActionTreeItems != null)
+            {
+                preserverActionTreeItem = preservedActionTreeItems.FirstOrDefault(
+                    x => x.Type == actionTreeItem.Type
+                );
+            }
+
+            if (actionTreeItem.WildCardAccess.Count > 0 || preserverActionTreeItem?.WildCardAccess?.Count > 0)
             {
                 var reducerActionTreeItem = reducedActionTreeItems.FirstOrDefault(
                     x => x.Type == actionTreeItem.Type
                 );
 
-                var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x));
+                var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x)).ToList();
+
+                if (preserverActionTreeItem != null)
+                {
+                    foreach (var item in preserverActionTreeItem.WildCardAccess)
+                    {
+                        if (!reducerActionTreeItem.WildCardAccess.Contains(item) && !access.Contains(item))
+                        {
+                            access.Add(item);
+                        }
+                    }
+                }
 
                 if (access.Count() == 0)
                     return null;
@@ -333,7 +361,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
             foreach (var subActionTreeItem in actionTreeItem.ActionTreeItems)
             {
-                var value = this.TraverseActionTree(subActionTreeItem, new JObject(), reducer, reducedActionTreeItems);
+                var value = this.TraverseActionTree(subActionTreeItem, new JObject(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
 
                 if (value != null)
                     accessTree[subActionTreeItem.TypeName] = value;
@@ -345,9 +373,18 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (dynamicAction != null && !stopTraversing)
                 {
-                    var actionBanks = TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+                    var actionBankItems = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
 
-                    var subItems = actionBanks.SelectMany(x => x.SubActionBankItems.ToList());
+                    var subItems = actionBankItems.SelectMany(x => x.SubActionBankItems.ToList()).ToList();
+
+                    if (preserver != null)
+                    {
+                        var preserverActionBankItems = preserver.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+
+                        subItems.AddRange(preserverActionBankItems.SelectMany(x => x.SubActionBankItems.ToList()));
+
+                        subItems = subItems.Distinct().ToList();
+                    }
 
                     if (subItems.Count() > 0)
                     {
@@ -364,7 +401,7 @@ namespace ShiftSoftware.TypeAuth.Core
                                 Type = null
                             };
 
-                            var value = this.TraverseActionTree(subActionTreeItem, accessTree[actionTreeItem.TypeName]!, reducer, reducedActionTreeItems, true);
+                            var value = this.TraverseActionTree(subActionTreeItem, accessTree[actionTreeItem.TypeName]!, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
 
                             if (value != null)
                                 accessTree[actionTreeItem.TypeName]![subActionTreeItem.TypeName] = value;
@@ -416,13 +453,41 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         if (dynamicAction != null)
                         {
-                            if (this.TypeAuthContextHelper.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.TypeAuthContextHelper.Can(dynamicAction, access, actionTreeItem.TypeName))
+                            if (this.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
                                 accesses.Add(access);
+
+                            if (preserver != null)
+                            {
+                                //If the access is reduced.
+                                if (!reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
+                                {
+                                    //If the access should've been preserved.
+                                    if (preserver.Can(dynamicAction, access, actionTreeItem.TypeName) && !accesses.Contains(access))
+                                    {
+                                        accesses.Add(access);
+                                    }
+                                }
+                            }
                         }
                         else if (actionTreeItem.Action.GetType().BaseType == typeof(Actions.Action))
                         {
-                            if (this.TypeAuthContextHelper.Can((actionTreeItem.Action as Actions.Action)!, access) && reducer.TypeAuthContextHelper.Can((actionTreeItem.Action as Actions.Action)!, access))
+                            var action = (actionTreeItem.Action as Actions.Action)!;
+
+                            if (this.TypeAuthContextHelper.Can(action, access) && reducer.TypeAuthContextHelper.Can(action, access))
                                 accesses.Add(access);
+
+                            if (preserver != null)
+                            {
+                                //If the access is reduced.
+                                if (!reducer.Can(action, access))
+                                {
+                                    //If the access should've been preserved.
+                                    if (preserver.Can(action, access) && !accesses.Contains(access))
+                                    {
+                                        accesses.Add(access);
+                                    }
+                                }
+                            }
                         }
                     }
 

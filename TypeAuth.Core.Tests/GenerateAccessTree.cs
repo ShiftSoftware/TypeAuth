@@ -128,6 +128,78 @@ namespace ShiftSoftware.TypeAuth.Tests
         }
 
         [TestMethod]
+        public void AccessPreserver()
+        {
+            var tAuth_Producer = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new
+                    {
+                        Customers = new List<Access> { Access.Read },
+                        DiscountVouchers = new List<Access> { Access.Read },
+                    }
+                }))
+                .Build();
+
+            var tAuth_Reducer = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new
+                    {
+                        Customers = new List<Access> { Access.Read, Access.Write },
+                        Tickets = new List<Access> { Access.Read },
+                    }
+                }))
+                .Build();
+
+            var tAuth_Preserver = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new
+                    {
+                        Customers = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                        DiscountVouchers = new List<Access> { Access.Read },
+                        Tickets = new List<Access> { Access.Read, Access.Write }
+                    },
+                    SystemActions = new
+                    {
+                        UserModule = new
+                        {
+                            Users = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                        }
+                    }
+                }))
+                .Build();
+
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+
+            Assert.AreEqual(
+                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new
+                    {
+                        Customers = new List<Access> { Access.Read, Access.Delete },
+                        DiscountVouchers = new List<Access> { Access.Read },
+                        Tickets = new List<Access> { Access.Write }
+                    },
+                    SystemActions = new
+                    {
+                        UserModule = new
+                        {
+                            Users = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                        }
+                    }
+                })
+            );
+        }
+
+        [TestMethod]
         public void AccessValueReducer()
         {
             var tAuth = new TypeAuthContextBuilder()
@@ -206,6 +278,52 @@ namespace ShiftSoftware.TypeAuth.Tests
         }
 
         [TestMethod]
+        public void WildCardAccessPreserver()
+        {
+            var tAuth_Producer = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new List<Access> { Access.Read }
+                }))
+                .Build();
+
+            var tAuth_Reducer = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                }))
+                .Build();
+
+            var tAuth_Preserver = new TypeAuthContextBuilder()
+                .AddActionTree<CRMActions>()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
+                }))
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                }))
+                .Build();
+
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+
+            Assert.AreEqual(
+                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                JsonConvert.SerializeObject(new
+                {
+                    CRMActions = new List<Access> { Access.Read, Access.Maximum },
+                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                })
+            );
+        }
+
+        [TestMethod]
         public void DynamicActions()
         {
             var tAuth = new TypeAuthContextBuilder()
@@ -265,6 +383,108 @@ namespace ShiftSoftware.TypeAuth.Tests
         }
 
         [TestMethod]
+        public void DynamicActions_Preserver()
+        {
+            var tAuth_Producer = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Companies = new
+                        {
+                            _1 = new List<Access> {  },
+                        },
+                        Cities = new {
+                            _1 = new List<Access> { Access.Read },
+                        },
+                        Departments = new
+                        {
+                            _1 = new List<Access> { },
+                            _2 = new List<Access> { },
+                            _3 = new List<Access> { },
+                        },
+                    }
+                }))
+                .Build();
+
+            var tAuth_Reducer = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Read, Access.Write },
+                        }
+                    },
+                }))
+                .Build();
+
+            var tAuth_Preserver = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Countries = new 
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write },
+                        },
+                        Companies = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write },
+                        },
+                        Cities = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                        },
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                            _2 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                            _3 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                        }
+                    },
+                }))
+                .Build();
+
+            //Assert.IsTrue(tAuth_Preserver.CanWrite(DataLevel.Companies, "_1"));
+
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+
+            Assert.AreEqual(
+                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                        },
+                        Countries = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write },
+                        },
+                        Companies = new
+                        {
+                            _1 = new List<Access> { Access.Read, Access.Write },
+                        },
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Write, Access.Delete },
+                            _2 = new List<Access> { Access.Delete },
+                            _3 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                        }
+                    },
+                })
+            );
+        }
+
+        [TestMethod]
         public void DynamicActionWildCard()
         {
             var tAuth = new TypeAuthContextBuilder()
@@ -311,6 +531,62 @@ namespace ShiftSoftware.TypeAuth.Tests
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
                 tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+            );
+        }
+
+        [TestMethod]
+        public void DynamicActionWildCardPreserver()
+        {
+            var tAuth_Producer = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Companies = new List<Access>() { Access.Read },
+                        Departments = new List<Access> { Access.Read },
+                    }
+                }))
+                .Build();
+
+            var tAuth_Reducer = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Companies = new List<Access>() { Access.Read },
+                        Departments = new List<Access> { Access.Read, Access.Write },
+                    },
+                }))
+                .Build();
+
+            var tAuth_Preserver = new TypeAuthContextBuilder()
+                .AddActionTree<DataLevel>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new List<Access>() { Access.Maximum },
+                        Companies = new List<Access>() { Access.Read, Access.Write },
+                        Departments = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                    },
+                }))
+                .Build();
+
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+
+            Assert.AreEqual(
+                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                JsonConvert.SerializeObject(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new List<Access>() { Access.Maximum },
+                        Companies = new List<Access>() { Access.Read, Access.Write },
+                        Departments = new List<Access> { Access.Read, Access.Delete },
+                    }
+                })
             );
         }
 
