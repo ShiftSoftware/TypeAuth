@@ -2,6 +2,7 @@
 
 public class ActionTreeItem
 {
+    public string? ID { get; set; }
     public string TypeName { get; set; } = default!;
     public string? DisplayName { get; set; }
     public string? DisplayDescription { get; set; }

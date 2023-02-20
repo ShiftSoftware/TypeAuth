@@ -26,6 +26,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (treeAttribute != null)
                 {
+                    actionTreeItem.ID = treeAttribute.ID;
                     actionTreeItem.DisplayName = treeAttribute.Name;
                     actionTreeItem.DisplayDescription = treeAttribute.Description;
                 }
