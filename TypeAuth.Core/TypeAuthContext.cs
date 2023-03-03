@@ -353,8 +353,8 @@ namespace ShiftSoftware.TypeAuth.Core
                     }
                 }
 
-                if (access.Count() == 0)
-                    return null;
+                if (access.Count() > 0)
+                    //return null;
 
                 return new JArray(access);
             }

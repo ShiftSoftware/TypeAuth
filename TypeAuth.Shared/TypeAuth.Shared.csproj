@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-	  <RootNamespace>ShiftSoftware.TypeAuth.Shared</RootNamespace>
-	  <AssemblyName>ShiftSoftware.TypeAuth.Shared</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<RootNamespace>ShiftSoftware.TypeAuth.Shared</RootNamespace>
+		<AssemblyName>ShiftSoftware.TypeAuth.Shared</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
+	</ItemGroup>
 
 </Project>

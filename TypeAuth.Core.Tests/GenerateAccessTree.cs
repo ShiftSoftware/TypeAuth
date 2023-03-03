@@ -324,6 +324,50 @@ namespace ShiftSoftware.TypeAuth.Tests
         }
 
         [TestMethod]
+        public void WildCardAccessPreserver2()
+        {
+            var tAuth_Producer = new TypeAuthContextBuilder()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    SystemActions = new
+                    {
+                        UserModule = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                    }
+                }))
+                .Build();
+
+            var tAuth_Reducer = new TypeAuthContextBuilder()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
+                }))
+                .Build();
+
+            var tAuth_Preserver = new TypeAuthContextBuilder()
+                .AddActionTree<SystemActions>()
+                .AddAccessTree(JsonConvert.SerializeObject(new
+                {
+                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
+                }))
+                .Build();
+
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+
+            Assert.AreEqual(
+                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                JsonConvert.SerializeObject(new
+                {
+                    SystemActions = new
+                    {
+                        UserModule = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                    }
+                })
+            );
+        }
+
+        [TestMethod]
         public void DynamicActions()
         {
             var tAuth = new TypeAuthContextBuilder()
