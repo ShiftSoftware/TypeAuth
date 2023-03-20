@@ -1,4 +1,4 @@
 ﻿{
-  "SystemActions": [ 1, 2, 3, 4 ],
-  "CRMActions": [ 1, 2, 3, 4 ]
+  "SystemActions": [ "r", "w", "d", "m" ],
+  "CRMActions": [ "r", "w", "d", "m" ]
 }

@@ -1,8 +1,8 @@
 ﻿{
   "SystemActions": {
     "UserModule": {
-      "Users": [ 1, 2 ]
+      "Users": [ "r", "w" ]
     }
   },
-  "CRMActions": [ 1, 2, 3, 4 ]
+  "CRMActions": [ "r", "w", "d", "m" ]
 }

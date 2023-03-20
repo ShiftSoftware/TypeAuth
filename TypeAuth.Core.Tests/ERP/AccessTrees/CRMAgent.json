@@ -1,10 +1,10 @@
 ﻿{
   "CRMActions": {
-    "Customers": [ 1, 2 ],
-    "DiscountVouchers": [ 1, 2 ],
+    "Customers": [ "r", "w" ],
+    "DiscountVouchers": [ "r", "w" ],
     "DiscountValue": "10",
-    "Tickets": [ 1, 2 ],
-    "SocialMediaComments": [ 1 ],
+    "Tickets": [ "r", "w" ],
+    "SocialMediaComments": [ "r" ],
     "WorkSchedule": "08:00:00 - 13:00:00, 14:00:00 - 18:00:00"
   }
 }

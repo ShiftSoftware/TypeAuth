@@ -201,7 +201,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         private void SetTextAccessValue(ActionBase theAction, string? actionMin, string? actionMax, string? valueToSet, string? maxAllowed, Func<string?, string?, string?>? comparer, string? Id = null)
         {
-           
+
             var actionMatches = this.FindOrAddInActionBank(theAction, Id);
 
             foreach (var action in actionMatches)
@@ -271,7 +271,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 {
                     var actionBankItem = new ActionBankItem(theAction, new List<Access>());
 
-                    actionBankItem.SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id }, new List<Access> { }));  
+                    actionBankItem.SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id }, new List<Access> { }));
 
                     this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
@@ -304,10 +304,10 @@ namespace ShiftSoftware.TypeAuth.Core
                 this.FlattenActionTree(preservedActionTreeItems, preserver.ActionTree);
             }
 
-            var accessTree = this.TraverseActionTree(this.ActionTree, new JObject(), reducer, reducedActionTreeItems, false, preserver, preservedActionTreeItems);
+            var accessTree = this.TraverseActionTree(this.ActionTree, new Dictionary<string, object>(), reducer, reducedActionTreeItems, false, preserver, preservedActionTreeItems);
 
             if (accessTree == null)
-                accessTree = new JObject(); //To return an empty json {}
+                accessTree = new Dictionary<string, object>(); //To return an empty json {}
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(accessTree);
         }
@@ -323,7 +323,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 flattenedActionTreeItems.Add(root);
         }
 
-        private JToken? TraverseActionTree(ActionTreeItem actionTreeItem, JToken accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeItem>? preservedActionTreeItems = null)
+        private object? TraverseActionTree(ActionTreeItem actionTreeItem, Dictionary<string, object> accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeItem>? preservedActionTreeItems = null)
         {
             ActionTreeItem? preserverActionTreeItem = null;
 
@@ -356,12 +356,12 @@ namespace ShiftSoftware.TypeAuth.Core
                 if (access.Count() > 0)
                     //return null;
 
-                return new JArray(access);
+                    return access;
             }
 
             foreach (var subActionTreeItem in actionTreeItem.ActionTreeItems)
             {
-                var value = this.TraverseActionTree(subActionTreeItem, new JObject(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
+                var value = this.TraverseActionTree(subActionTreeItem, new Dictionary<string, object>(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
 
                 if (value != null)
                     accessTree[subActionTreeItem.TypeName] = value;
@@ -388,7 +388,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                     if (subItems.Count() > 0)
                     {
-                        var dynamicItems = new JObject();
+                        var dynamicItems = new Dictionary<string, object>();
 
                         accessTree[actionTreeItem.TypeName] = dynamicItems;
 
@@ -401,10 +401,10 @@ namespace ShiftSoftware.TypeAuth.Core
                                 Type = null
                             };
 
-                            var value = this.TraverseActionTree(subActionTreeItem, accessTree[actionTreeItem.TypeName]!, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
+                            var value = this.TraverseActionTree(subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
 
                             if (value != null)
-                                accessTree[actionTreeItem.TypeName]![subActionTreeItem.TypeName] = value;
+                                dynamicItems![subActionTreeItem.TypeName] = value;
                         }
 
                         if (dynamicItems.Count == 0)
@@ -442,7 +442,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (value == null || value == textAction?.MinimumAccess || value == dynamicTextAction?.MinimumAccess)
                         return null;
 
-                    return new JValue(value);
+                    return value;
                 }
 
                 else
@@ -492,7 +492,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     }
 
                     if (accesses.Count > 0)
-                        return new JArray(accesses);
+                        return accesses;
                     else
                         return null;
                 }
