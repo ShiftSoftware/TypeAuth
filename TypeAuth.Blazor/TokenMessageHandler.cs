@@ -17,16 +17,16 @@ public class TokenMessageHandler : DelegatingHandler
 
     protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var tokrn = tokenProvider.GetToken();
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokrn);
+        var token = tokenProvider.GetToken();
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         return base.Send(request, cancellationToken);
     }
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var tokrn = tokenProvider.GetToken();
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokrn);
+        var token = tokenProvider.GetToken();
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         return base.SendAsync(request, cancellationToken);
     }
