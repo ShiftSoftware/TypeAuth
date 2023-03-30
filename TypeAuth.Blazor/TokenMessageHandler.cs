@@ -9,6 +9,9 @@ public class TokenMessageHandler : DelegatingHandler
 
     public TokenMessageHandler(ITokenProvider tokenProvider)
     {
+        //add this to solve "The inner handler has not been assigned"
+        InnerHandler = new HttpClientHandler();
+
         this.tokenProvider = tokenProvider;
     }
 
