@@ -22,6 +22,7 @@ public static class IServiceCollectionExtensions
         }
 
         services.TryAddScoped<AuthenticationStateProvider, TypeAuthStateProvider>();
+        services.AddTransient<TokenMessageHandler>();
         services.AddAuthorizationCore();
 
         //Create custom TypeAuthOptions with action trees for dependency injection
