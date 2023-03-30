@@ -6,13 +6,13 @@ using System.Text.Json;
 
 namespace ShiftSoftware.TypeAuth.Blazor.Providers;
 
-public class CustomAuthStateProvider : AuthenticationStateProvider
+public class TypeAuthStateProvider : AuthenticationStateProvider
 {
     private readonly HttpClient http;
     private readonly TypeAuthBlazorOptions options;
     private readonly ITokenProvider tokenProvider;
 
-    public CustomAuthStateProvider(
+    public TypeAuthStateProvider(
         HttpClient http, 
         TypeAuthBlazorOptions options, 
         ITokenProvider tokenProvider)

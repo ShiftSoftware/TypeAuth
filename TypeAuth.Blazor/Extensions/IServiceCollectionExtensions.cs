@@ -21,7 +21,7 @@ public static class IServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
-        services.TryAddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+        services.TryAddScoped<AuthenticationStateProvider, TypeAuthStateProvider>();
         services.AddAuthorizationCore();
 
         //Create custom TypeAuthOptions with action trees for dependency injection
