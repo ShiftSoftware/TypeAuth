@@ -21,7 +21,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\TypeAuth.Core\TypeAuth.Core.csproj" />
 		<ProjectReference Include="..\TypeAuth.Shared\TypeAuth.Shared.csproj" />
 	</ItemGroup>
 
