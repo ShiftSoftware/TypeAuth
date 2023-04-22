@@ -11,7 +11,7 @@
 		<Authors>aza.asim,Shift Software</Authors>
 		<Product>TypeAuth Core</Product>
 		<AssemblyName>ShiftSoftware.TypeAuth.Core</AssemblyName>
-		<Version>1.1.3-alpha</Version>
+		<Version>1.4.1</Version>
 		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
