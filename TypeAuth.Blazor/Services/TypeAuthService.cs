@@ -15,6 +15,13 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
 
 
             BuildTypeAuthConext();
+
+            authStateProvider.AuthenticationStateChanged += AuthStateProvider_AuthenticationStateChanged;
+        }
+
+        private void AuthStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
+        {
+            BuildTypeAuthConext();
         }
 
         private void BuildTypeAuthConext()
@@ -27,11 +34,6 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
 
             if (options.ActionTrees is not null && accessTrees is not null)
                 base.Init(accessTrees, options.ActionTrees.ToArray());
-        }
-
-        public void AuthStateHasChanged()
-        {
-            BuildTypeAuthConext();
         }
     }
 }

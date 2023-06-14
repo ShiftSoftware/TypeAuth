@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using ShiftSoftware.TypeAuth.Blazor.Providers;
 using ShiftSoftware.TypeAuth.Blazor.Services;
 
 namespace ShiftSoftware.TypeAuth.Blazor.Extensions;
@@ -20,10 +18,6 @@ public static class IServiceCollectionExtensions
         {
             throw new ArgumentNullException(nameof(services));
         }
-
-        services.TryAddScoped<AuthenticationStateProvider, TypeAuthStateProvider>();
-        services.AddTransient<TokenMessageHandler>();
-        services.AddAuthorizationCore();
 
         //Create custom TypeAuthOptions with action trees for dependency injection
         services.TryAddScoped(x =>
