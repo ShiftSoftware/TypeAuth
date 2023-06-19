@@ -8,7 +8,7 @@
         /// <summary>
         /// Optional ID for identifying the Action Tree.
         /// </summary>
-        public string? ID { get; set; }
+        //public string? ID { get; set; }
 
         /// <summary>
         /// Friendly name for identifying the Action Tree.
@@ -25,9 +25,9 @@
 
         }
 
-        public ActionTree(string? name, string? description, string? Id = null)
+        public ActionTree(string? name, string? description/*, string? Id = null*/)
         {
-            this.ID = Id;
+            //this.ID = Id;
             this.Name = name;
             this.Description = description;
         }
