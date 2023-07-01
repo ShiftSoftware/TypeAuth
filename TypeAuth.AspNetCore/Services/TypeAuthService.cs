@@ -20,11 +20,15 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Services
 
         private void BuildTypeAuthConext()
         {
-            //Get the access trees from the token
-            var accessTrees = httpContextAccessor.HttpContext.User?.Claims?
-                .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
-                .Select(x=> x.Value).ToList();
+            var accessTrees = new List<string>();
 
+            if (httpContextAccessor.HttpContext is not null)
+            {
+                //Get the access trees from the token
+                accessTrees = httpContextAccessor.HttpContext.User?.Claims?
+                    .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
+                    .Select(x => x.Value).ToList();
+            }
 
             if (options.ActionTrees is not null && accessTrees is not null)
                 base.Init(accessTrees, options.ActionTrees.ToArray());
