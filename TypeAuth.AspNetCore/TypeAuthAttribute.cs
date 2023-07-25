@@ -6,6 +6,7 @@ using ShiftSoftware.TypeAuth.AspNetCore.Services;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore;
 
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class TypeAuthAttribute<TActionTree> : TypeAuthAttribute
 {
     public TypeAuthAttribute(string actionName, Access access) :
@@ -15,6 +16,7 @@ public class TypeAuthAttribute<TActionTree> : TypeAuthAttribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
 {
     private readonly Type actionTreeType;
