@@ -508,5 +508,45 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             return this.ActionTrees.ToArray();
         }
+
+        public Dictionary<string, object> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare)
+        {
+            var inAccessibleActions = new Dictionary<string, object>();
+
+            foreach (var actionBankItem in typeAuthContextToCompare.TypeAuthContextHelper.ActionBank)
+            {
+                var action = actionBankItem.Action;
+
+                if (action is not null)
+                {
+                    var inAccessibleForThisAction = new List<object>();
+
+                    foreach (var access in actionBankItem.AccessList)
+                    {
+                        if (!this.Can(action, access))
+                        {
+                            if (action is BooleanAction && access != Access.Maximum)
+                                continue;
+
+                            if (action is ReadAction && access != Access.Read)
+                                continue;
+
+                            if (action is ReadWriteAction && !(access == Access.Read || access == Access.Write))
+                                continue;
+
+                            if (action is ReadWriteDeleteAction && !(access == Access.Read || access == Access.Write || access == Access.Delete))
+                                continue;
+
+                            inAccessibleForThisAction.Add(access);
+                        }
+                    }
+
+                    if (inAccessibleForThisAction.Count > 0)
+                        inAccessibleActions[action.Name!] = string.Join(", ", inAccessibleForThisAction);
+                }
+            }
+
+            return inAccessibleActions;
+        }
     }
 }
