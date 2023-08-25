@@ -532,9 +532,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.ActionTrees.ToArray();
         }
 
-        public Dictionary<string, object> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare)
+        public Dictionary<ActionBase, string> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare)
         {
-            var inAccessibleActions = new Dictionary<string, object>();
+            var inAccessibleActions = new Dictionary<ActionBase, string>();
 
             foreach (var actionBankItem in typeAuthContextToCompare.TypeAuthContextHelper.ActionBank)
             {
@@ -565,7 +565,19 @@ namespace ShiftSoftware.TypeAuth.Core
                     }
 
                     if (inAccessibleForThisAction.Count > 0)
-                        inAccessibleActions[action.Name!] = string.Join(", ", inAccessibleForThisAction);
+                        inAccessibleActions[action] = string.Join(", ", inAccessibleForThisAction);
+
+                    if (action is DecimalAction decimalAction)
+                    {
+                        var targetValue = typeAuthContextToCompare.AccessValue(decimalAction);
+                        var allowedValue = this.AccessValue(decimalAction);
+
+
+                        if (targetValue > allowedValue)
+                        {
+                            inAccessibleActions[action] = $"Maximum allowed value is {allowedValue}. You can't grant {targetValue}";
+                        }
+                    }
                 }
             }
 
