@@ -3,6 +3,7 @@
     "Customers": [ "r" ],
     "DiscountVouchers": [ "r" ],
     "DiscountValue": "2",
+    "DecimalDiscount": 2.50,
     "WorkSchedule": "20:00:00 - 21:00:00"
   }
 }

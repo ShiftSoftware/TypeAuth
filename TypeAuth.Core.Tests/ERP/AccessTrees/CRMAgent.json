@@ -3,6 +3,7 @@
     "Customers": [ "r", "w" ],
     "DiscountVouchers": [ "r", "w" ],
     "DiscountValue": "10",
+    "DecimalDiscount": 15.0,
     "Tickets": [ "r", "w" ],
     "SocialMediaComments": [ "r" ],
     "WorkSchedule": "08:00:00 - 13:00:00, 14:00:00 - 18:00:00"

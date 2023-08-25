@@ -27,6 +27,14 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.AreEqual("2", tAuth.AccessValue(CRMActions.DiscountValue));
         }
 
+        [TestMethod("2.50% Decimal Discount Value")]
+        public void _2_50DecimalPercentDiscount()
+        {
+            var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
+
+            Assert.AreEqual(2.5m, tAuth.AccessValue(CRMActions.DecimalDiscount));
+        }
+
         [TestMethod("No Access on Tickets")]
         public void ReadWriteTickets()
         {

@@ -158,9 +158,29 @@ namespace ShiftSoftware.TypeAuth.Core
             return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess);
         }
 
+        public decimal? AccessValue(DecimalAction action)
+        {
+            var textValue = AccessValue(action as TextAction);
+
+            if (textValue != null)
+                return decimal.Parse(textValue);
+
+            return null;
+        }
+
         public string? AccessValue(DynamicTextAction action, string? Id, string? selfId = null)
         {
             return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess, Id, selfId);
+        }
+
+        public decimal? AccessValue(DynamicDecimalAction action, string? Id, string? selfId = null)
+        {
+            var textValue = AccessValue(action as DynamicTextAction, Id, selfId);
+
+            if (textValue != null)
+                return decimal.Parse(textValue);
+
+            return null;
         }
 
         private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, string? selfId = null)
@@ -256,7 +276,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
 
-            if (actionMatches.Count == 0 && theAction.GetType().BaseType == typeof(Actions.Action))
+            if (actionMatches.Count == 0 && theAction is Actions.Action)
             {
                 var actionBankItem = new ActionBankItem(theAction, new List<Access>());
 
@@ -265,7 +285,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 actionMatches.Add(actionBankItem);
             }
 
-            if (theAction.GetType().BaseType == typeof(DynamicAction))
+            if (theAction is DynamicAction)
             {
                 if (actionMatches.Count == 0)
                 {
@@ -442,6 +462,9 @@ namespace ShiftSoftware.TypeAuth.Core
                     if (value == null || value == textAction?.MinimumAccess || value == dynamicTextAction?.MinimumAccess)
                         return null;
 
+                    if (textAction is DecimalAction || dynamicTextAction is DynamicDecimalAction)
+                        return decimal.Parse(value);
+
                     return value;
                 }
 
@@ -469,7 +492,7 @@ namespace ShiftSoftware.TypeAuth.Core
                                 }
                             }
                         }
-                        else if (actionTreeItem.Action.GetType().BaseType == typeof(Actions.Action))
+                        else if (actionTreeItem.Action is Actions.Action)
                         {
                             var action = (actionTreeItem.Action as Actions.Action)!;
 

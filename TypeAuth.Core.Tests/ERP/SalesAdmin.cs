@@ -14,6 +14,14 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.AreEqual("100", tAuth.AccessValue(CRMActions.DiscountValue));
         }
 
+        [TestMethod("Full Decimal Discount via Wild Card")]
+        public void FullDecimalDiscountViaWildCard()
+        {
+            var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
+
+            Assert.AreEqual(100, tAuth.AccessValue(CRMActions.DecimalDiscount));
+        }
+
         [TestMethod("Only Read/Write users")]
         public void OnlyReadWriteUsers()
         {
@@ -39,7 +47,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         }
 
         [TestMethod("Full Access on Tickets & Comments")]
-        public void FullDiscountOnTicketsAndComments()
+        public void FullAccessOnTicketsAndComments()
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 

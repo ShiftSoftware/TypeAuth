@@ -25,5 +25,7 @@ namespace ShiftSoftware.TypeAuth.Shared
 
             return null;
         });
+
+        public readonly static DynamicDecimalAction DiscountByDepartmentDecimal = new DynamicDecimalAction("Discount (Decimal)", "", 0, 100);
     }
 }

@@ -441,6 +441,49 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_4", "_4"));
         }
 
+        [TestMethod("Decimal Action")]
+        public void DecimalAction()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        DiscountByDepartmentDecimal = new
+                        {
+                            _shift_software_type_auth_core_self_reference = 80,
+                            _2 = 20,
+                            _3 = 30,
+                            _4 = 40,
+                        }
+                    }
+                }))
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        DiscountByDepartmentDecimal = new
+                        {
+                            _shift_software_type_auth_core_self_reference = 85,
+                            _4 = 60
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            System.Diagnostics.Debug.WriteLine(typeAuth.GenerateAccessTree(typeAuth));
+
+            Assert.AreEqual(20, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_2"));
+            Assert.AreEqual(30, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_3"));
+            Assert.AreEqual(60, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_4"));
+
+            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_1", "_1"));
+            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_2", "_2"));
+            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_3", "_3"));
+            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_4", "_4"));
+        }
+
         [TestMethod("Wild Card And Normal Access Tree")]
         public void WildCardAndNormalAccessTree()
         {

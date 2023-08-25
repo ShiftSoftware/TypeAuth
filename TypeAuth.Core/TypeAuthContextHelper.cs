@@ -88,7 +88,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            if (actionCursor.Action != null && (node.AccessArray.Count > 0 || node.AccessValue != null || (actionCursor.Action.GetType().BaseType == typeof(DynamicAction) &&  node.AccessObject != null)))
+            if (actionCursor.Action != null && (node.AccessArray.Count > 0 || node.AccessValue != null || (actionCursor.Action is DynamicAction && node.AccessObject != null)))
             {
                 var theAction = (ActionBase)actionCursor.Action;
 
@@ -106,7 +106,7 @@ namespace ShiftSoftware.TypeAuth.Core
                         node.AccessValue = minimumAccess;
                 }
 
-                if (theAction.GetType().BaseType == typeof(DynamicAction) && node.AccessArray.Count > 0)
+                if (theAction  is DynamicAction && node.AccessArray.Count > 0)
                     actionCursor.WildCardAccess = node.AccessArray;
 
                 this.ActionBank.Add(new ActionBankItem(theAction, node.AccessArray, node.AccessValue, node.AccessObject));
@@ -125,7 +125,7 @@ namespace ShiftSoftware.TypeAuth.Core
             if (action == null)
                 return;
 
-            if (action.GetType().BaseType == typeof(DynamicAction))
+            if (action is DynamicAction)
             {
                 var dynamicAction = action as DynamicAction;
 
@@ -154,7 +154,7 @@ namespace ShiftSoftware.TypeAuth.Core
             {
                     actionMatches.Add(item);
 
-                if (actionToCheck.GetType().BaseType == typeof(DynamicAction))
+                if (actionToCheck is DynamicAction)
                 {
                     actionMatches.AddRange(item.SubActionBankItems.Where(x =>
                     {

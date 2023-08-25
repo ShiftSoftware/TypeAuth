@@ -80,13 +80,41 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 AccessTreeFiles.Affiliates,
             }, typeof(SystemActions), typeof(CRMActions));
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             Assert.IsTrue(
-                tAuth1.AccessValue(CRMActions.DiscountValue).Equals("100") &&
-                tAuth2.AccessValue(CRMActions.DiscountValue).Equals("10") &&
-                tAuth3.AccessValue(CRMActions.DiscountValue).Equals("2")
+                tAuth1.AccessValue(CRMActions.DiscountValue)!.Equals("100") &&
+                tAuth2.AccessValue(CRMActions.DiscountValue)!.Equals("10") &&
+                tAuth3.AccessValue(CRMActions.DiscountValue)!.Equals("2")
             );
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
+
+        [TestMethod("100 Decimal Discount Value (From Many Trees)")]
+        public void _100DecimalPercentDiscountValue()
+        {
+            var tAuth1 = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.Affiliates,
+                AccessTreeFiles.SalesAdmin,
+                AccessTreeFiles.CRMAgent,
+
+            }, typeof(SystemActions), typeof(CRMActions));
+
+            var tAuth2 = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.Affiliates,
+                AccessTreeFiles.CRMAgent,
+
+            }, typeof(SystemActions), typeof(CRMActions));
+
+            var tAuth3 = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.Affiliates,
+            }, typeof(SystemActions), typeof(CRMActions));
+
+            Assert.IsTrue(
+                tAuth1.AccessValue(CRMActions.DecimalDiscount)!.Equals(100m) &&
+                tAuth2.AccessValue(CRMActions.DecimalDiscount)!.Equals(15m) &&
+                tAuth3.AccessValue(CRMActions.DecimalDiscount)!.Equals(2.5m)
+            );
         }
 
         [TestMethod("Combined Work Schedule")]

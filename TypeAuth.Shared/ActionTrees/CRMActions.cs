@@ -27,6 +27,8 @@ namespace ShiftSoftware.TypeAuth.Shared
             return null;
         });
 
+        public static readonly DecimalAction DecimalDiscount = new DecimalAction("Sale Discount (Decimal)", null, 0, 100);
+
         public readonly static ReadWriteAction Tickets = new ReadWriteAction("Tickets");
         public readonly static ReadAction SocialMediaComments = new ReadAction("Social Media Comments");
 
