@@ -2,7 +2,7 @@
 using ShiftSoftware.TypeAuth.Core;
 using System.Collections.Generic;
 using System.Text.Json;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 
 namespace ShiftSoftware.TypeAuth.Tests.ERP
 {

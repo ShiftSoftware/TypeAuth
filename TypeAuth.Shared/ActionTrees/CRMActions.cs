@@ -3,7 +3,7 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShiftSoftware.TypeAuth.Shared
+namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
 {
 
     [ActionTree("CRM Actions", "Actions Related to the CRM Module.")]
@@ -11,7 +11,7 @@ namespace ShiftSoftware.TypeAuth.Shared
     {
         public readonly static ReadWriteDeleteAction Customers = new ReadWriteDeleteAction("Customers");
         public readonly static ReadWriteDeleteAction DiscountVouchers = new ReadWriteDeleteAction("Discount Vouchers");
-       
+
         public readonly static TextAction DiscountValue = new TextAction("Sale Discount", "", "0", "100", (a, b) =>
         {
             var numbers = new List<int>();

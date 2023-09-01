@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ShiftSoftware.TypeAuth.AspNetCore.Services;
 using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;

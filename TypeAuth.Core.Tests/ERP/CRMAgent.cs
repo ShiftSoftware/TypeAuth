@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 
 namespace ShiftSoftware.TypeAuth.Tests.ERP
 {

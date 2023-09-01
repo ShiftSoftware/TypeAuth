@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static ShiftSoftware.TypeAuth.Shared.SystemActions;
+using static ShiftSoftware.TypeAuth.Shared.ActionTrees.SystemActions;
 
 namespace ShiftSoftware.TypeAuth.Tests
 {

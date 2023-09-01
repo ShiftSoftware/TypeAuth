@@ -3,7 +3,7 @@ using ShiftSoftware.TypeAuth.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 
 namespace ShiftSoftware.TypeAuth.Tests.ERP
 {

@@ -1,7 +1,7 @@
 ﻿using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Core.Actions;
 
-namespace ShiftSoftware.TypeAuth.Shared
+namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
 {
     [ActionTree("System Actions", "Actions related to the System Module and Admistration.")]
     public class SystemActions

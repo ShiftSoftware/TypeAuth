@@ -2,7 +2,7 @@
 using ShiftSoftware.TypeAuth.Core.Actions;
 using System.Linq;
 
-namespace ShiftSoftware.TypeAuth.Shared
+namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
 {
     [ActionTree("Data Level Actions", "Actions Data Level Access.")]
     public class DataLevel

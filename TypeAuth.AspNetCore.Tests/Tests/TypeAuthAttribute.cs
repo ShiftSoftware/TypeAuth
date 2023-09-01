@@ -3,7 +3,7 @@ using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Shared;
 using Xunit.Abstractions;
 
-namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
+namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 {
     [Collection("API Collection")]
     public class TypeAuthAttribute
@@ -24,18 +24,18 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
             {
                 new {
                     CRMActions = new {
-                        Tickets = new List<Core.Access> { Core.Access.Read }
+                        Tickets = new List<Access> { Access.Read }
                     }
                 }
             });
 
-            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await this._client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/write")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await this._client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete")).StatusCode);
         }
 
         [Fact(DisplayName = "02. Read/Write Access")]
@@ -45,21 +45,21 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
             {
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> {
-                            ShiftSoftware.TypeAuth.Core.Access.Read,
-                            ShiftSoftware.TypeAuth.Core.Access.Write
+                        Tickets = new List<Access> {
+                            Access.Read,
+                            Access.Write
                         }
                     }
                 }
             });
 
-            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await this._client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete")).StatusCode);
         }
 
         [Fact(DisplayName = "03. Read/Write/Delete Access")]
@@ -69,22 +69,22 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
             {
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> {
-                            ShiftSoftware.TypeAuth.Core.Access.Read,
-                            ShiftSoftware.TypeAuth.Core.Access.Write,
-                            ShiftSoftware.TypeAuth.Core.Access.Delete
+                        Tickets = new List<Access> {
+                            Access.Read,
+                            Access.Write,
+                            Access.Delete
                         }
                     }
                 }
             });
 
-            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete")).StatusCode);
         }
 
         [Fact(DisplayName = "04. Multiple Access Trees")]
@@ -94,34 +94,34 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
             {
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> {
-                            ShiftSoftware.TypeAuth.Core.Access.Read
+                        Tickets = new List<Access> {
+                            Access.Read
                         }
                     }
                 },
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> {
-                            ShiftSoftware.TypeAuth.Core.Access.Write
+                        Tickets = new List<Access> {
+                            Access.Write
                         }
                     }
                 },
                 new {
                     CRMActions = new {
-                        Tickets = new List<ShiftSoftware.TypeAuth.Core.Access> {
-                            ShiftSoftware.TypeAuth.Core.Access.Delete
+                        Tickets = new List<Access> {
+                            Access.Delete
                         }
                     }
                 }
             });
 
-            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete")).StatusCode);
         }
 
         [Fact(DisplayName = "05. Read Nested")]
@@ -136,9 +136,9 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests
                 }
             });
 
-            this._client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await this._client.GetAsync("/api/default/read-nested")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read-nested")).StatusCode);
         }
     }
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Text;
-using ShiftSoftware.TypeAuth.Shared;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 
 var builder = WebApplication.CreateBuilder(args);
 
