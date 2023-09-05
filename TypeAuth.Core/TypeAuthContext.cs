@@ -584,7 +584,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return inAccessibleActions;
         }
 
-        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate)
+        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, string? selfId = null)
         {
             var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
 
@@ -612,6 +612,9 @@ namespace ShiftSoftware.TypeAuth.Core
                     }
                 }
             }
+
+            if (selfId is not null)
+                ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
 
             return (wildCardAccess, ids);
         }

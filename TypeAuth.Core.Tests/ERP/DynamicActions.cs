@@ -650,6 +650,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                     {
                         Cities = new
                         {
+                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Read, Access.Write },
                             _1 = new List<Access> { },
                             _2 = new List<Access> { Access.Read },
                             _3 = new List<Access> { Access.Write },
@@ -689,9 +690,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_5"));
             Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_5"));
 
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds, new List<string> { "_2", "_5", "_6" });
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds, new List<string> { "_3", "_5", "_6" });
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds, new List<string> { "_4", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read, "self").AccessibleIds, new List<string> { "self", "_2", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write, "I").AccessibleIds, new List<string> { "I", "_3", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete, "me").AccessibleIds, new List<string> { "_4", "_6" });
         }
     }
 }
