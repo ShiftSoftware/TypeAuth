@@ -617,5 +617,81 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.IsFalse(typeAuth2.CanWrite(DataLevel.Departments, "_3"));
             Assert.IsFalse(typeAuth2.CanDelete(DataLevel.Departments, "_3"));
         }
+
+        [TestMethod("Get Accessible Items - Wildcard")]
+        public void GetAccessibleItems_Wildcard()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).WildCard);
+
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).WildCard);
+        }
+
+        [TestMethod("Get Accessible Items - Ids")]
+        public void GetAccessibleItems_Ids()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new
+                        {
+                            _1 = new List<Access> { },
+                            _2 = new List<Access> { Access.Read },
+                            _3 = new List<Access> { Access.Write },
+                            _4 = new List<Access> { Access.Delete },
+                            _5 = new List<Access> { Access.Read, Access.Write },
+                            _6 = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).WildCard);
+
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_1"));
+
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_2"));
+
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_3"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_3"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_3"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_3"));
+
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_5"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_5"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).AccessibleIds.Contains("_5"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_5"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_5"));
+
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds, new List<string> { "_2", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds, new List<string> { "_3", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds, new List<string> { "_4", "_6" });
+        }
     }
 }

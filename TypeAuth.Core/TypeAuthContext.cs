@@ -583,5 +583,37 @@ namespace ShiftSoftware.TypeAuth.Core
 
             return inAccessibleActions;
         }
+
+        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate)
+        {
+            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+
+            var wildCardAccess = false;
+
+            foreach (var item in locatedActions)
+            {
+                if (item.AccessList.Any(predicate))
+                {
+                    wildCardAccess = true;
+                    break;
+                }
+            }
+
+            List<string> ids = new List<string>();
+
+            if (!wildCardAccess)
+            {
+                foreach (var item in locatedActions)
+                {
+                    foreach (var subItem in item.SubActionBankItems)
+                    {
+                        if (subItem.AccessList.Any(predicate))
+                            ids!.Add((subItem.Action as DynamicAction)!.Id!);
+                    }
+                }
+            }
+
+            return (wildCardAccess, ids);
+        }
     }
 }
