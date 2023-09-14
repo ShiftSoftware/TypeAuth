@@ -10,6 +10,7 @@ public class DynamicActionExpressionBuilder : IDynamicActionExpressionBuilder
     private IServiceProvider ServiceProvider { get; set; }
     private long? UserId { get; set; }
     public Func<Access, bool> AccessPredicate { get; set; }
+    public Operator CombineWithExistingFiltersWith { get; set; } = Operator.And;
 
     public DynamicActionExpressionBuilder(IServiceProvider serviceProvider, Func<Access, bool> accessPredicate, long? LoggedInUserId)
     {
