@@ -5,7 +5,6 @@
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RootNamespace>ShiftSoftware.TypeAuth.Core</RootNamespace>
 		<PackageId>ShiftSoftware.TypeAuth.Core</PackageId>
 		<Authors>aza.asim,Shift Software</Authors>

@@ -9,7 +9,6 @@
 		<PackageId>ShiftSoftware.TypeAuth.Blazor</PackageId>
 
 		<Authors>nahro,aza.asim,Shift Software</Authors>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>2023.09.14.20</Version>
 		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
