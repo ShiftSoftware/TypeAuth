@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\ShiftFrameworkGlobalSettings.props" Condition="Exists('..\..\ShiftFrameworkGlobalSettings.props')" />
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -9,7 +10,7 @@
 		<AssemblyName>ShiftSoftware.TypeAuth.AspNetCore</AssemblyName>
 
 		<Authors>nahro,aza.asim,Shift Software</Authors>
-		<Version>2023.09.14.20</Version>
+		<Version>$(ShiftFrameworkVersion)</Version>
 		<PackageProjectUrl>https://github.com/ShiftSoftware/TypeAuth</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ShiftSoftware/TypeAuth</RepositoryUrl>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
