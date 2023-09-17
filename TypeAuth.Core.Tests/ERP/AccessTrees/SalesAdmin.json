@@ -1,8 +1,0 @@
-﻿{
-  "SystemActions": {
-    "UserModule": {
-      "Users": [ "r", "w" ]
-    }
-  },
-  "CRMActions": [ "r", "w", "d", "m" ]
-}
