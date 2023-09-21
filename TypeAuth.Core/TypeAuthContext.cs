@@ -73,7 +73,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
         }
 
-        internal bool Can(Type actionTreeType, string actionName, Access access)
+        public bool Can(Type actionTreeType, string actionName, Access access)
         {
             var instance = (Activator.CreateInstance(actionTreeType))!;
 

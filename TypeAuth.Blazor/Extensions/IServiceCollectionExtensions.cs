@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Services;
+using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.Blazor.Extensions;
 
@@ -28,7 +29,7 @@ public static class IServiceCollectionExtensions
             return typeAuthOptions;
         });
 
-        services.TryAddScoped<TypeAuthService>();
+        services.TryAddScoped<ITypeAuthService, BlazorTypeAuthService>();
 
         return services;
     }

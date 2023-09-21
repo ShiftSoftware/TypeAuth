@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShiftSoftware.TypeAuth.AspNetCore.Services;
+using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 
@@ -32,7 +33,7 @@ public static class IServiceCollectionExtensions
             return typeAuthOptions;
         });
 
-        services.TryAddScoped<TypeAuthService>();
+        services.TryAddScoped<ITypeAuthService, AspNetCoreTypeAuthService>();
 
         return services;
     }

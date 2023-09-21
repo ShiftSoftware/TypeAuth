@@ -3,12 +3,12 @@ using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.Blazor.Services
 {
-    public class TypeAuthService : TypeAuthContext
+    internal class BlazorTypeAuthService : TypeAuthContext, ITypeAuthService
     {
         private readonly AuthenticationStateProvider authStateProvider;
         private readonly TypeAuthBlazorOptions options;
 
-        public TypeAuthService(AuthenticationStateProvider authStateProvider, TypeAuthBlazorOptions options)
+        public BlazorTypeAuthService(AuthenticationStateProvider authStateProvider, TypeAuthBlazorOptions options)
         {
             this.authStateProvider = authStateProvider;
             this.options = options;

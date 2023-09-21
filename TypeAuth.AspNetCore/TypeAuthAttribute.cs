@@ -32,7 +32,7 @@ public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        var service = context.HttpContext.RequestServices.GetService(typeof(TypeAuthService));
+        var service = context.HttpContext.RequestServices.GetService(typeof(ITypeAuthService));
 
         if(service == null)
         {
@@ -40,7 +40,7 @@ public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
             return;
         }
 
-        var typeAuthService = (TypeAuthService)service;
+        var typeAuthService = (ITypeAuthService) service;
         
         //Check for authrization
         if (!(context.HttpContext.User.Identity?.IsAuthenticated ?? false))

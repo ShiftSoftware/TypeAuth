@@ -3,14 +3,14 @@ using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Services
 {
-    public class TypeAuthService : TypeAuthContext
+    internal class AspNetCoreTypeAuthService : TypeAuthContext, ITypeAuthService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly TypeAuthAspNetCoreOptions options;
 
         //public TypeAuthContext TypeAuthContext { get; private set; }
 
-        public TypeAuthService(IHttpContextAccessor httpContextAccessor, TypeAuthAspNetCoreOptions options)
+        public AspNetCoreTypeAuthService(IHttpContextAccessor httpContextAccessor, TypeAuthAspNetCoreOptions options)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.options = options;
