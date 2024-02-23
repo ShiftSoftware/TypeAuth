@@ -19,10 +19,10 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Sample.Controllers
     [Authorize]
     public class DefaultController : ControllerBase
     {
-        private readonly TypeAuthService typeAuthService;
+        private readonly ITypeAuthService typeAuthService;
         IConfiguration configuration;
 
-        public DefaultController(TypeAuthService typeAuthService, IConfiguration configuration)
+        public DefaultController(ITypeAuthService typeAuthService, IConfiguration configuration)
         {
             this.typeAuthService = typeAuthService;
             this.configuration = configuration;
