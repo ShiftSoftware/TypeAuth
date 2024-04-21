@@ -23,4 +23,32 @@ public class DynamicActionFilterBuilder<Entity>
 
         return createdFilter;
     }
+
+    public DynamicActionFilterBy<Entity> FilterBy<TKey>(Expression<Func<Entity, TKey>> keySelector, List<string> accessibleKeys)
+    {
+        var parameter = Expression.Parameter(typeof(Entity));
+
+        // Build expression for ids.Contains(x.ID)
+        var keySelectorInvoke = Expression.Invoke(keySelector, parameter);
+
+        var createdFilter = new DynamicActionFilterBy<Entity>(accessibleKeys, keySelectorInvoke, parameter, typeof(TKey));
+
+        DynamicActionFilters.Add(createdFilter);
+
+        return createdFilter;
+    }
+
+    public DynamicActionFilterBy<Entity> FilterBy<TKey>(Expression<Func<Entity, TKey>> keySelector, string claimId)
+    {
+        var parameter = Expression.Parameter(typeof(Entity));
+
+        // Build expression for ids.Contains(x.ID)
+        var keySelectorInvoke = Expression.Invoke(keySelector, parameter);
+
+        var createdFilter = new DynamicActionFilterBy<Entity>(claimId, keySelectorInvoke, parameter, typeof(TKey));
+
+        DynamicActionFilters.Add(createdFilter);
+
+        return createdFilter;
+    }
 }
