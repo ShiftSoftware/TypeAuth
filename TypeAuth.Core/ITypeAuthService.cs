@@ -7,45 +7,45 @@ public interface ITypeAuthService
 {
     bool Can(ActionBase action, Access access);
 
-    bool Can(ActionBase action, Access access, string Id, string? selfId = null);
+    bool Can(ActionBase action, Access access, string Id, params string[]? selfId);
 
     bool Can(Type actionTreeType, string actionName, Access access);
 
     bool CanRead(ReadAction action);
 
-    bool CanRead(DynamicReadAction action, string Id, string? selfId = null);
+    bool CanRead(DynamicReadAction action, string Id, params string[]? selfId);
 
     bool CanRead(ReadWriteAction action);
 
-    bool CanRead(DynamicReadWriteAction action, string Id, string? selfId = null);
+    bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId);
 
     bool CanRead(ReadWriteDeleteAction action);
 
-    bool CanRead(DynamicReadWriteDeleteAction action, string Id, string? selfId = null);
+    bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
 
     bool CanWrite(ReadWriteAction action);
 
-    bool CanWrite(DynamicReadWriteAction action, string Id, string? selfId = null);
+    bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId);
 
     bool CanWrite(ReadWriteDeleteAction action);
 
-    bool CanWrite(DynamicReadWriteDeleteAction action, string Id, string? selfId = null);
+    bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
 
     bool CanDelete(ReadWriteDeleteAction action);
 
-    bool CanDelete(DynamicReadWriteDeleteAction action, string Id, string? selfId = null);
+    bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
 
     bool CanAccess(BooleanAction action);
 
-    bool CanAccess(DynamicBooleanAction action, string Id, string? selfId = null);
+    bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId);
 
     string? AccessValue(TextAction action);
 
     decimal? AccessValue(DecimalAction action);
 
-    string? AccessValue(DynamicTextAction action, string? Id, string? selfId = null);
+    string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId);
 
-    decimal? AccessValue(DynamicDecimalAction action, string? Id, string? selfId = null);
+    decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId);
 
     void SetAccessValue(TextAction theAction, string? value, string? maximumValue);
 
@@ -59,5 +59,5 @@ public interface ITypeAuthService
 
     Dictionary<ActionBase, string> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare);
 
-    (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, string? selfId = null);
+    (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
 }

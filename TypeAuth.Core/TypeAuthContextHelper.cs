@@ -146,7 +146,7 @@ namespace ShiftSoftware.TypeAuth.Core
             }
         }
 
-        internal List<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, string? selfId = null)
+        internal List<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, params string[]? selfId)
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
@@ -160,7 +160,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (x.Action as DynamicAction)!;
 
-                        return action.Id == Id || (Id != null && selfId != null && Id == selfId && action.Id == TypeAuthContext.SelfRererenceKey);
+                        return action.Id == Id || (Id != null && selfId != null && selfId.Contains(Id) && action.Id == TypeAuthContext.SelfRererenceKey);
                     }));
                 }
             }
@@ -179,7 +179,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 }).ToList();
         }
 
-        internal bool Can(ActionBase actionToCheck, Access accessTypeToCheck, string? Id = null, string? selfId = null)
+        internal bool Can(ActionBase actionToCheck, Access accessTypeToCheck, string? Id = null, params string[]? selfId)
         {
             var access = false;
 

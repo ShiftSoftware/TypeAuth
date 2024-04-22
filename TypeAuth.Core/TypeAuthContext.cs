@@ -68,7 +68,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access);
         }
 
-        public bool Can(ActionBase action, Access access, string Id, string? selfId = null)
+        public bool Can(ActionBase action, Access access, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
         }
@@ -92,7 +92,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
-        public bool CanRead(DynamicReadAction action, string Id, string? selfId = null)
+        public bool CanRead(DynamicReadAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
@@ -100,7 +100,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
-        public bool CanRead(DynamicReadWriteAction action, string Id, string? selfId = null)
+        public bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
@@ -108,7 +108,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
-        public bool CanRead(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        public bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
@@ -118,7 +118,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
-        public bool CanWrite(DynamicReadWriteAction action, string Id, string? selfId = null)
+        public bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
         }
@@ -128,7 +128,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
-        public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
         }
@@ -138,7 +138,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Delete);
         }
 
-        public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, string? selfId = null)
+        public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Delete, Id, selfId);
         }
@@ -148,7 +148,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Maximum);
         }
 
-        public bool CanAccess(DynamicBooleanAction action, string Id, string? selfId = null)
+        public bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id, selfId);
         }
@@ -168,12 +168,12 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
-        public string? AccessValue(DynamicTextAction action, string? Id, string? selfId = null)
+        public string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId)
         {
             return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess, Id, selfId);
         }
 
-        public decimal? AccessValue(DynamicDecimalAction action, string? Id, string? selfId = null)
+        public decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId)
         {
             var textValue = AccessValue(action as DynamicTextAction, Id, selfId);
 
@@ -183,7 +183,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
-        private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, string? selfId = null)
+        private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, params string[]? selfId)
         {
             var access = minAccess;
 
@@ -584,7 +584,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return inAccessibleActions;
         }
 
-        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, string? selfId = null)
+        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
         {
             var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
 
@@ -613,8 +613,20 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
+            //if (selfId is not null)
+            //    ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
+
             if (selfId is not null)
-                ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
+            {
+                if (ids.Contains(SelfRererenceKey))
+                {
+                    ids.Remove(SelfRererenceKey);
+
+                    ids.InsertRange(0, selfId);
+                }
+
+                //ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
+            }
 
             return (wildCardAccess, ids);
         }
