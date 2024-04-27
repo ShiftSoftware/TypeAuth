@@ -15,6 +15,7 @@ public class DynamicActionFilterBy<Entity>
     public Expression<Func<Entity, long?>>? CreatedByUserIDKeySelector { get; set; }
     public Type? DTOTypeForHashId { get; set; }
     public bool ShowNulls { get; set; }
+    public string? SelfClaimId { get; set; }
 
     public DynamicActionFilterBy(DynamicAction dynamicAction, InvocationExpression invocationExpression, ParameterExpression parameterExpression, Type tKey)
     {
@@ -50,6 +51,13 @@ public class DynamicActionFilterBy<Entity>
     public DynamicActionFilterBy<Entity> IncludeCreatedByCurrentUser(Expression<Func<Entity, long?>>? keySelector)
     {
         this.CreatedByUserIDKeySelector = keySelector;
+
+        return this;
+    }
+
+    public DynamicActionFilterBy<Entity> IncludeSelfItems(string selfClaimId)
+    {
+        this.SelfClaimId = selfClaimId;
 
         return this;
     }
