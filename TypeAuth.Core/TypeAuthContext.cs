@@ -11,6 +11,7 @@ namespace ShiftSoftware.TypeAuth.Core
         private TypeAuthContextHelper TypeAuthContextHelper { get; set; }
 
         internal const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
+        internal const string EmptyOrNullKey = "_shift_software_type_auth_core_empty_or_null";
 
         internal List<string> AccessTreeJsonStrings { get; set; } = default!;
 

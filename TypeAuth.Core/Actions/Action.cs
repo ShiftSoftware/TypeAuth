@@ -72,9 +72,13 @@
 
         internal List<KeyValuePair<string, string>> Items { get; set; }
 
-        public void Expand(List<KeyValuePair<string, string>> items, bool addSelf = false)
+        public void Expand(List<KeyValuePair<string, string>> items, bool addSelf = false, bool addEmptyOrNull = false)
         {
             this.Items = items.ToList();
+
+
+            if (addEmptyOrNull)
+                this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.EmptyOrNullKey, "Unassigned"));
 
             if (addSelf)
                 this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.SelfRererenceKey, "Self"));
