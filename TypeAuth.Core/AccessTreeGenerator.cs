@@ -2,40 +2,32 @@
 
 namespace ShiftSoftware.TypeAuth.Core;
 
-public class AccessTreeGenerator
+public static class AccessTreeGenerator
 {
-    private readonly TypeAuthContext TypeAuthContext;
-    private readonly TypeAuthContextHelper TypeAuthContextHelper;
-    public AccessTreeGenerator(TypeAuthContext typeAuthContext)
+    public static void SetAccessValue(this TypeAuthContext typeAuthContext, TextAction theAction, string? value, string? maximumValue)
     {
-        this.TypeAuthContext = typeAuthContext;
-        this.TypeAuthContextHelper = typeAuthContext.TypeAuthContextHelper;
+        typeAuthContext.SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer);
     }
 
-    public void SetAccessValue(TextAction theAction, string? value, string? maximumValue)
+    public static void SetAccessValue(this TypeAuthContext typeAuthContext, DynamicTextAction theAction, string? Id, string? value, string? maximumValue)
     {
-        SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer);
+        typeAuthContext.SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer, Id);
     }
 
-    public void SetAccessValue(DynamicTextAction theAction, string? Id, string? value, string? maximumValue)
-    {
-        SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer, Id);
-    }
-
-    private void SetTextAccessValue(ActionBase theAction, string? actionMin, string? actionMax, string? valueToSet, string? maxAllowed, Func<string?, string?, string?>? comparer, string? Id = null)
+    private static void SetTextAccessValue(this TypeAuthContext typeAuthContext, ActionBase theAction, string? actionMin, string? actionMax, string? valueToSet, string? maxAllowed, Func<string?, string?, string?>? comparer, string? Id = null)
     {
 
-        var actionMatches = this.FindOrAddInActionBank(theAction, Id);
+        var actionMatches = typeAuthContext.FindOrAddInActionBank(theAction, Id);
 
         foreach (var action in actionMatches)
         {
-            valueToSet = ReduceValue(comparer, actionMin, actionMax, valueToSet, maxAllowed);
+            valueToSet = typeAuthContext.ReduceValue(comparer, actionMin, actionMax, valueToSet, maxAllowed);
 
             action.AccessValue = valueToSet;
         }
     }
 
-    private string? ReduceValue(Func<string?, string?, string?>? comparer, string? actionMinimum, string? actionMaximum, string? value, string? maximumValue)
+    private static string? ReduceValue(this TypeAuthContext typeAuthContext, Func<string?, string?, string?>? comparer, string? actionMinimum, string? actionMaximum, string? value, string? maximumValue)
     {
         if (comparer != null)
         {
@@ -62,9 +54,9 @@ public class AccessTreeGenerator
         return value;
     }
 
-    public void ToggleAccess(ActionBase theAction, Access access, string? Id = null)
+    public static void ToggleAccess(this TypeAuthContext typeAuthContext, ActionBase theAction, Access access, string? Id = null)
     {
-        var actionMatches = this.FindOrAddInActionBank(theAction, Id);
+        var actionMatches = typeAuthContext.FindOrAddInActionBank(theAction, Id);
 
         foreach (var action in actionMatches)
         {
@@ -75,15 +67,15 @@ public class AccessTreeGenerator
         }
     }
 
-    private List<ActionBankItem> FindOrAddInActionBank(ActionBase theAction, string? Id)
+    private static List<ActionBankItem> FindOrAddInActionBank(this TypeAuthContext typeAuthContext, ActionBase theAction, string? Id)
     {
-        var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+        var actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
 
         if (actionMatches.Count == 0 && theAction is Actions.Action)
         {
             var actionBankItem = new ActionBankItem(theAction, new List<Access>());
 
-            this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+            typeAuthContext.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
             actionMatches.Add(actionBankItem);
         }
@@ -96,9 +88,9 @@ public class AccessTreeGenerator
 
                 actionBankItem.SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id }, new List<Access> { }));
 
-                this.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
+                typeAuthContext.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
-                actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
             }
 
 
@@ -106,28 +98,28 @@ public class AccessTreeGenerator
             {
                 actionMatches.First().SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id, Type = theAction.Type }, new List<Access>()));
 
-                actionMatches = this.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
             }
         }
 
         return actionMatches;
     }
 
-    public string GenerateAccessTree(TypeAuthContext reducer, TypeAuthContext? preserver = null)
+    public static string GenerateAccessTree(this TypeAuthContext typeAuthContext, TypeAuthContext reducer, TypeAuthContext? preserver = null)
     {
         var reducedActionTreeItems = new List<ActionTreeNode>();
 
-        this.FlattenActionTree(reducedActionTreeItems, reducer.ActionTree);
+        typeAuthContext.FlattenActionTree(reducedActionTreeItems, reducer.ActionTree);
 
         List<ActionTreeNode>? preservedActionTreeItems = null;
 
         if (preserver != null)
         {
             preservedActionTreeItems = new List<ActionTreeNode>();
-            this.FlattenActionTree(preservedActionTreeItems, preserver.ActionTree);
+            typeAuthContext.FlattenActionTree(preservedActionTreeItems, preserver.ActionTree);
         }
 
-        var accessTree = this.TraverseActionTree(this.TypeAuthContext.ActionTree, new Dictionary<string, object>(), reducer, reducedActionTreeItems, false, preserver, preservedActionTreeItems);
+        var accessTree = typeAuthContext.TraverseActionTree(typeAuthContext.ActionTree, new Dictionary<string, object>(), reducer, reducedActionTreeItems, false, preserver, preservedActionTreeItems);
 
         if (accessTree == null)
             accessTree = new Dictionary<string, object>(); //To return an empty json {}
@@ -135,18 +127,18 @@ public class AccessTreeGenerator
         return Newtonsoft.Json.JsonConvert.SerializeObject(accessTree);
     }
 
-    private void FlattenActionTree(List<ActionTreeNode> flattenedActionTreeItems, ActionTreeNode root)
+    private static void FlattenActionTree(this TypeAuthContext typeAuthContext, List<ActionTreeNode> flattenedActionTreeItems, ActionTreeNode root)
     {
         foreach (var item in root.ActionTreeItems)
         {
-            FlattenActionTree(flattenedActionTreeItems, item);
+            typeAuthContext.FlattenActionTree(flattenedActionTreeItems, item);
         }
 
         if (!root.IsADynamicSubItem)
             flattenedActionTreeItems.Add(root);
     }
 
-    private object? TraverseActionTree(ActionTreeNode actionTreeItem, Dictionary<string, object> accessTree, TypeAuthContext reducer, List<ActionTreeNode> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeNode>? preservedActionTreeItems = null)
+    private static object? TraverseActionTree(this TypeAuthContext typeAuthContext, ActionTreeNode actionTreeItem, Dictionary<string, object> accessTree, TypeAuthContext reducer, List<ActionTreeNode> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeNode>? preservedActionTreeItems = null)
     {
         ActionTreeNode? preserverActionTreeItem = null;
 
@@ -184,7 +176,7 @@ public class AccessTreeGenerator
 
         foreach (var subActionTreeItem in actionTreeItem.ActionTreeItems)
         {
-            var value = this.TraverseActionTree(subActionTreeItem, new Dictionary<string, object>(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
+            var value = typeAuthContext.TraverseActionTree(subActionTreeItem, new Dictionary<string, object>(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
 
             if (value != null)
                 accessTree[subActionTreeItem.ID] = value;
@@ -196,7 +188,7 @@ public class AccessTreeGenerator
 
             if (dynamicAction != null && !stopTraversing)
             {
-                var actionBankItems = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+                var actionBankItems = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
 
                 var subItems = actionBankItems.SelectMany(x => x.SubActionBankItems.ToList()).ToList();
 
@@ -223,7 +215,7 @@ public class AccessTreeGenerator
                             ID = (item.Action as DynamicAction)!.Id!
                         };
 
-                        var value = this.TraverseActionTree(subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
+                        var value = typeAuthContext.TraverseActionTree(subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
 
                         if (value != null)
                             dynamicItems![subActionTreeItem.ID] = value;
@@ -244,9 +236,9 @@ public class AccessTreeGenerator
                 string? value = null;
 
                 if (dynamicTextAction != null)
-                    value = this.TypeAuthContext.AccessValue(dynamicTextAction, actionTreeItem.ID);
+                    value = typeAuthContext.AccessValue(dynamicTextAction, actionTreeItem.ID);
                 else if (textAction != null)
-                    value = this.TypeAuthContext.AccessValue(textAction);
+                    value = typeAuthContext.AccessValue(textAction);
 
                 string? reducedValue = null;
 
@@ -256,9 +248,9 @@ public class AccessTreeGenerator
                     reducedValue = reducer.AccessValue(textAction);
 
                 if (dynamicTextAction != null)
-                    value = ReduceValue(dynamicTextAction.Comparer, dynamicTextAction.MinimumAccess, dynamicTextAction.MaximumAccess, value, reducedValue);
+                    value = typeAuthContext.ReduceValue(dynamicTextAction.Comparer, dynamicTextAction.MinimumAccess, dynamicTextAction.MaximumAccess, value, reducedValue);
                 else if (textAction != null)
-                    value = ReduceValue(textAction.Comparer, textAction.MinimumAccess, textAction.MaximumAccess, value, reducedValue);
+                    value = typeAuthContext.ReduceValue(textAction.Comparer, textAction.MinimumAccess, textAction.MaximumAccess, value, reducedValue);
 
 
                 if (value == null || value == textAction?.MinimumAccess || value == dynamicTextAction?.MinimumAccess)
@@ -278,7 +270,7 @@ public class AccessTreeGenerator
                 {
                     if (dynamicAction != null)
                     {
-                        if (this.TypeAuthContext.Can(dynamicAction, access, actionTreeItem.ID) && reducer.Can(dynamicAction, access, actionTreeItem.ID))
+                        if (typeAuthContext.Can(dynamicAction, access, actionTreeItem.ID) && reducer.Can(dynamicAction, access, actionTreeItem.ID))
                             accesses.Add(access);
 
                         if (preserver != null)
@@ -298,7 +290,7 @@ public class AccessTreeGenerator
                     {
                         var action = (actionTreeItem.Action as Actions.Action)!;
 
-                        if (this.TypeAuthContextHelper.Can(action, access) && reducer.TypeAuthContextHelper.Can(action, access))
+                        if (typeAuthContext.TypeAuthContextHelper.Can(action, access) && reducer.TypeAuthContextHelper.Can(action, access))
                             accesses.Add(access);
 
                         if (preserver != null)
@@ -329,7 +321,7 @@ public class AccessTreeGenerator
         return accessTree;
     }
 
-    public Dictionary<ActionBase, string> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare)
+    public static Dictionary<ActionBase, string> FindInAccessibleActionsOn(this TypeAuthContext typeAuthContext, TypeAuthContext typeAuthContextToCompare)
     {
         var inAccessibleActions = new Dictionary<ActionBase, string>();
 
@@ -343,7 +335,7 @@ public class AccessTreeGenerator
 
                 foreach (var access in actionBankItem.AccessList)
                 {
-                    if (!this.TypeAuthContext.Can(action, access))
+                    if (!typeAuthContext.Can(action, access))
                     {
                         if (action is BooleanAction && access != Access.Maximum)
                             continue;
@@ -367,7 +359,7 @@ public class AccessTreeGenerator
                 if (action is DecimalAction decimalAction)
                 {
                     var targetValue = typeAuthContextToCompare.AccessValue(decimalAction);
-                    var allowedValue = this.TypeAuthContext.AccessValue(decimalAction);
+                    var allowedValue = typeAuthContext.AccessValue(decimalAction);
 
 
                     if (targetValue > allowedValue)
