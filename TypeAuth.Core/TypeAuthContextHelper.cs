@@ -20,11 +20,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
             foreach (var tree in actionTrees)
             {
-                var key = string.IsNullOrWhiteSpace(rootActionTree.Key) ? tree.Name : $"{rootActionTree.Key}.{tree.Name}";
+                var path = string.IsNullOrWhiteSpace(rootActionTree.Path) ? tree.Name : $"{rootActionTree.Path}.{tree.Name}";
                 
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
-                var actionTreeItem = new ActionTreeItem(key) { ID = tree.Name };
+                var actionTreeItem = new ActionTreeItem(path) { ID = tree.Name };
 
                 if (treeAttribute != null)
                 {
@@ -47,9 +47,9 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (ActionBase)value;
 
-                        action.Key = $"{actionTreeItem.Key}.{y.Name}";
+                        action.Path = $"{actionTreeItem.Path}.{y.Name}";
 
-                        var thisActionTreeItem = new ActionTreeItem(action.Key)
+                        var thisActionTreeItem = new ActionTreeItem(action.Path)
                         {
                             ID = y.Name,
                             Action = action,
@@ -134,7 +134,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 foreach (var item in dynamicAction!.Items)
                 {
-                    var newTreeItem = new ActionTreeItem(actionTreeItem.Key + item.Key)
+                    var newTreeItem = new ActionTreeItem(actionTreeItem.Path + item.Key)
                     {
                         Action = action,
                         DisplayName = item.Value,
@@ -152,7 +152,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            foreach (var item in this.ActionBank.Where(x => x.Action.Key == actionToCheck.Key).ToList())
+            foreach (var item in this.ActionBank.Where(x => x.Action.Path == actionToCheck.Path).ToList())
             {
                 actionMatches.Add(item);
 

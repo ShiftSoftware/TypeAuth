@@ -7,7 +7,7 @@
         /// </summary>
         public string? Name { get; set; }
 
-        public string? Key { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// Additional description about the Action

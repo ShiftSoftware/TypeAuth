@@ -3,7 +3,7 @@
 public class ActionTreeItem
 {
     public string ID { get; set; } = default!;
-    public string? Key { get; set; }
+    public string? Path { get; set; }
     public string? DisplayName { get; set; }
     public string? DisplayDescription { get; set; }
     public dynamic? AdditionalData { get; set; }
@@ -13,10 +13,10 @@ public class ActionTreeItem
     public HashSet<ActionTreeItem> ActionTreeItems { get; set; }
 
     public bool DynamicSubitem { get; set; }
-    public ActionTreeItem(string? key)
+    public ActionTreeItem(string? path)
     {
         this.ActionTreeItems = new HashSet<ActionTreeItem>();
         this.WildCardAccess = new List<Access>();
-        this.Key = key;
+        this.Path = path;
     }
 }

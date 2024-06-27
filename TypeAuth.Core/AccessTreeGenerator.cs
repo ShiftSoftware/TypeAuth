@@ -153,14 +153,14 @@ public class AccessTreeGenerator
         if (preservedActionTreeItems != null)
         {
             preserverActionTreeItem = preservedActionTreeItems.FirstOrDefault(
-                x => x.Key == actionTreeItem.Key
+                x => x.Path == actionTreeItem.Path
             );
         }
 
         if (actionTreeItem.WildCardAccess.Count > 0 || preserverActionTreeItem?.WildCardAccess?.Count > 0)
         {
             var reducerActionTreeItem = reducedActionTreeItems.FirstOrDefault(
-                x => x.Key == actionTreeItem.Key
+                x => x.Path == actionTreeItem.Path
             );
 
             var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x)).ToList();
@@ -217,7 +217,7 @@ public class AccessTreeGenerator
 
                     foreach (var item in subItems)
                     {
-                        var subActionTreeItem = new ActionTreeItem(actionTreeItem.Key)
+                        var subActionTreeItem = new ActionTreeItem(actionTreeItem.Path)
                         {
                             Action = actionTreeItem.Action,
                             ID = (item.Action as DynamicAction)!.Id!
