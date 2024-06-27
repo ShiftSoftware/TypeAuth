@@ -12,7 +12,7 @@ public class ActionTreeNode
     //public DynamicActionBase? DynamicAction { get; set; }
     public HashSet<ActionTreeNode> ActionTreeItems { get; set; }
 
-    public bool DynamicSubitem { get; set; }
+    public bool IsADynamicSubItem { get; set; }
     public ActionTreeNode(string? path)
     {
         this.ActionTreeItems = new HashSet<ActionTreeNode>();

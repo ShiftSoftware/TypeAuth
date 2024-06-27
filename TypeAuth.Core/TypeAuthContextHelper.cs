@@ -67,7 +67,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal void PopulateActionBank(ActionTreeNode actionCursor, object? accessCursor)
         {
-            if (actionCursor.DynamicSubitem)
+            if (actionCursor.IsADynamicSubItem)
                 return;
 
             AccessTreeNode node = new AccessTreeNode(accessCursor);
@@ -140,7 +140,7 @@ namespace ShiftSoftware.TypeAuth.Core
                         DisplayName = item.Value,
                         ID = item.Key,
                         WildCardAccess = new List<Access>(),
-                        DynamicSubitem = true
+                        IsADynamicSubItem = true
                     };
 
                     actionTreeItem.ActionTreeItems.Add(newTreeItem);

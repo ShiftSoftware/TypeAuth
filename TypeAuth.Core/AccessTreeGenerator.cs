@@ -142,7 +142,7 @@ public class AccessTreeGenerator
             FlattenActionTree(flattenedActionTreeItems, item);
         }
 
-        if (!root.DynamicSubitem)
+        if (!root.IsADynamicSubItem)
             flattenedActionTreeItems.Add(root);
     }
 
