@@ -187,7 +187,7 @@ public class AccessTreeGenerator
             var value = this.TraverseActionTree(subActionTreeItem, new Dictionary<string, object>(), reducer, reducedActionTreeItems, stopTraversing, preserver, preservedActionTreeItems);
 
             if (value != null)
-                accessTree[subActionTreeItem.TypeName] = value;
+                accessTree[subActionTreeItem.ID] = value;
         }
 
         if (actionTreeItem.Action != null)
@@ -213,20 +213,20 @@ public class AccessTreeGenerator
                 {
                     var dynamicItems = new Dictionary<string, object>();
 
-                    accessTree[actionTreeItem.TypeName] = dynamicItems;
+                    accessTree[actionTreeItem.ID] = dynamicItems;
 
                     foreach (var item in subItems)
                     {
                         var subActionTreeItem = new ActionTreeItem(actionTreeItem.Key)
                         {
                             Action = actionTreeItem.Action,
-                            TypeName = (item.Action as DynamicAction)!.Id!
+                            ID = (item.Action as DynamicAction)!.Id!
                         };
 
                         var value = this.TraverseActionTree(subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
 
                         if (value != null)
-                            dynamicItems![subActionTreeItem.TypeName] = value;
+                            dynamicItems![subActionTreeItem.ID] = value;
                     }
 
                     if (dynamicItems.Count == 0)
@@ -244,14 +244,14 @@ public class AccessTreeGenerator
                 string? value = null;
 
                 if (dynamicTextAction != null)
-                    value = this.TypeAuthContext.AccessValue(dynamicTextAction, actionTreeItem.TypeName);
+                    value = this.TypeAuthContext.AccessValue(dynamicTextAction, actionTreeItem.ID);
                 else if (textAction != null)
                     value = this.TypeAuthContext.AccessValue(textAction);
 
                 string? reducedValue = null;
 
                 if (dynamicTextAction != null)
-                    reducedValue = reducer.AccessValue(dynamicTextAction, actionTreeItem.TypeName);
+                    reducedValue = reducer.AccessValue(dynamicTextAction, actionTreeItem.ID);
                 else if (textAction != null)
                     reducedValue = reducer.AccessValue(textAction);
 
@@ -278,16 +278,16 @@ public class AccessTreeGenerator
                 {
                     if (dynamicAction != null)
                     {
-                        if (this.TypeAuthContext.Can(dynamicAction, access, actionTreeItem.TypeName) && reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
+                        if (this.TypeAuthContext.Can(dynamicAction, access, actionTreeItem.ID) && reducer.Can(dynamicAction, access, actionTreeItem.ID))
                             accesses.Add(access);
 
                         if (preserver != null)
                         {
                             //If the access is reduced.
-                            if (!reducer.Can(dynamicAction, access, actionTreeItem.TypeName))
+                            if (!reducer.Can(dynamicAction, access, actionTreeItem.ID))
                             {
                                 //If the access should've been preserved.
-                                if (preserver.Can(dynamicAction, access, actionTreeItem.TypeName) && !accesses.Contains(access))
+                                if (preserver.Can(dynamicAction, access, actionTreeItem.ID) && !accesses.Contains(access))
                                 {
                                     accesses.Add(access);
                                 }

@@ -2,9 +2,8 @@
 
 public class ActionTreeItem
 {
-    public string? ID { get; set; }
+    public string ID { get; set; } = default!;
     public string? Key { get; set; }
-    public string TypeName { get; set; } = default!;
     public string? DisplayName { get; set; }
     public string? DisplayDescription { get; set; }
     public dynamic? AdditionalData { get; set; }

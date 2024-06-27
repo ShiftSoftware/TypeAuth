@@ -16,7 +16,7 @@ namespace ShiftSoftware.TypeAuth.Core
         internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree)
         {
             if (rootActionTree is null)
-                rootActionTree = new ActionTreeItem(null) { TypeName = "Root" };
+                rootActionTree = new ActionTreeItem(null) { ID = "Root" };
 
             foreach (var tree in actionTrees)
             {
@@ -24,7 +24,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
-                var actionTreeItem = new ActionTreeItem(key) { TypeName = tree.Name };
+                var actionTreeItem = new ActionTreeItem(key) { ID = tree.Name };
 
                 if (treeAttribute != null)
                 {
@@ -51,7 +51,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                         var thisActionTreeItem = new ActionTreeItem(action.Key)
                         {
-                            TypeName = y.Name,
+                            ID = y.Name,
                             Action = action,
                             DisplayName = action.Name,
                             DisplayDescription = action.Description
@@ -86,7 +86,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     else
                     {
                         if (accessCursor != null)
-                            PopulateActionBank(entry, node.AccessObject![entry.TypeName]);
+                            PopulateActionBank(entry, node.AccessObject![entry.ID]);
                     }
                 }
             }
@@ -138,7 +138,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         Action = action,
                         DisplayName = item.Value,
-                        TypeName = item.Key,
+                        ID = item.Key,
                         WildCardAccess = new List<Access>(),
                         DynamicSubitem = true
                     };
