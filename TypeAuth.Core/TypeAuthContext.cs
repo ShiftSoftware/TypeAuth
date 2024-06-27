@@ -16,7 +16,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal Type[] ActionTrees { get; set; } = default!;
 
-        public ActionTreeItem ActionTree { get; set; } = default!;
+        public ActionTreeNode ActionTree { get; set; } = default!;
 
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {

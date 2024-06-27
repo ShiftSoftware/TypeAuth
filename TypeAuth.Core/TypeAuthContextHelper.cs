@@ -13,10 +13,10 @@ namespace ShiftSoftware.TypeAuth.Core
             ActionBank = new List<ActionBankItem>();
         }
 
-        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree)
+        internal ActionTreeNode GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeNode? rootActionTree)
         {
             if (rootActionTree is null)
-                rootActionTree = new ActionTreeItem(null) { ID = "Root" };
+                rootActionTree = new ActionTreeNode(null) { ID = "Root" };
 
             foreach (var tree in actionTrees)
             {
@@ -24,7 +24,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
-                var actionTreeItem = new ActionTreeItem(path) { ID = tree.Name };
+                var actionTreeItem = new ActionTreeNode(path) { ID = tree.Name };
 
                 if (treeAttribute != null)
                 {
@@ -49,7 +49,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                         action.Path = $"{actionTreeItem.Path}.{y.Name}";
 
-                        var thisActionTreeItem = new ActionTreeItem(action.Path)
+                        var thisActionTreeItem = new ActionTreeNode(action.Path)
                         {
                             ID = y.Name,
                             Action = action,
@@ -65,7 +65,7 @@ namespace ShiftSoftware.TypeAuth.Core
             return rootActionTree;
         }
 
-        internal void PopulateActionBank(ActionTreeItem actionCursor, object? accessCursor)
+        internal void PopulateActionBank(ActionTreeNode actionCursor, object? accessCursor)
         {
             if (actionCursor.DynamicSubitem)
                 return;
@@ -116,7 +116,7 @@ namespace ShiftSoftware.TypeAuth.Core
             }
         }
 
-        internal void ExpandDynamicActions(ActionTreeItem actionTreeItem)
+        internal void ExpandDynamicActions(ActionTreeNode actionTreeItem)
         {
             foreach (var item in actionTreeItem.ActionTreeItems)
             {
@@ -134,7 +134,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 foreach (var item in dynamicAction!.Items)
                 {
-                    var newTreeItem = new ActionTreeItem(actionTreeItem.Path + item.Key)
+                    var newTreeItem = new ActionTreeNode(actionTreeItem.Path + item.Key)
                     {
                         Action = action,
                         DisplayName = item.Value,

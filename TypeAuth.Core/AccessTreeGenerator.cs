@@ -115,15 +115,15 @@ public class AccessTreeGenerator
 
     public string GenerateAccessTree(TypeAuthContext reducer, TypeAuthContext? preserver = null)
     {
-        var reducedActionTreeItems = new List<ActionTreeItem>();
+        var reducedActionTreeItems = new List<ActionTreeNode>();
 
         this.FlattenActionTree(reducedActionTreeItems, reducer.ActionTree);
 
-        List<ActionTreeItem>? preservedActionTreeItems = null;
+        List<ActionTreeNode>? preservedActionTreeItems = null;
 
         if (preserver != null)
         {
-            preservedActionTreeItems = new List<ActionTreeItem>();
+            preservedActionTreeItems = new List<ActionTreeNode>();
             this.FlattenActionTree(preservedActionTreeItems, preserver.ActionTree);
         }
 
@@ -135,7 +135,7 @@ public class AccessTreeGenerator
         return Newtonsoft.Json.JsonConvert.SerializeObject(accessTree);
     }
 
-    private void FlattenActionTree(List<ActionTreeItem> flattenedActionTreeItems, ActionTreeItem root)
+    private void FlattenActionTree(List<ActionTreeNode> flattenedActionTreeItems, ActionTreeNode root)
     {
         foreach (var item in root.ActionTreeItems)
         {
@@ -146,9 +146,9 @@ public class AccessTreeGenerator
             flattenedActionTreeItems.Add(root);
     }
 
-    private object? TraverseActionTree(ActionTreeItem actionTreeItem, Dictionary<string, object> accessTree, TypeAuthContext reducer, List<ActionTreeItem> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeItem>? preservedActionTreeItems = null)
+    private object? TraverseActionTree(ActionTreeNode actionTreeItem, Dictionary<string, object> accessTree, TypeAuthContext reducer, List<ActionTreeNode> reducedActionTreeItems, bool stopTraversing = false, TypeAuthContext? preserver = null, List<ActionTreeNode>? preservedActionTreeItems = null)
     {
-        ActionTreeItem? preserverActionTreeItem = null;
+        ActionTreeNode? preserverActionTreeItem = null;
 
         if (preservedActionTreeItems != null)
         {
@@ -217,7 +217,7 @@ public class AccessTreeGenerator
 
                     foreach (var item in subItems)
                     {
-                        var subActionTreeItem = new ActionTreeItem(actionTreeItem.Path)
+                        var subActionTreeItem = new ActionTreeNode(actionTreeItem.Path)
                         {
                             Action = actionTreeItem.Action,
                             ID = (item.Action as DynamicAction)!.Id!
