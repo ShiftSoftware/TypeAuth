@@ -13,16 +13,18 @@ namespace ShiftSoftware.TypeAuth.Core
             ActionBank = new List<ActionBankItem>();
         }
 
-        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree = null)
+        internal ActionTreeItem GenerateActionTree(List<Type> actionTrees, List<string> accessTreeJSONStrings, ActionTreeItem? rootActionTree)
         {
             if (rootActionTree is null)
-                rootActionTree = new ActionTreeItem() { TypeName = "Root" };
+                rootActionTree = new ActionTreeItem(null) { TypeName = "Root" };
 
             foreach (var tree in actionTrees)
             {
+                var key = string.IsNullOrWhiteSpace(rootActionTree.Key) ? tree.Name : $"{rootActionTree.Key}.{tree.Name}";
+                
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
-                var actionTreeItem = new ActionTreeItem() { TypeName = tree.Name, Type = tree };
+                var actionTreeItem = new ActionTreeItem(key) { TypeName = tree.Name };
 
                 if (treeAttribute != null)
                 {
@@ -45,13 +47,14 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (ActionBase)value;
 
-                        var thisActionTreeItem = new ActionTreeItem
+                        action.Key = $"{actionTreeItem.Key}.{y.Name}";
+
+                        var thisActionTreeItem = new ActionTreeItem(action.Key)
                         {
                             TypeName = y.Name,
                             Action = action,
                             DisplayName = action.Name,
-                            DisplayDescription = action.Description,
-                            Type = y.FieldType
+                            DisplayDescription = action.Description
                         };
 
                         actionTreeItem.ActionTreeItems.Add(thisActionTreeItem);
@@ -131,12 +134,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 foreach (var item in dynamicAction!.Items)
                 {
-                    var newTreeItem = new ActionTreeItem
+                    var newTreeItem = new ActionTreeItem(actionTreeItem.Key + item.Key)
                     {
                         Action = action,
                         DisplayName = item.Value,
                         TypeName = item.Key,
-                        Type = action.GetType(),
                         WildCardAccess = new List<Access>(),
                         DynamicSubitem = true
                     };
@@ -150,9 +152,9 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            foreach (var item in this.ActionBank.Where(x => x.Action == actionToCheck).ToList())
+            foreach (var item in this.ActionBank.Where(x => x.Action.Key == actionToCheck.Key).ToList())
             {
-                    actionMatches.Add(item);
+                actionMatches.Add(item);
 
                 if (actionToCheck is DynamicAction)
                 {

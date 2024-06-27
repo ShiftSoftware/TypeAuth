@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using ShiftSoftware.TypeAuth.Core.Actions;
+﻿using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -41,7 +40,7 @@ namespace ShiftSoftware.TypeAuth.Core
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
 
-            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings);
+            this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings, null);
 
             //Console.WriteLine("Action Trees Are:");
             //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.ActionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
@@ -351,14 +350,14 @@ namespace ShiftSoftware.TypeAuth.Core
             if (preservedActionTreeItems != null)
             {
                 preserverActionTreeItem = preservedActionTreeItems.FirstOrDefault(
-                    x => x.Type == actionTreeItem.Type
+                    x => x.Key == actionTreeItem.Key
                 );
             }
 
             if (actionTreeItem.WildCardAccess.Count > 0 || preserverActionTreeItem?.WildCardAccess?.Count > 0)
             {
                 var reducerActionTreeItem = reducedActionTreeItems.FirstOrDefault(
-                    x => x.Type == actionTreeItem.Type
+                    x => x.Key == actionTreeItem.Key
                 );
 
                 var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x)).ToList();
@@ -415,11 +414,10 @@ namespace ShiftSoftware.TypeAuth.Core
 
                         foreach (var item in subItems)
                         {
-                            var subActionTreeItem = new ActionTreeItem
+                            var subActionTreeItem = new ActionTreeItem(actionTreeItem.Key)
                             {
                                 Action = actionTreeItem.Action,
-                                TypeName = (item.Action as DynamicAction)!.Id!,
-                                Type = null
+                                TypeName = (item.Action as DynamicAction)!.Id!
                             };
 
                             var value = this.TraverseActionTree(subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);

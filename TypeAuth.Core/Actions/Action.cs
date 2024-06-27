@@ -7,6 +7,8 @@
         /// </summary>
         public string? Name { get; set; }
 
+        public string? Key { get; set; }
+
         /// <summary>
         /// Additional description about the Action
         /// </summary>
