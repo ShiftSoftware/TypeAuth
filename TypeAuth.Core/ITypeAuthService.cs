@@ -47,17 +47,7 @@ public interface ITypeAuthService
 
     decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId);
 
-    void SetAccessValue(TextAction theAction, string? value, string? maximumValue);
-
-    void SetAccessValue(DynamicTextAction theAction, string? Id, string? value, string? maximumValue);
-
-    void ToggleAccess(ActionBase theAction, Access access, string? Id = null);
-
-    string GenerateAccessTree(TypeAuthContext reducer, TypeAuthContext? preserver = null);
-
     Type[] GetRegisteredActionTrees();
-
-    Dictionary<ActionBase, string> FindInAccessibleActionsOn(TypeAuthContext typeAuthContextToCompare);
 
     (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
 }

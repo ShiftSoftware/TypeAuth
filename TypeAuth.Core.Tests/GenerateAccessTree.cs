@@ -4,8 +4,6 @@ using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using static ShiftSoftware.TypeAuth.Shared.ActionTrees.SystemActions;
 
 namespace ShiftSoftware.TypeAuth.Tests
 {
@@ -17,7 +15,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
-            var accessTree = tAuth.GenerateAccessTree(tAuth);
+            var accessTree = new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth);
 
             //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(accessTree).ToString());
 
@@ -32,7 +30,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
-            var accessTree = tAuth.GenerateAccessTree(tAuth);
+            var accessTree = new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth);
 
             //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(accessTree).ToString());
 
@@ -47,7 +45,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SuperAdmin);
 
-            var accessTree = tAuth.GenerateAccessTree(tAuth);
+            var accessTree = new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth);
 
             //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(accessTree).ToString());
 
@@ -62,7 +60,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
-            var accessTree = tAuth.GenerateAccessTree(tAuth);
+            var accessTree = new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth);
 
             //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(accessTree).ToString());
 
@@ -119,11 +117,11 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth_Reducer).GenerateAccessTree(tAuth_Reducer)
             );
         }
 
@@ -176,10 +174,10 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
 
             Assert.AreEqual(
-                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
                 JsonConvert.SerializeObject(new
                 {
                     CRMActions = new
@@ -226,11 +224,11 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth_Reducer).GenerateAccessTree(tAuth_Reducer)
             );
         }
 
@@ -269,11 +267,11 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth_Reducer).GenerateAccessTree(tAuth_Reducer)
             );
         }
 
@@ -311,10 +309,10 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
 
             Assert.AreEqual(
-                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
                 JsonConvert.SerializeObject(new
                 {
                     CRMActions = new List<Access> { Access.Read, Access.Maximum },
@@ -353,10 +351,10 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
 
             Assert.AreEqual(
-                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
                 JsonConvert.SerializeObject(new
                 {
                     SystemActions = new
@@ -418,11 +416,11 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth_Reducer).GenerateAccessTree(tAuth_Reducer)
             );
         }
 
@@ -497,10 +495,10 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             //Assert.IsTrue(tAuth_Preserver.CanWrite(DataLevel.Companies, "_1"));
 
-            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
 
             Assert.AreEqual(
-                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
                 JsonConvert.SerializeObject(new
                 {
                     DataLevel = new
@@ -570,11 +568,11 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth_Reducer).GenerateAccessTree(tAuth_Reducer)
             );
         }
 
@@ -618,10 +616,10 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
+            //Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver)).ToString());
 
             Assert.AreEqual(
-                tAuth_Producer.GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
+                new AccessTreeGenerator(tAuth_Producer).GenerateAccessTree(tAuth_Reducer, tAuth_Preserver),
                 JsonConvert.SerializeObject(new
                 {
                     DataLevel = new
@@ -671,10 +669,10 @@ namespace ShiftSoftware.TypeAuth.Tests
                 }))
                 .Build();
 
-            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(tAuth.GenerateAccessTree(tAuth_Reducer)).ToString());
+            Console.WriteLine(Newtonsoft.Json.Linq.JObject.Parse(new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer)).ToString());
 
             Assert.AreEqual(
-                tAuth.GenerateAccessTree(tAuth_Reducer),
+                new AccessTreeGenerator(tAuth).GenerateAccessTree(tAuth_Reducer),
                 JsonConvert.SerializeObject(new
                 {
                     DataLevel = new
