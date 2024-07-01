@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.TypeAuth.AspNetCore.Services;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore;
 
@@ -40,7 +39,7 @@ public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
             return;
         }
 
-        var typeAuthService = (ITypeAuthService) service;
+        var typeAuthService = (TypeAuthContext) service;
         
         //Check for authrization
         if (!(context.HttpContext.User.Identity?.IsAuthenticated ?? false))

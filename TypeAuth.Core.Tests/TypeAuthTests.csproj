@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" />
 		<ProjectReference Include="..\TypeAuth.Shared\TypeAuth.Shared.csproj" />
 	</ItemGroup>
 

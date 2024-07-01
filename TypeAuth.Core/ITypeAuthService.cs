@@ -9,8 +9,7 @@ public interface ITypeAuthService
 
     bool Can(ActionBase action, Access access, string Id, params string[]? selfId);
 
-    bool Can(Type actionTreeType, string actionName, Access access);
-
+    
     bool CanRead(ReadAction action);
 
     bool CanRead(DynamicReadAction action, string Id, params string[]? selfId);

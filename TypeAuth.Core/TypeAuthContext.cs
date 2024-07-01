@@ -73,21 +73,6 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
         }
 
-        public bool Can(Type actionTreeType, string actionName, Access access)
-        {
-            var instance = (Activator.CreateInstance(actionTreeType))!;
-
-            var action = (Actions.Action) actionTreeType
-                .GetFields()
-                .FirstOrDefault(x => x.Name.Equals(actionName, StringComparison.InvariantCultureIgnoreCase))
-                ?.GetValue(instance)!;
-
-            if (action == null)
-                throw new Exception($"No Such Action ({actionTreeType.FullName}.{actionName})");
-
-            return this.TypeAuthContextHelper.Can(action, access);
-        }
-
         public bool CanRead(ReadAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
