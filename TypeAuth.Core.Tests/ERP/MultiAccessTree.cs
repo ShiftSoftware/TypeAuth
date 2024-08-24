@@ -175,5 +175,49 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 !canWork[cantWorkAt22_30]
             );
         }
+
+        [TestMethod("Merging a (read-only Wild Card tree) with a (full access explicit tree)")]
+        public void ReadOnlyWildCardTree_Plus_FullAcessExplicitTree()
+        {
+            var tAuth_ReadOnlyWildCard = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.System_All_ReadOnly,
+            }, typeof(SystemActions));
+
+            var tAuth_FullAccessExplicit = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.System_All_Users,
+            }, typeof(SystemActions));
+
+            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead(SystemActions.UserModule.Users));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite(SystemActions.UserModule.Users));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete(SystemActions.UserModule.Users));
+
+            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete(SystemActions.UserModule.Roles));
+
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanRead(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanWrite(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanDelete(SystemActions.UserModule.Users));
+
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanRead(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanWrite(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanDelete(SystemActions.UserModule.Roles));
+
+            var tAuth_Merged = new TypeAuthContext(new List<string>
+            {
+                AccessTreeFiles.System_All_ReadOnly,
+                AccessTreeFiles.System_All_Users,
+            }, typeof(SystemActions));
+
+            Assert.IsTrue(tAuth_Merged.CanRead(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_Merged.CanWrite(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_Merged.CanDelete(SystemActions.UserModule.Users));
+
+            Assert.IsTrue(tAuth_Merged.CanRead(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_Merged.CanWrite(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_Merged.CanDelete(SystemActions.UserModule.Roles));
+        }
     }
 }

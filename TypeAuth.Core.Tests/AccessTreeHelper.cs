@@ -49,6 +49,22 @@ namespace ShiftSoftware.TypeAuth.Tests
                 WorkSchedule = "20:00:00 - 21:00:00"
             }
         });
+
+        public static string System_All_ReadOnly = Newtonsoft.Json.JsonConvert.SerializeObject(new
+        {
+            SystemActions = new List<Access> { Access.Read }
+        });
+
+        public static string System_All_Users = Newtonsoft.Json.JsonConvert.SerializeObject(new
+        {
+            SystemActions = new
+            {
+                UserModule = new
+                {
+                    Users = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                }
+            },
+        });
     }
 
     class AccessTreeHelper
