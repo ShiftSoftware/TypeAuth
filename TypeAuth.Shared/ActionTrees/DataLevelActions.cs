@@ -7,11 +7,11 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
     [ActionTree("Data Level Actions", "Actions Data Level Access.")]
     public class DataLevel
     {
-        public readonly static DynamicBooleanAction Cities = new DynamicBooleanAction("Cities");
-        public readonly static DynamicReadAction Countries = new DynamicReadAction("Countries");
-        public readonly static DynamicReadWriteAction Companies = new DynamicReadWriteAction("Companies");
-        public readonly static DynamicReadWriteDeleteAction Departments = new DynamicReadWriteDeleteAction("Departments");
-        public readonly static DynamicTextAction DiscountByDepartment = new DynamicTextAction("Discount", "", "0", "100", (a, b) =>
+        public DynamicBooleanAction Cities = new DynamicBooleanAction("Cities");
+        public DynamicReadAction Countries = new DynamicReadAction("Countries");
+        public DynamicReadWriteAction Companies = new DynamicReadWriteAction("Companies");
+        public DynamicReadWriteDeleteAction Departments = new DynamicReadWriteDeleteAction("Departments");
+        public DynamicTextAction DiscountByDepartment = new DynamicTextAction("Discount", "", "0", "100", (a, b) =>
         {
             var numbers = new System.Collections.Generic.List<int>();
 
@@ -26,6 +26,6 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
             return null;
         });
 
-        public readonly static DynamicDecimalAction DiscountByDepartmentDecimal = new DynamicDecimalAction("Discount (Decimal)", "", 0, 100);
+        public DynamicDecimalAction DiscountByDepartmentDecimal = new DynamicDecimalAction("Discount (Decimal)", "", 0, 100);
     }
 }

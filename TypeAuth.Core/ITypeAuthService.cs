@@ -9,44 +9,44 @@ public interface ITypeAuthService
 
     bool Can(ActionBase action, Access access, string Id, params string[]? selfId);
 
-    
-    bool CanRead(ReadAction action);
 
-    bool CanRead(DynamicReadAction action, string Id, params string[]? selfId);
+    bool CanRead<TActionTree>(Func<TActionTree, ReadAction> action);
 
-    bool CanRead(ReadWriteAction action);
+    bool CanRead<TActionTree>(Func<TActionTree, DynamicReadAction> action, string Id, params string[]? selfId);
 
-    bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId);
+    bool CanRead<TActionTree>(Func<TActionTree, ReadWriteAction> action);
 
-    bool CanRead(ReadWriteDeleteAction action);
+    bool CanRead<TActionTree>(Func<TActionTree, DynamicReadWriteAction> action, string Id, params string[]? selfId);
 
-    bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanRead<TActionTree>(Func<TActionTree, ReadWriteDeleteAction> action);
 
-    bool CanWrite(ReadWriteAction action);
+    bool CanRead<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId);
 
-    bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId);
+    bool CanWrite<TActionTree>(Func<TActionTree, ReadWriteAction> action);
 
-    bool CanWrite(ReadWriteDeleteAction action);
+    bool CanWrite<TActionTree>(Func<TActionTree, DynamicReadWriteAction> action, string Id, params string[]? selfId);
 
-    bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanWrite<TActionTree>(Func<TActionTree, ReadWriteDeleteAction> action);
 
-    bool CanDelete(ReadWriteDeleteAction action);
+    bool CanWrite<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId);
 
-    bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanDelete<TActionTree>(Func<TActionTree, ReadWriteDeleteAction> action);
 
-    bool CanAccess(BooleanAction action);
+    bool CanDelete<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId);
 
-    bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId);
+    bool CanAccess<TActionTree>(Func<TActionTree, BooleanAction> action);
 
-    string? AccessValue(TextAction action);
+    bool CanAccess<TActionTree>(Func<TActionTree, DynamicBooleanAction> action, string Id, params string[]? selfId);
 
-    decimal? AccessValue(DecimalAction action);
+    string? AccessValue<TActionTree>(Func<TActionTree, TextAction> action);
 
-    string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId);
+    decimal? AccessValue<TActionTree>(Func<TActionTree, DecimalAction> action);
 
-    decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId);
+    string? AccessValue<TActionTree>(Func<TActionTree, DynamicTextAction> action, string? Id, params string[]? selfId);
+
+    decimal? AccessValue<TActionTree>(Func<TActionTree, DynamicDecimalAction> action, string? Id, params string[]? selfId);
 
     Type[] GetRegisteredActionTrees();
 
-    (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
+    (bool WildCard, List<string> AccessibleIds) GetAccessibleItems<TActionTree>(Func<TActionTree, DynamicAction> dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
 }

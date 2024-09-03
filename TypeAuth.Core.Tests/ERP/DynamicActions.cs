@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ShiftSoftware.TypeAuth.Core;
+using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 using System.Collections.Generic;
 using System.Text.Json;
-using ShiftSoftware.TypeAuth.Shared.ActionTrees;
 
 namespace ShiftSoftware.TypeAuth.Tests.ERP
 {
@@ -11,21 +11,21 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
     {
         public DynamicActions()
         {
-            var data = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("_1", "One"),
-                new KeyValuePair<string, string>("_2", "Two"),
-                new KeyValuePair<string, string>("_3", "Three"),
-                new KeyValuePair<string, string>("_4", "Four"),
-                new KeyValuePair<string, string>("_5", "Five"),
-                new KeyValuePair<string, string>("_6", "Six"),
-            };
+            //var data = new List<KeyValuePair<string, string>>
+            //{
+            //    new KeyValuePair<string, string>("_1", "One"),
+            //    new KeyValuePair<string, string>("_2", "Two"),
+            //    new KeyValuePair<string, string>("_3", "Three"),
+            //    new KeyValuePair<string, string>("_4", "Four"),
+            //    new KeyValuePair<string, string>("_5", "Five"),
+            //    new KeyValuePair<string, string>("_6", "Six"),
+            //};
 
-            DataLevel.Cities.Expand(data);
-            DataLevel.Countries.Expand(data);
-            DataLevel.Companies.Expand(data);
-            DataLevel.Departments.Expand(data);
-            DataLevel.DiscountByDepartment.Expand(data);
+            //DataLevel.Cities.Expand(data);
+            //DataLevel.Countries.Expand(data);
+            //DataLevel.Companies.Expand(data);
+            //DataLevel.Departments.Expand(data);
+            //DataLevel.DiscountByDepartment.Expand(data);
         }
 
         [TestMethod("Full Access On All Cities")]
@@ -42,28 +42,28 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_4"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4"));
 
 
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Countries, "_1"));
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Countries, "_2"));
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Countries, "_3"));
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Countries, "_4"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x => x.Countries, "_1"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x => x.Countries, "_2"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x => x.Countries, "_3"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x => x.Countries, "_4"));
 
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_1"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_2"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_3"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_4"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_5"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_1"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_2"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_3"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_4"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_5"));
 
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_2"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_4"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_5"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_5"));
         }
 
         [TestMethod("Full Access On All Countries")]
@@ -80,10 +80,10 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Countries, "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Countries, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Countries, "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Countries, "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Countries, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Countries, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Countries, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Countries, "_4"));
         }
 
         [TestMethod("Full Access On All Companies")]
@@ -100,17 +100,17 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_4"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_5"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_5"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Companies, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Companies, "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Companies, "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Companies, "_4"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Companies, "_5"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_5"));
         }
 
         [TestMethod("Full Access On All Departments")]
@@ -127,41 +127,41 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_5"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_5"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_5"));
         }
 
         [TestMethod("Full Access On All Departments - WildCard")]
@@ -175,41 +175,41 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1", "_5"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1", "_5"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_3"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_4"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_5"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_4"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_5"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_3"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_4"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1", "_5"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_4"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1", "_5"));
         }
 
         [TestMethod("Access On Certain Cities")]
@@ -230,10 +230,10 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_4"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4"));
         }
 
         [TestMethod("Access On Self City")]
@@ -255,32 +255,32 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", null));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, null, null));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1", null));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, null, null));
 
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1", "_1")); //True
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", "_2"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", "_3"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_1", "_4"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1", "_1")); //True
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1", "_2"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1", "_3"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1", "_4"));
 
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2", "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2", "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2", "_4"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2", "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2", "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2", "_4"));
 
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3", "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3", "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3", "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3", "_4"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3", "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3", "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3", "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3", "_4"));
 
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_4"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_4", "_1"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_4", "_2"));
-            Assert.IsFalse(typeAuth.CanAccess(DataLevel.Cities, "_4", "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_4", "_4")); //True
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4", "_1"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4", "_2"));
+            Assert.IsFalse(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4", "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4", "_4")); //True
         }
 
         [TestMethod("Certain Access On Departments")]
@@ -303,64 +303,64 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_1"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1", "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1", "_1"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1", "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1", "_1"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_1", "_1"));
 
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Departments, "_1", "_2"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_1", "_2"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1", "_2"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1", "_2"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1", "_2"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_1", "_2"));
 
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Departments, "_1", "_3"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_1", "_3"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1", "_3"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1", "_3"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1", "_3"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_1", "_3"));
 
-            Assert.IsFalse(typeAuth.CanRead(DataLevel.Departments, "_1", "_5"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_1", "_5"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_1", "_5"));
+            Assert.IsFalse(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1", "_5"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1", "_5"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_1", "_5"));
 
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2", "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2", "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2", "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2", "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2", "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2", "_4"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2", "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2", "_3"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2", "_4"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_2", "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_2", "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_2", "_4"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_3"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_4"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2", "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2", "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2", "_4"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_3"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_3"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_3"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_3"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3", "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3", "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3", "_3"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3", "_4"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_3", "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_3", "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_3", "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_3", "_4"));
 
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_3", "_1"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_3", "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_3", "_3"));
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Departments, "_3", "_4"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_3", "_1"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_3", "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_3", "_3"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_3", "_4"));
 
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3", "_1"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3", "_2"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3", "_3"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_3", "_4"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_3", "_1"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_3", "_2"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_3", "_3"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_3", "_4"));
 
         }
 
@@ -393,11 +393,11 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x=> x.Departments, "_1"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x=> x.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x=> x.Departments, "_2", "_2"));
         }
 
         [TestMethod("Text Action")]
@@ -431,14 +431,14 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.AreEqual("20", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_2"));
-            Assert.AreEqual("30", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_3"));
-            Assert.AreEqual("60", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_4"));
+            Assert.AreEqual("20", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_2"));
+            Assert.AreEqual("30", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_3"));
+            Assert.AreEqual("60", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_4"));
 
-            Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_1", "_1"));
-            Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_2", "_2"));
-            Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_3", "_3"));
-            Assert.AreEqual("85", typeAuth.AccessValue(DataLevel.DiscountByDepartment, "_4", "_4"));
+            Assert.AreEqual("85", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_1", "_1"));
+            Assert.AreEqual("85", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_2", "_2"));
+            Assert.AreEqual("85", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_3", "_3"));
+            Assert.AreEqual("85", typeAuth.AccessValue<DataLevel>(x=> x.DiscountByDepartment, "_4", "_4"));
         }
 
         [TestMethod("Decimal Action")]
@@ -474,14 +474,14 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
 
             System.Diagnostics.Debug.WriteLine(typeAuth.GenerateAccessTree(typeAuth));
 
-            Assert.AreEqual(20, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_2"));
-            Assert.AreEqual(30, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_3"));
-            Assert.AreEqual(60, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_4"));
+            Assert.AreEqual(20, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_2"));
+            Assert.AreEqual(30, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_3"));
+            Assert.AreEqual(60, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_4"));
 
-            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_1", "_1"));
-            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_2", "_2"));
-            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_3", "_3"));
-            Assert.AreEqual(85, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_4", "_4"));
+            Assert.AreEqual(85, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_1", "_1"));
+            Assert.AreEqual(85, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_2", "_2"));
+            Assert.AreEqual(85, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_3", "_3"));
+            Assert.AreEqual(85, typeAuth.AccessValue<DataLevel>(x => x.DiscountByDepartmentDecimal, "_4", "_4"));
         }
 
         [TestMethod("Wild Card And Normal Access Tree")]
@@ -513,20 +513,20 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Companies, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Companies, "_2"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_2"));
 
-            Assert.IsFalse(typeAuth.CanWrite(DataLevel.Companies, "_2"));
-            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, "_2"));
+            Assert.IsFalse(typeAuth.CanWrite<DataLevel>(x => x.Companies, "_2"));
+            Assert.IsFalse(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2", "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_2", "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2", "_2"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1"));
         }
 
         [TestMethod("Multiple Action Trees")]
@@ -545,10 +545,10 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<SystemActions>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_2"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_3"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_4"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_2"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_3"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_4"));
         }
 
         [TestMethod("Multiple TypeAuth Context")]
@@ -591,34 +591,34 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                .AddActionTree<DataLevel>()
                .Build();
 
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_1"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_10"));
-            Assert.IsTrue(typeAuth.CanAccess(DataLevel.Cities, "_20"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_1"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_10"));
+            Assert.IsTrue(typeAuth.CanAccess<DataLevel>(x => x.Cities, "_20"));
 
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanRead<DataLevel>(x => x.Departments, "_3"));
 
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanWrite<DataLevel>(x => x.Departments, "_3"));
 
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_2"));
-            Assert.IsTrue(typeAuth.CanDelete(DataLevel.Departments, "_3"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsTrue(typeAuth.CanDelete<DataLevel>(x => x.Departments, "_3"));
 
 
-            Assert.IsTrue(typeAuth2.CanRead(DataLevel.Departments, "_1"));
-            Assert.IsTrue(typeAuth2.CanWrite(DataLevel.Departments, "_1"));
-            Assert.IsFalse(typeAuth2.CanDelete(DataLevel.Departments, "_1"));
+            Assert.IsTrue(typeAuth2.CanRead<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsTrue(typeAuth2.CanWrite<DataLevel>(x => x.Departments, "_1"));
+            Assert.IsFalse(typeAuth2.CanDelete<DataLevel>(x => x.Departments, "_1"));
 
-            Assert.IsFalse(typeAuth2.CanRead(DataLevel.Departments, "_2"));
-            Assert.IsFalse(typeAuth2.CanWrite(DataLevel.Departments, "_2"));
-            Assert.IsFalse(typeAuth2.CanDelete(DataLevel.Departments, "_2"));
+            Assert.IsFalse(typeAuth2.CanRead<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsFalse(typeAuth2.CanWrite<DataLevel>(x => x.Departments, "_2"));
+            Assert.IsFalse(typeAuth2.CanDelete<DataLevel>(x => x.Departments, "_2"));
 
-            Assert.IsFalse(typeAuth2.CanRead(DataLevel.Departments, "_3"));
-            Assert.IsFalse(typeAuth2.CanWrite(DataLevel.Departments, "_3"));
-            Assert.IsFalse(typeAuth2.CanDelete(DataLevel.Departments, "_3"));
+            Assert.IsFalse(typeAuth2.CanRead<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsFalse(typeAuth2.CanWrite<DataLevel>(x => x.Departments, "_3"));
+            Assert.IsFalse(typeAuth2.CanDelete<DataLevel>(x => x.Departments, "_3"));
         }
 
         [TestMethod("Get Accessible Items - Wildcard")]
@@ -635,12 +635,12 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).WildCard);
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).WildCard);
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).WildCard);
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).WildCard);
 
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).WildCard);
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read || x == Access.Write).WildCard);
         }
 
         [TestMethod("Get Accessible Items - Ids")]
@@ -666,36 +666,36 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).WildCard);
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).WildCard);
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).WildCard);
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).WildCard);
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).WildCard);
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read || x == Access.Write).WildCard);
 
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_1"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_1"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_1"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).AccessibleIds.Contains("_1"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_1"));
 
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_2"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_2"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_2"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_2"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).AccessibleIds.Contains("_2"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_2"));
 
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_3"));
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_3"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_3"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_3"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).AccessibleIds.Contains("_3"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).AccessibleIds.Contains("_3"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).AccessibleIds.Contains("_3"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_3"));
 
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read).AccessibleIds.Contains("_5"));
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write).AccessibleIds.Contains("_5"));
-            Assert.IsTrue(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read || x == Access.Write).AccessibleIds.Contains("_5"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete).AccessibleIds.Contains("_5"));
-            Assert.IsFalse(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_5"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read).AccessibleIds.Contains("_5"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write).AccessibleIds.Contains("_5"));
+            Assert.IsTrue(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read || x == Access.Write).AccessibleIds.Contains("_5"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete).AccessibleIds.Contains("_5"));
+            Assert.IsFalse(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Maximum).AccessibleIds.Contains("_5"));
 
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read, "self").AccessibleIds, new List<string> { "self", "_2", "_5", "_6" });
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write, "I").AccessibleIds, new List<string> { "I", "_3", "_5", "_6" });
-            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete, "me").AccessibleIds, new List<string> { "_4", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Read, "self").AccessibleIds, new List<string> { "self", "_2", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Write, "I").AccessibleIds, new List<string> { "I", "_3", "_5", "_6" });
+            CollectionAssert.AreEqual(typeAuth.GetAccessibleItems<DataLevel>(x=> x.Cities, x => x == Access.Delete, "me").AccessibleIds, new List<string> { "_4", "_6" });
         }
     }
 }

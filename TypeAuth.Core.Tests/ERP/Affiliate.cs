@@ -13,9 +13,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
             Assert.IsTrue(
-                tAuth.CanRead(CRMActions.Customers) &&
-                !tAuth.CanWrite(CRMActions.Customers) &&
-                !tAuth.CanDelete(CRMActions.Customers)
+                tAuth.CanRead<CRMActions>(x => x.Customers) &&
+                !tAuth.CanWrite<CRMActions>(x => x.Customers) &&
+                !tAuth.CanDelete<CRMActions>(x => x.Customers)
             );
         }
 
@@ -24,7 +24,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
-            Assert.AreEqual("2", tAuth.AccessValue(CRMActions.DiscountValue));
+            Assert.AreEqual("2", tAuth.AccessValue<CRMActions>(x => x.DiscountValue));
         }
 
         [TestMethod("2.50% Decimal Discount Value")]
@@ -32,7 +32,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
-            Assert.AreEqual(2.5m, tAuth.AccessValue(CRMActions.DecimalDiscount));
+            Assert.AreEqual(2.5m, tAuth.AccessValue<CRMActions>(x => x.DecimalDiscount));
         }
 
         [TestMethod("No Access on Tickets")]
@@ -41,8 +41,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
             Assert.IsTrue(
-                !tAuth.CanRead(CRMActions.Tickets) &&
-                !tAuth.CanWrite(CRMActions.Tickets)
+                !tAuth.CanRead<CRMActions>(x => x.Tickets) &&
+                !tAuth.CanWrite<CRMActions>(x => x.Tickets)
             );
         }
 
@@ -52,7 +52,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.Affiliates);
 
             Assert.IsTrue(
-                !tAuth.CanRead(CRMActions.SocialMediaComments)
+                !tAuth.CanRead<CRMActions>(x => x.SocialMediaComments)
             );
         }
 

@@ -29,8 +29,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             }, typeof(SystemActions), typeof(CRMActions));
 
             Assert.IsTrue(
-                tAuth_WithSuperAdmin.CanAccess(SystemActions.UserModule.SetOrResetPassword) &&
-                !tAuth_WithoutSuperAdmin.CanAccess(SystemActions.UserModule.SetOrResetPassword)
+                tAuth_WithSuperAdmin.CanAccess<SystemActions.UserModule>(x => x.SetOrResetPassword) &&
+                !tAuth_WithoutSuperAdmin.CanAccess<SystemActions.UserModule>(x => x.SetOrResetPassword)
             );
         }
 
@@ -52,8 +52,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             }, typeof(SystemActions), typeof(CRMActions));
 
             Assert.IsTrue(
-                !tAuth_WithoutSuperAdmin.CanDelete(SystemActions.UserModule.Users) &&
-                tAuth_WithSuperAdmin.CanDelete(SystemActions.UserModule.Users)
+                !tAuth_WithoutSuperAdmin.CanDelete<SystemActions.UserModule>(x => x.Users) &&
+                tAuth_WithSuperAdmin.CanDelete<SystemActions.UserModule>(x => x.Users)
             );
         }
 
@@ -81,9 +81,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             }, typeof(SystemActions), typeof(CRMActions));
 
             Assert.IsTrue(
-                tAuth1.AccessValue(CRMActions.DiscountValue)!.Equals("100") &&
-                tAuth2.AccessValue(CRMActions.DiscountValue)!.Equals("10") &&
-                tAuth3.AccessValue(CRMActions.DiscountValue)!.Equals("2")
+                tAuth1.AccessValue<CRMActions>(x => x.DiscountValue)!.Equals("100") &&
+                tAuth2.AccessValue<CRMActions>(x => x.DiscountValue)!.Equals("10") &&
+                tAuth3.AccessValue<CRMActions>(x => x.DiscountValue)!.Equals("2")
             );
         }
 
@@ -111,9 +111,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             }, typeof(SystemActions), typeof(CRMActions));
 
             Assert.IsTrue(
-                tAuth1.AccessValue(CRMActions.DecimalDiscount)!.Equals(100m) &&
-                tAuth2.AccessValue(CRMActions.DecimalDiscount)!.Equals(15m) &&
-                tAuth3.AccessValue(CRMActions.DecimalDiscount)!.Equals(2.5m)
+                tAuth1.AccessValue<CRMActions>(x => x.DecimalDiscount)!.Equals(100m) &&
+                tAuth2.AccessValue<CRMActions>(x => x.DecimalDiscount)!.Equals(15m) &&
+                tAuth3.AccessValue<CRMActions>(x => x.DecimalDiscount)!.Equals(2.5m)
             );
         }
 
@@ -135,7 +135,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var canWorkAt20_30 = new TimeSpan(20, 30, 0);
             var cantWorkAt22_30 = new TimeSpan(22, 30, 0);
 
-            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+            var schedule = tAuth.AccessValue<CRMActions>(x => x.WorkSchedule);
 
             var canWork = new Dictionary<TimeSpan, bool>
             {
@@ -189,21 +189,21 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 AccessTreeFiles.System_All_Users,
             }, typeof(SystemActions));
 
-            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead(SystemActions.UserModule.Users));
-            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite(SystemActions.UserModule.Users));
-            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead<SystemActions.UserModule>(x => x.Users));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite<SystemActions.UserModule>(x => x.Users));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete<SystemActions.UserModule>(x => x.Users));
 
-            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete(SystemActions.UserModule.Roles));
+            Assert.IsTrue(tAuth_ReadOnlyWildCard.CanRead<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanWrite<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_ReadOnlyWildCard.CanDelete<SystemActions.UserModule>(x => x.Roles));
 
-            Assert.IsTrue(tAuth_FullAccessExplicit.CanRead(SystemActions.UserModule.Users));
-            Assert.IsTrue(tAuth_FullAccessExplicit.CanWrite(SystemActions.UserModule.Users));
-            Assert.IsTrue(tAuth_FullAccessExplicit.CanDelete(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanRead<SystemActions.UserModule>(x => x.Users));
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanWrite<SystemActions.UserModule>(x => x.Users));
+            Assert.IsTrue(tAuth_FullAccessExplicit.CanDelete<SystemActions.UserModule>(x => x.Users));
 
-            Assert.IsFalse(tAuth_FullAccessExplicit.CanRead(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_FullAccessExplicit.CanWrite(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_FullAccessExplicit.CanDelete(SystemActions.UserModule.Roles));
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanRead<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanWrite<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_FullAccessExplicit.CanDelete<SystemActions.UserModule>(x => x.Roles));
 
             var tAuth_Merged = new TypeAuthContext(new List<string>
             {
@@ -211,13 +211,13 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 AccessTreeFiles.System_All_Users,
             }, typeof(SystemActions));
 
-            Assert.IsTrue(tAuth_Merged.CanRead(SystemActions.UserModule.Users));
-            Assert.IsTrue(tAuth_Merged.CanWrite(SystemActions.UserModule.Users));
-            Assert.IsTrue(tAuth_Merged.CanDelete(SystemActions.UserModule.Users));
+            Assert.IsTrue(tAuth_Merged.CanRead<SystemActions.UserModule>(x => x.Users));
+            Assert.IsTrue(tAuth_Merged.CanWrite<SystemActions.UserModule>(x => x.Users));
+            Assert.IsTrue(tAuth_Merged.CanDelete<SystemActions.UserModule>(x => x.Users));
 
-            Assert.IsTrue(tAuth_Merged.CanRead(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_Merged.CanWrite(SystemActions.UserModule.Roles));
-            Assert.IsFalse(tAuth_Merged.CanDelete(SystemActions.UserModule.Roles));
+            Assert.IsTrue(tAuth_Merged.CanRead<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_Merged.CanWrite<SystemActions.UserModule>(x => x.Roles));
+            Assert.IsFalse(tAuth_Merged.CanDelete<SystemActions.UserModule>(x => x.Roles));
         }
     }
 }

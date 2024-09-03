@@ -63,6 +63,18 @@ namespace ShiftSoftware.TypeAuth.Core
             this.TypeAuthContextHelper.ExpandDynamicActions(this.ActionTree);
         }
 
+        private TAction GetAction<TActionTree, TAction>(Func<TActionTree, TAction> actionSelector)
+        {
+            TActionTree actionTree = (TActionTree) this.TypeAuthContextHelper.Actions.FirstOrDefault(x => x.GetType() == typeof(TActionTree));
+
+            if (actionTree == null)
+                return default;
+
+            TAction action = actionSelector.Invoke(actionTree);
+
+            return action;
+        }
+
         public bool Can(ActionBase action, Access access)
         {
             return this.TypeAuthContextHelper.Can(action, access);
@@ -73,77 +85,82 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
         }
 
-        public bool CanRead(ReadAction action)
+        public bool CanRead<TActionTree>(Func<TActionTree, ReadAction> action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Read);
-        }
-        public bool CanRead(DynamicReadAction action, string Id, params string[]? selfId)
-        {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
-        }
-        public bool CanRead(ReadWriteAction action)
-        {
-            return this.TypeAuthContextHelper.Can(action, Access.Read);
-        }
-        public bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId)
-        {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
-        }
-        public bool CanRead(ReadWriteDeleteAction action)
-        {
-            return this.TypeAuthContextHelper.Can(action, Access.Read);
-        }
-        public bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
-        {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read);
         }
 
-        public bool CanWrite(ReadWriteAction action)
+        public bool CanRead<TActionTree>(Func<TActionTree, DynamicReadAction> action, string Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read, Id, selfId);
         }
 
-        public bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId)
+        public bool CanRead<TActionTree>(Func<TActionTree, ReadWriteAction> action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read);
         }
 
-        public bool CanWrite(ReadWriteDeleteAction action)
+        public bool CanRead<TActionTree>(Func<TActionTree, DynamicReadWriteAction> action, string Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read, Id, selfId);
         }
 
-        public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
+        public bool CanRead<TActionTree>(Func<TActionTree, ReadWriteDeleteAction> action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read);
         }
 
-        public bool CanDelete(ReadWriteDeleteAction action)
+        public bool CanRead<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Delete);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Read, Id, selfId);
         }
 
-        public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
+        public bool CanWrite<TActionTree>(Func<TActionTree, ReadWriteAction> action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Delete, Id, selfId);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Write);
         }
 
-        public bool CanAccess(BooleanAction action)
+        public bool CanWrite<TActionTree>(Func<TActionTree, DynamicReadWriteAction> action, string Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Maximum);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Write, Id, selfId);
         }
 
-        public bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId)
+        public bool CanWrite<TActionTree>(Func<TActionTree, ReadWriteDeleteAction> action)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id, selfId);
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Write);
         }
 
-        public string? AccessValue(TextAction action)
+        public bool CanWrite<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId)
+        {
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Write, Id, selfId);
+        }
+
+        public bool CanDelete<TActionTree>(Func<TActionTree,  ReadWriteDeleteAction> action)
+        {
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Delete);
+        }
+
+        public bool CanDelete<TActionTree>(Func<TActionTree, DynamicReadWriteDeleteAction> action, string Id, params string[]? selfId)
+        {
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Delete, Id, selfId);
+        }
+
+        public bool CanAccess<TActionTree>(Func<TActionTree, BooleanAction> action)
+        {
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Maximum);
+        }
+
+        public bool CanAccess<TActionTree>(Func<TActionTree, DynamicBooleanAction> action, string Id, params string[]? selfId)
+        {
+            return this.TypeAuthContextHelper.Can(GetAction(action), Access.Maximum, Id, selfId);
+        }
+
+        internal string? AccessValue(TextAction action)
         {
             return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess);
         }
 
-        public decimal? AccessValue(DecimalAction action)
+        internal decimal? AccessValue(DecimalAction action)
         {
             var textValue = AccessValue(action as TextAction);
 
@@ -153,12 +170,12 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
-        public string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId)
+        internal string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId)
         {
             return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess, Id, selfId);
         }
 
-        public decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId)
+        internal decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId)
         {
             var textValue = AccessValue(action as DynamicTextAction, Id, selfId);
 
@@ -166,6 +183,26 @@ namespace ShiftSoftware.TypeAuth.Core
                 return decimal.Parse(textValue);
 
             return null;
+        }
+
+        public string? AccessValue<TActionTree>(Func<TActionTree, TextAction> action)
+        {
+            return AccessValue(GetAction(action));
+        }
+
+        public decimal? AccessValue<TActionTree>(Func<TActionTree, DecimalAction> action)
+        {
+            return AccessValue(GetAction(action));
+        }
+
+        public string? AccessValue<TActionTree>(Func<TActionTree, DynamicTextAction> action, string? Id, params string[]? selfId)
+        {
+            return AccessValue(GetAction(action), Id, selfId);
+        }
+
+        public decimal? AccessValue<TActionTree>(Func<TActionTree, DynamicDecimalAction> action, string? Id, params string[]? selfId)
+        {
+            return AccessValue(GetAction(action), Id, selfId);
         }
 
         private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, params string[]? selfId)
@@ -199,9 +236,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.ActionTrees.ToArray();
         }
 
-        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
+        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems<TAction>(Func<TAction, DynamicAction> dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
         {
-            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(GetAction(dynamicAction));
 
             var wildCardAccess = false;
 

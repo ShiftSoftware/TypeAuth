@@ -13,7 +13,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
-            Assert.AreEqual("10", tAuth.AccessValue(CRMActions.DiscountValue));
+            Assert.AreEqual("10", tAuth.AccessValue<CRMActions>(x => x.DiscountValue));
         }
 
         [TestMethod("15% Decimal Discount Value")]
@@ -21,7 +21,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
-            Assert.AreEqual(15, tAuth.AccessValue(CRMActions.DecimalDiscount));
+            Assert.AreEqual(15, tAuth.AccessValue<CRMActions>(x => x.DecimalDiscount));
         }
 
         [TestMethod("Read/Write Tickets")]
@@ -30,8 +30,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
             Assert.IsTrue(
-                tAuth.CanRead(CRMActions.Tickets) &&
-                tAuth.CanWrite(CRMActions.Tickets)
+                tAuth.CanRead<CRMActions>(x => x.Tickets) &&
+                tAuth.CanWrite<CRMActions>(x => x.Tickets)
             );
         }
 
@@ -41,7 +41,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.CRMAgent);
 
             Assert.IsTrue(
-                tAuth.CanRead(CRMActions.SocialMediaComments)
+                tAuth.CanRead<CRMActions>(x => x.SocialMediaComments)
             );
         }
 
@@ -67,7 +67,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(accessTree);
 
-            var schedule = tAuth.AccessValue(CRMActions.WorkSchedule);
+            var schedule = tAuth.AccessValue<CRMActions>(x => x.WorkSchedule);
 
             var canWork = false;
 

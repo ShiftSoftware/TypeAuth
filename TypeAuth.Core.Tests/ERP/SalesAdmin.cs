@@ -11,7 +11,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
-            Assert.AreEqual("100", tAuth.AccessValue(CRMActions.DiscountValue));
+            Assert.AreEqual("100", tAuth.AccessValue<CRMActions>(x => x.DiscountValue));
         }
 
         [TestMethod("Full Decimal Discount via Wild Card")]
@@ -19,7 +19,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
-            Assert.AreEqual(100, tAuth.AccessValue(CRMActions.DecimalDiscount));
+            Assert.AreEqual(100, tAuth.AccessValue<CRMActions>(x => x.DecimalDiscount));
         }
 
         [TestMethod("Only Read/Write users")]
@@ -28,9 +28,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
             Assert.IsTrue(
-                tAuth.CanRead(SystemActions.UserModule.Users) &&
-                tAuth.CanWrite(SystemActions.UserModule.Users) &&
-                !tAuth.CanDelete(SystemActions.UserModule.Users)
+                tAuth.CanRead<SystemActions.UserModule>(x => x.Users) &&
+                tAuth.CanWrite<SystemActions.UserModule>(x => x.Users) &&
+                !tAuth.CanDelete<SystemActions.UserModule>(x => x.Users)
             );
         }
 
@@ -40,9 +40,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
             Assert.IsTrue(
-                tAuth.CanRead(CRMActions.DiscountVouchers) &&
-                tAuth.CanWrite(CRMActions.DiscountVouchers) &&
-                tAuth.CanDelete(CRMActions.DiscountVouchers)
+                tAuth.CanRead<CRMActions>(x => x.DiscountVouchers) &&
+                tAuth.CanWrite<CRMActions>(x => x.DiscountVouchers) &&
+                tAuth.CanDelete<CRMActions>(x => x.DiscountVouchers)
             );
         }
 
@@ -52,9 +52,9 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SalesAdmin);
 
             Assert.IsTrue(
-                tAuth.CanRead(CRMActions.Tickets) &&
-                tAuth.CanWrite(CRMActions.Tickets) &&
-                tAuth.CanRead(CRMActions.SocialMediaComments)
+                tAuth.CanRead<CRMActions>(x => x.Tickets) &&
+                tAuth.CanWrite<CRMActions>(x => x.Tickets) &&
+                tAuth.CanRead<CRMActions>(x => x.SocialMediaComments)
             );
         }
     }

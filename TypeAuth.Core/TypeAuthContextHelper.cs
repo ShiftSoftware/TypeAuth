@@ -8,6 +8,8 @@ namespace ShiftSoftware.TypeAuth.Core
     {
         internal List<ActionBankItem> ActionBank { get; set; }
 
+        internal List<object> Actions = new List<object>();
+
         public TypeAuthContextHelper()
         {
             ActionBank = new List<ActionBankItem>();
@@ -20,8 +22,12 @@ namespace ShiftSoftware.TypeAuth.Core
 
             foreach (var tree in actionTrees)
             {
+                var instance = Activator.CreateInstance(tree);
+
+                Actions.Add(instance);
+
                 var path = string.IsNullOrWhiteSpace(rootActionTree.Path) ? tree.Name : $"{rootActionTree.Path}.{tree.Name}";
-                
+
                 var treeAttribute = tree.GetCustomAttribute((typeof(ActionTree))) as ActionTree;
 
                 var actionTreeItem = new ActionTreeNode(path) { ID = tree.Name };
@@ -34,14 +40,14 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
 
                 rootActionTree.ActionTreeItems.Add(actionTreeItem);
-                
+
                 var childTress = tree.GetNestedTypes().ToList().Where(x => x.GetCustomAttributes(typeof(ActionTree), false) != null).ToList();
 
                 GenerateActionTree(childTress, accessTreeJSONStrings, actionTreeItem);
 
-                tree.GetFields(BindingFlags.Public | BindingFlags.Static).ToList().ForEach(y =>
+                tree.GetFields(BindingFlags.Public | BindingFlags.Instance).ToList().ForEach(y =>
                 {
-                    var value = y.GetValue(y);
+                    var value = y.GetValue(instance);
 
                     if (value != null && (value as ActionBase) != null)
                     {
@@ -109,7 +115,7 @@ namespace ShiftSoftware.TypeAuth.Core
                         node.AccessValue = minimumAccess;
                 }
 
-                if (theAction  is DynamicAction && node.AccessArray.Count > 0)
+                if (theAction is DynamicAction && node.AccessArray.Count > 0)
                     actionCursor.WildCardAccess = node.AccessArray;
 
                 this.ActionBank.Add(new ActionBankItem(theAction, node.AccessArray, node.AccessValue, node.AccessObject));
@@ -152,7 +158,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
 
-            foreach (var item in this.ActionBank.Where(x => x.Action.Path == actionToCheck.Path).ToList())
+            foreach (var item in this.ActionBank.Where(x => x.Action.Path == actionToCheck?.Path).ToList())
             {
                 actionMatches.Add(item);
 

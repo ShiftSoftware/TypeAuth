@@ -12,7 +12,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SuperAdmin);
 
-            Assert.IsTrue(tAuth.CanAccess(SystemActions.Login.MultipleSession));
+            Assert.IsTrue(tAuth.CanAccess<SystemActions.Login>(x => x.MultipleSession));
         }
 
         [TestMethod("No Login")]
@@ -22,8 +22,8 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             var tAuth2 = new TypeAuthContext(AccessTreeFiles.SuperAdmin);
 
             Assert.IsTrue(
-                !tAuth1.CanAccess(SystemActions.Login.MultipleSession) &&
-                !tAuth2.CanAccess(SystemActions.Login.MultipleSession)
+                !tAuth1.CanAccess<SystemActions.Login>(x => x.MultipleSession) &&
+                !tAuth2.CanAccess<SystemActions.Login>(x => x.MultipleSession)
             );
         }
 
@@ -32,7 +32,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
         {
             var tAuth = AccessTreeHelper.GetTypeAuthContext(AccessTreeFiles.SuperAdmin);
 
-            Assert.IsTrue(tAuth.CanDelete(CRMActions.Customers));
+            Assert.IsTrue(tAuth.CanDelete<CRMActions>(x => x.Customers));
         }
     }
 }

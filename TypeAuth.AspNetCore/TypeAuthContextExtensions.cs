@@ -5,7 +5,7 @@ public static class TypeAuthContextExtensions
 {
     public static bool Can(this TypeAuthContext typeAuthContext, Type actionTreeType, string actionName, Access access)
     {
-        var instance = (Activator.CreateInstance(actionTreeType))!;
+        var instance = typeAuthContext.TypeAuthContextHelper.Actions.FirstOrDefault(x => x.GetType() == actionTreeType);
 
         var action = (Core.Actions.Action)actionTreeType
             .GetFields()
