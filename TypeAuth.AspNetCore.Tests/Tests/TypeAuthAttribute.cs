@@ -1,7 +1,5 @@
 ﻿using ShiftSoftware.TypeAuth.AspNetCore.Sample;
 using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.TypeAuth.Shared;
-using Xunit.Abstractions;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 {
@@ -31,11 +29,11 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/write", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete", TestContext.Current.CancellationToken)).StatusCode);
         }
 
         [Fact(DisplayName = "02. Read/Write Access")]
@@ -55,11 +53,11 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await _client.GetAsync("/api/default/delete", TestContext.Current.CancellationToken)).StatusCode);
         }
 
         [Fact(DisplayName = "03. Read/Write/Delete Access")]
@@ -80,11 +78,11 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete", TestContext.Current.CancellationToken)).StatusCode);
         }
 
         [Fact(DisplayName = "04. Multiple Access Trees")]
@@ -117,11 +115,11 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/write", TestContext.Current.CancellationToken)).StatusCode);
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/delete", TestContext.Current.CancellationToken)).StatusCode);
         }
 
         [Fact(DisplayName = "05. Read Nested")]
@@ -138,7 +136,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read-nested")).StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.OK, (await _client.GetAsync("/api/default/read-nested", TestContext.Current.CancellationToken)).StatusCode);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.TypeAuth.AspNetCore.Sample;
-using Xunit.Abstractions;
+﻿using ShiftSoftware.TypeAuth.AspNetCore.Sample;
+using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
 {
@@ -21,7 +20,7 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
         {
             var token = await Common.GetTokenAsync(_client, new List<dynamic> { });
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-            var response = await _client.GetAsync($"/api/default/can-access-city/_1");
+            var response = await _client.GetAsync($"/api/default/can-access-city/_1", TestContext.Current.CancellationToken);
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
 
             _client.DefaultRequestHeaders.Remove("Authorization");
@@ -38,10 +37,10 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Tests.Tests
                 }
             });
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-            response = await _client.GetAsync($"/api/default/can-access-city/_1");
+            response = await _client.GetAsync($"/api/default/can-access-city/_1", TestContext.Current.CancellationToken);
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
-            response = await _client.GetAsync($"/api/default/can-access-city/_2");
+            response = await _client.GetAsync($"/api/default/can-access-city/_2", TestContext.Current.CancellationToken);
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
         }
     }
