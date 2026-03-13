@@ -83,7 +83,7 @@
                 this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.EmptyOrNullKey, "Unassigned"));
 
             if (addSelf)
-                this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.SelfRererenceKey, "Self"));
+                this.Items.Insert(0, new KeyValuePair<string, string>(TypeAuthContext.SelfReferenceKey, "Self"));
         }
     }
 }

@@ -48,11 +48,11 @@
 ### Phase 1: Housekeeping & Safety Net
 **Goal:** Clean up without changing any logic. Zero risk.
 
-- [ ] **1.1** Remove commented-out `Console.WriteLine` debug blocks from `TypeAuthContext.cs`, `TypeAuthContextHelper.cs`, and test files.
-- [ ] **1.2** Remove the empty `Extensions.cs` file (or repurpose if needed later).
-- [ ] **1.3** Fix the `acessValue` parameter typo in `ActionBankItem` constructor (internal class — not a breaking change).
-- [ ] **1.4** Add `// Note:` comment on `SelfRererenceKey` explaining why the typo is preserved.
-- [ ] **1.5** Run all tests → green.
+- [x] **1.1** Remove commented-out `Console.WriteLine` debug blocks from `TypeAuthContext.cs`, `TypeAuthContextHelper.cs`, and `ActionTreeNode.cs`.
+- [x] **1.2** Remove the empty `Extensions.cs` file.
+- [x] **1.3** Fix the `acessValue` parameter typo in `ActionBankItem` constructor (internal class — not a breaking change).
+- [x] **1.4** Add `// Note:` comment on `SelfRererenceKey` explaining why the typo is preserved.
+- [x] **1.5** All 62 tests pass ✅
 
 ### Phase 2: Extract shared Text/Decimal logic (reduce duplication)
 **Goal:** Reduce copy-paste between `Action`/`DynamicAction` text property sets.
@@ -104,7 +104,7 @@
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 1 – Housekeeping | ⬜ Not started | |
+| 1 – Housekeeping | ✅ Complete | All 62 tests pass. Removed debug comments, empty file, fixed internal typo. |
 | 2 – Text/Decimal dedup | ⬜ Not started | |
 | 3 – Split ContextHelper | ⬜ Not started | |
 | 4 – Split AccessTreeGen | ⬜ Not started | |

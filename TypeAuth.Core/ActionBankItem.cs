@@ -12,11 +12,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public List<ActionBankItem> SubActionBankItems { get; set; }
 
-        public ActionBankItem(ActionBase action, List<Access> accessTypes, string? acessValue = null, JObject? accessObject = null)
+        public ActionBankItem(ActionBase action, List<Access> accessTypes, string? accessValue = null, JObject? accessObject = null)
         {
             this.Action = action;
             this.AccessList = accessTypes;
-            this.AccessValue = acessValue;
+            this.AccessValue = accessValue;
 
             this.SubActionBankItems = new List<ActionBankItem>();
             

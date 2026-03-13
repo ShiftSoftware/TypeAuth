@@ -9,7 +9,6 @@ public class ActionTreeNode
     public dynamic? AdditionalData { get; set; }
     public List<Access> WildCardAccess { get; set; }
     public Actions.ActionBase? Action { get; set; }
-    //public DynamicActionBase? DynamicAction { get; set; }
     public HashSet<ActionTreeNode> ActionTreeItems { get; set; }
 
     public bool IsADynamicSubItem { get; set; }

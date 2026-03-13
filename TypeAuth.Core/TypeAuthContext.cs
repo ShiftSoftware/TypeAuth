@@ -9,7 +9,7 @@ namespace ShiftSoftware.TypeAuth.Core
     {
         internal TypeAuthContextHelper TypeAuthContextHelper { get; set; }
 
-        internal const string SelfRererenceKey = "_shift_software_type_auth_core_self_reference";
+        internal const string SelfReferenceKey = "_shift_software_type_auth_core_self_reference";
         internal const string EmptyOrNullKey = "_shift_software_type_auth_core_empty_or_null";
 
         internal List<string> AccessTreeJsonStrings { get; set; } = default!;
@@ -42,23 +42,12 @@ namespace ShiftSoftware.TypeAuth.Core
 
             this.ActionTree = this.TypeAuthContextHelper.GenerateActionTree(actionTrees.ToList(), accessTreeJSONStrings, null);
 
-            //Console.WriteLine("Action Trees Are:");
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.ActionTree, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings()
-            //{
-            //    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-            //}));
-
-            //Console.WriteLine();
-
             foreach (var accessTreeJSONString in accessTreeJSONStrings)
             {
                 var accessTree = Newtonsoft.Json.JsonConvert.DeserializeObject(accessTreeJSONString);
 
-                //Console.WriteLine(accessTree.ToString());
                 this.TypeAuthContextHelper.PopulateActionBank(this.ActionTree, accessTree);
             }
-
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(this.TypeAuthContextHelper.ActionBank, Newtonsoft.Json.Formatting.Indented));
 
             this.TypeAuthContextHelper.ExpandDynamicActions(this.ActionTree);
         }
@@ -228,19 +217,14 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            //if (selfId is not null)
-            //    ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
-
             if (selfId is not null)
             {
-                if (ids.Contains(SelfRererenceKey))
+                if (ids.Contains(SelfReferenceKey))
                 {
-                    ids.Remove(SelfRererenceKey);
+                    ids.Remove(SelfReferenceKey);
 
                     ids.InsertRange(0, selfId);
                 }
-
-                //ids = ids.Select(x => x.Equals(SelfRererenceKey) ? selfId : x).ToList();
             }
 
             return (wildCardAccess, ids);

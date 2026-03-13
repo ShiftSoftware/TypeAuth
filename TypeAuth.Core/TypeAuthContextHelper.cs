@@ -28,7 +28,6 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (treeAttribute != null)
                 {
-                    //actionTreeItem.ID = treeAttribute.ID;
                     actionTreeItem.DisplayName = treeAttribute.Name;
                     actionTreeItem.DisplayDescription = treeAttribute.Description;
                 }
@@ -162,12 +161,10 @@ namespace ShiftSoftware.TypeAuth.Core
                     {
                         var action = (x.Action as DynamicAction)!;
 
-                        return action.Id == Id || (Id != null && selfId != null && selfId.Contains(Id) && action.Id == TypeAuthContext.SelfRererenceKey);
+                        return action.Id == Id || (Id != null && selfId != null && selfId.Contains(Id) && action.Id == TypeAuthContext.SelfReferenceKey);
                     }));
                 }
             }
-
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actionMatches, Newtonsoft.Json.Formatting.Indented));
 
             return actionMatches
                 .Where(x =>
