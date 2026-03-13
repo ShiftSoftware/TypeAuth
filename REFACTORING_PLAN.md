@@ -51,7 +51,7 @@
 - [x] **1.1** Remove commented-out `Console.WriteLine` debug blocks from `TypeAuthContext.cs`, `TypeAuthContextHelper.cs`, and `ActionTreeNode.cs`.
 - [x] **1.2** Remove the empty `Extensions.cs` file.
 - [x] **1.3** Fix the `acessValue` parameter typo in `ActionBankItem` constructor (internal class — not a breaking change).
-- [x] **1.4** Add `// Note:` comment on `SelfRererenceKey` explaining why the typo is preserved.
+- [x] **1.4** Fix `SelfRererenceKey` → `SelfReferenceKey` variable name typo (internal const — string value was already correct, only the variable name had the typo).
 - [x] **1.5** All 62 tests pass ✅
 
 ### Phase 2: Extract shared Text/Decimal logic (reduce duplication)
