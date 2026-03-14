@@ -94,18 +94,12 @@ namespace ShiftSoftware.TypeAuth.Core
             {
                 var theAction = (ActionBase)actionCursor.Action;
 
-                if (theAction.Type == ActionType.Text && node.AccessValue == null)
+                if (theAction.Type == ActionType.Text && node.AccessValue == null && theAction is ITextAccessProperties textProps)
                 {
-                    var textAction = theAction as TextAction;
-                    var dynamicTextAction = theAction as DynamicTextAction;
-
-                    var maximumAccess = textAction?.MaximumAccess ?? dynamicTextAction?.MaximumAccess;
-                    var minimumAccess = textAction?.MinimumAccess ?? dynamicTextAction?.MinimumAccess;
-
                     if (node.AccessArray.Contains(Access.Maximum))
-                        node.AccessValue = maximumAccess;
+                        node.AccessValue = textProps.MaximumAccess;
                     else
-                        node.AccessValue = minimumAccess;
+                        node.AccessValue = textProps.MinimumAccess;
                 }
 
                 if (theAction  is DynamicAction && node.AccessArray.Count > 0)

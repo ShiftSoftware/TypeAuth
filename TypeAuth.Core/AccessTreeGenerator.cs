@@ -6,38 +6,40 @@ public static class AccessTreeGenerator
 {
     public static void SetAccessValue(this TypeAuthContext typeAuthContext, TextAction theAction, string? value, string? maximumValue)
     {
-        typeAuthContext.SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer);
+        typeAuthContext.SetTextAccessValue(theAction, theAction, value, maximumValue);
     }
 
     public static void SetAccessValue(this TypeAuthContext typeAuthContext, DynamicTextAction theAction, string? Id, string? value, string? maximumValue)
     {
-        typeAuthContext.SetTextAccessValue(theAction, theAction.MinimumAccess, theAction.MaximumAccess, value, maximumValue, theAction.Comparer, Id);
+        typeAuthContext.SetTextAccessValue(theAction, theAction, value, maximumValue, Id);
     }
 
-    private static void SetTextAccessValue(this TypeAuthContext typeAuthContext, ActionBase theAction, string? actionMin, string? actionMax, string? valueToSet, string? maxAllowed, Func<string?, string?, string?>? comparer, string? Id = null)
+    private static void SetTextAccessValue(this TypeAuthContext typeAuthContext, ActionBase theAction, ITextAccessProperties textProps, string? valueToSet, string? maxAllowed, string? Id = null)
     {
 
         var actionMatches = typeAuthContext.FindOrAddInActionBank(theAction, Id);
 
         foreach (var action in actionMatches)
         {
-            valueToSet = typeAuthContext.ReduceValue(comparer, actionMin, actionMax, valueToSet, maxAllowed);
+            valueToSet = typeAuthContext.ReduceValue(textProps, valueToSet, maxAllowed);
 
             action.AccessValue = valueToSet;
         }
     }
 
-    private static string? ReduceValue(this TypeAuthContext typeAuthContext, Func<string?, string?, string?>? comparer, string? actionMinimum, string? actionMaximum, string? value, string? maximumValue)
+    private static string? ReduceValue(this TypeAuthContext typeAuthContext, ITextAccessProperties textProps, string? value, string? maximumValue)
     {
+        var comparer = textProps.Comparer;
+
         if (comparer != null)
         {
             //Only used to parse the value.
             //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
             value = comparer(value, value);
 
-            var assignableMaximumWinner = comparer(maximumValue, actionMaximum);
+            var assignableMaximumWinner = comparer(maximumValue, textProps.MaximumAccess);
 
-            if (assignableMaximumWinner == actionMaximum)
+            if (assignableMaximumWinner == textProps.MaximumAccess)
                 assignableMaximumWinner = maximumValue;
 
             var actionMaximumWinner = comparer(value, assignableMaximumWinner);
@@ -45,10 +47,10 @@ public static class AccessTreeGenerator
             if (actionMaximumWinner == value)
                 value = assignableMaximumWinner;
 
-            var minimumWinner = comparer(value, actionMinimum);
+            var minimumWinner = comparer(value, textProps.MinimumAccess);
 
-            if (minimumWinner == actionMinimum)
-                value = actionMinimum;
+            if (minimumWinner == textProps.MinimumAccess)
+                value = textProps.MinimumAccess;
         }
 
         return value;
@@ -228,35 +230,20 @@ public static class AccessTreeGenerator
                 }
             }
 
-            if (actionTreeItem.Action.Type == ActionType.Text)
+            if (actionTreeItem.Action.Type == ActionType.Text && actionTreeItem.Action is ITextAccessProperties textProps)
             {
-                var textAction = actionTreeItem.Action as TextAction;
-                var dynamicTextAction = actionTreeItem.Action as DynamicTextAction;
+                var isDynamic = actionTreeItem.Action is DynamicAction;
+                var id = isDynamic ? actionTreeItem.ID : null;
 
-                string? value = null;
+                string? value = typeAuthContext.GetTextAccessValue(actionTreeItem.Action, textProps, id);
+                string? reducedValue = reducer.GetTextAccessValue(actionTreeItem.Action, textProps, id);
 
-                if (dynamicTextAction != null)
-                    value = typeAuthContext.AccessValue(dynamicTextAction, actionTreeItem.ID);
-                else if (textAction != null)
-                    value = typeAuthContext.AccessValue(textAction);
+                value = typeAuthContext.ReduceValue(textProps, value, reducedValue);
 
-                string? reducedValue = null;
-
-                if (dynamicTextAction != null)
-                    reducedValue = reducer.AccessValue(dynamicTextAction, actionTreeItem.ID);
-                else if (textAction != null)
-                    reducedValue = reducer.AccessValue(textAction);
-
-                if (dynamicTextAction != null)
-                    value = typeAuthContext.ReduceValue(dynamicTextAction.Comparer, dynamicTextAction.MinimumAccess, dynamicTextAction.MaximumAccess, value, reducedValue);
-                else if (textAction != null)
-                    value = typeAuthContext.ReduceValue(textAction.Comparer, textAction.MinimumAccess, textAction.MaximumAccess, value, reducedValue);
-
-
-                if (value == null || value == textAction?.MinimumAccess || value == dynamicTextAction?.MinimumAccess)
+                if (value == null || value == textProps.MinimumAccess)
                     return null;
 
-                if (textAction is DecimalAction || dynamicTextAction is DynamicDecimalAction)
+                if (actionTreeItem.Action is DecimalAction || actionTreeItem.Action is DynamicDecimalAction)
                     return decimal.Parse(value);
 
                 return value;

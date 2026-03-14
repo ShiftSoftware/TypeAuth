@@ -129,7 +129,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public string? AccessValue(TextAction action)
         {
-            return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess);
+            return GetTextAccessValue(action, action);
         }
 
         public decimal? AccessValue(DecimalAction action)
@@ -144,7 +144,7 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId)
         {
-            return GetTextAccessValue(action, action.Comparer, action.Merger, action.MinimumAccess, action.MaximumAccess, Id, selfId);
+            return GetTextAccessValue(action, action, Id, selfId);
         }
 
         public decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId)
@@ -157,9 +157,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
-        private string? GetTextAccessValue(ActionBase action, Func<string?, string?, string?>? comparer, Func<string?, string?, string?>? merger, string? minAccess, string? maxAccess, string? Id = null, params string[]? selfId)
+        internal string? GetTextAccessValue(ActionBase action, ITextAccessProperties textProps, string? Id = null, params string[]? selfId)
         {
-            var access = minAccess;
+            var access = textProps.MinimumAccess;
 
             var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId);
 
@@ -169,11 +169,11 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 if (i > 0)
                 {
-                    if (comparer != null)
-                        thisAccess = comparer(access, thisAccess);
+                    if (textProps.Comparer != null)
+                        thisAccess = textProps.Comparer(access, thisAccess);
 
-                    if (merger != null)
-                        thisAccess = merger(access, thisAccess);
+                    if (textProps.Merger != null)
+                        thisAccess = textProps.Merger(access, thisAccess);
                 }
 
                 if (thisAccess != null)

@@ -57,10 +57,10 @@
 ### Phase 2: Extract shared Text/Decimal logic (reduce duplication)
 **Goal:** Reduce copy-paste between `Action`/`DynamicAction` text property sets.
 
-- [ ] **2.1** Introduce an internal interface `ITextAccessProperties` with `MaximumAccess`, `MinimumAccess`, `Comparer`, `Merger` — implemented by both `TextAction` and `DynamicTextAction`.
-- [ ] **2.2** Refactor `TypeAuthContext.GetTextAccessValue` and `TypeAuthContextHelper.PopulateActionBank` to use the interface instead of casting to both `TextAction` and `DynamicTextAction` separately.
-- [ ] **2.3** Refactor `AccessTreeGenerator` text-handling code to use the interface.
-- [ ] **2.4** Run all tests → green.
+- [x] **2.1** Introduce an internal interface `ITextAccessProperties` with `MaximumAccess`, `MinimumAccess`, `Comparer`, `Merger` — implemented by both `TextAction` and `DynamicTextAction`.
+- [x] **2.2** Refactor `TypeAuthContext.GetTextAccessValue` and `TypeAuthContextHelper.PopulateActionBank` to use the interface instead of casting to both `TextAction` and `DynamicTextAction` separately.
+- [x] **2.3** Refactor `AccessTreeGenerator` text-handling code (`SetAccessValue`, `ReduceValue`, `TraverseActionTree`) to use the interface.
+- [x] **2.4** All 62 tests pass ✅
 
 ### Phase 3: Break up `TypeAuthContextHelper`
 **Goal:** Single-responsibility classes behind the same internal API.
@@ -105,7 +105,7 @@
 | Phase | Status | Notes |
 |-------|--------|-------|
 | 1 – Housekeeping | ✅ Complete | All 62 tests pass. Removed debug comments, empty file, fixed internal typo. |
-| 2 – Text/Decimal dedup | ⬜ Not started | |
+| 2 – Text/Decimal dedup | ✅ Complete | Introduced `ITextAccessProperties` interface. Eliminated double-cast pattern in `PopulateActionBank`, `GetTextAccessValue`, `SetAccessValue`, `ReduceValue`, and `TraverseActionTree`. All 62 tests pass. |
 | 3 – Split ContextHelper | ⬜ Not started | |
 | 4 – Split AccessTreeGen | ⬜ Not started | |
 | 5 – Harden parsing | ⬜ Not started | |

@@ -1,6 +1,6 @@
 ﻿namespace ShiftSoftware.TypeAuth.Core.Actions
 {
-    public class TextAction : Action
+    public class TextAction : Action, ITextAccessProperties
     {
         /// <summary>
         /// For non-standard Action Types the Maximum (Or Full Access) should be specified.
@@ -36,7 +36,7 @@
         }
     }
 
-    public class DynamicTextAction : DynamicAction
+    public class DynamicTextAction : DynamicAction, ITextAccessProperties
     {
         /// <summary>
         /// For non-standard Action Types the Maximum (Or Full Access) should be specified.
