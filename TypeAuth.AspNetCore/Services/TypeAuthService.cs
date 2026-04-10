@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.AspNetCore.Services
@@ -8,12 +9,10 @@ namespace ShiftSoftware.TypeAuth.AspNetCore.Services
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly TypeAuthAspNetCoreOptions options;
 
-        //public TypeAuthContext TypeAuthContext { get; private set; }
-
-        public AspNetCoreTypeAuthService(IHttpContextAccessor httpContextAccessor, TypeAuthAspNetCoreOptions options)
+        public AspNetCoreTypeAuthService(IHttpContextAccessor httpContextAccessor, IOptions<TypeAuthAspNetCoreOptions> options)
         {
             this.httpContextAccessor = httpContextAccessor;
-            this.options = options;
+            this.options = options.Value;
 
             this.BuildTypeAuthConext();
         }
