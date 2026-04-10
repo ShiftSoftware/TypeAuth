@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Options;
 using ShiftSoftware.TypeAuth.Core;
 
 namespace ShiftSoftware.TypeAuth.Blazor.Services
@@ -8,10 +9,10 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
         private readonly AuthenticationStateProvider authStateProvider;
         private readonly TypeAuthBlazorOptions options;
 
-        public BlazorTypeAuthService(AuthenticationStateProvider authStateProvider, TypeAuthBlazorOptions options)
+        public BlazorTypeAuthService(AuthenticationStateProvider authStateProvider, IOptions<TypeAuthBlazorOptions> options)
         {
             this.authStateProvider = authStateProvider;
-            this.options = options;
+            this.options = options.Value;
 
 
             BuildTypeAuthConext();
