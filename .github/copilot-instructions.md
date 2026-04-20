@@ -88,6 +88,6 @@ ActionBase
 - **Build after changes** — run `run_build` to verify compilation.
 - **Run tests** — after any logic change, run the test suite to verify no regressions.
 - **Incremental changes** — make small, focused changes. Don't combine unrelated refactoring in one step.
-- **Update the plan** — after completing a phase, update master `REFACTORING_PLAN.md` to reflect progress.
-- **Strong emphasis on context management** — Create per-module detail files as iterations grow, and apply new methods to keep things tidy and keep the master `REFACTORING_PLAN.md` managable as complexity increases.
+- **Update the plan** — after completing a phase, update the master plan at `.shift/repos/typeauth/REFACTORING_PLAN.md` (in the `.shift` repo) to reflect progress.
+- **Strong emphasis on context management** — Create per-module detail files as iterations grow, and apply new methods to keep things tidy and keep the master plan (`.shift/repos/typeauth/REFACTORING_PLAN.md`) manageable as complexity increases.
 
