@@ -18,6 +18,8 @@ internal static class AccessTreeTraverser
 
             if (assignableMaximumWinner == textProps.MaximumAccess)
                 assignableMaximumWinner = maximumValue;
+            else
+                assignableMaximumWinner = textProps.MaximumAccess;
 
             var actionMaximumWinner = comparer(value, assignableMaximumWinner);
 
