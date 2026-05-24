@@ -30,46 +30,46 @@ namespace ShiftSoftware.TypeAuth.Core
             _actionBankPopulator.ExpandDynamicActions(actionTreeItem);
         }
 
-        internal List<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, params string[]? selfId)
+        internal IEnumerable<ActionBankItem> LocateActionInBank(ActionBase actionToCheck, string? Id = null, params string[]? selfId)
         {
-            List<ActionBankItem> actionMatches = new List<ActionBankItem> { };
-
-            foreach (var item in this.ActionBank.Where(x => x.Action.Path == actionToCheck.Path).ToList())
+            foreach (var item in this.ActionBank)
             {
-                actionMatches.Add(item);
+                if (item.Action.Path != actionToCheck.Path)
+                    continue;
+
+                if (IsMatch(item, Id))
+                    yield return item;
 
                 if (actionToCheck is DynamicAction)
                 {
-                    actionMatches.AddRange(item.SubActionBankItems.Where(x =>
+                    foreach (var sub in item.SubActionBankItems)
                     {
-                        var action = (x.Action as DynamicAction)!;
+                        var action = (sub.Action as DynamicAction)!;
 
-                        return action.Id == Id || (Id != null && selfId != null && selfId.Contains(Id) && action.Id == TypeAuthContext.SelfReferenceKey);
-                    }));
+                        if (action.Id == Id || (Id != null && selfId != null && selfId.Contains(Id) && action.Id == TypeAuthContext.SelfReferenceKey))
+                        {
+                            if (IsMatch(sub, Id))
+                                yield return sub;
+                        }
+                    }
                 }
             }
-
-            return actionMatches
-                .Where(x =>
-                {
-                    var dynamicAction = x.Action as DynamicAction;
-
-                    if (Id != null && dynamicAction != null && dynamicAction.Id == null && x.AccessList.Count == 0)
-                        return false;
-
-                    return true;
-                }).ToList();
         }
 
         internal bool Can(ActionBase actionToCheck, Access accessTypeToCheck, string? Id = null, params string[]? selfId)
         {
-            var access = false;
+            return LocateActionInBank(actionToCheck, Id, selfId)
+                .Any(x => x.AccessList.IndexOf(accessTypeToCheck) > -1);
+        }
 
-            var actionMatches = this.LocateActionInBank(actionToCheck, Id, selfId);
+        private static bool IsMatch(ActionBankItem item, string? Id)
+        {
+            var dynamicAction = item.Action as DynamicAction;
 
-            access = actionMatches.Any(actionMatch => actionMatch.AccessList.IndexOf(accessTypeToCheck) > -1);
+            if (Id != null && dynamicAction != null && dynamicAction.Id == null && item.AccessList.Count == 0)
+                return false;
 
-            return access;
+            return true;
         }
     }
 }

@@ -57,7 +57,7 @@ public static class AccessTreeEditor
 
     private static List<ActionBankItem> FindOrAddInActionBank(this TypeAuthContext typeAuthContext, ActionBase theAction, string? Id)
     {
-        var actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+        var actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id).ToList();
 
         if (actionMatches.Count == 0 && theAction is Actions.Action)
         {
@@ -78,7 +78,7 @@ public static class AccessTreeEditor
 
                 typeAuthContext.TypeAuthContextHelper.ActionBank.Add(actionBankItem);
 
-                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id).ToList();
             }
 
 
@@ -86,7 +86,7 @@ public static class AccessTreeEditor
             {
                 actionMatches.First().SubActionBankItems.Add(new ActionBankItem(new DynamicAction { Id = Id, Type = theAction.Type }, new List<Access>()));
 
-                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id);
+                actionMatches = typeAuthContext.TypeAuthContextHelper.LocateActionInBank(theAction, Id).ToList();
             }
         }
 

@@ -4,11 +4,12 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 namespace ShiftSoftware.TypeAuth.Core
 {
     /// <summary>
-    /// This is what you use to check Action Trees against an Access Tree
+    /// This is what you use to check Action Trees against an Access Tree.
+    /// An un-initialized context (before <see cref="Init"/> is called) is fail-closed: all permission checks return false / deny.
     /// </summary>
-    public class TypeAuthContext
+    public class TypeAuthContext : ITypeAuthService
     {
-        internal TypeAuthContextHelper TypeAuthContextHelper { get; set; }
+        internal TypeAuthContextHelper TypeAuthContextHelper { get; set; } = new TypeAuthContextHelper();
 
         internal const string SelfReferenceKey = "_shift_software_type_auth_core_self_reference";
         internal const string EmptyOrNullKey = "_shift_software_type_auth_core_empty_or_null";
@@ -187,7 +188,7 @@ namespace ShiftSoftware.TypeAuth.Core
         {
             var access = textProps.MinimumAccess;
 
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId);
+            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId).ToList();
 
             for (int i = 0; i < actionMatches.Count; i++)
             {
@@ -218,7 +219,7 @@ namespace ShiftSoftware.TypeAuth.Core
         /// <inheritdoc cref="ITypeAuthService.GetAccessibleItems"/>
         public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
         {
-            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
+            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction).ToList();
 
             var wildCardAccess = false;
 
