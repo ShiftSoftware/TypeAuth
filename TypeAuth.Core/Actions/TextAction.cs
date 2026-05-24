@@ -25,6 +25,7 @@ namespace ShiftSoftware.TypeAuth.Core.Actions
         /// <summary>
         /// Merges two access values into a combined value. Mutually exclusive with <see cref="Comparer"/>.
         /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
         public Func<string?, string?, string?>? Merger { get; set; }
 
         public TextAction() : base(ActionType.Text)
@@ -76,6 +77,7 @@ namespace ShiftSoftware.TypeAuth.Core.Actions
         /// <summary>
         /// Merges two access values into a combined value. Mutually exclusive with <see cref="Comparer"/>.
         /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
         public Func<string?, string?, string?>? Merger { get; set; }
 
         public DynamicTextAction() : base(ActionType.Text)

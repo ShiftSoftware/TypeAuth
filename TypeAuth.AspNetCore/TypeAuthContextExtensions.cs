@@ -5,12 +5,10 @@ public static class TypeAuthContextExtensions
 {
     public static bool Can(this TypeAuthContext typeAuthContext, Type actionTreeType, string actionName, Access access)
     {
-        var instance = (Activator.CreateInstance(actionTreeType))!;
-
         var action = (Core.Actions.Action)actionTreeType
-            .GetFields()
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
             .FirstOrDefault(x => x.Name.Equals(actionName, StringComparison.InvariantCultureIgnoreCase))
-            ?.GetValue(instance)!;
+            ?.GetValue(null)!;
 
         if (action == null)
             throw new Exception($"No Such Action ({actionTreeType.FullName}.{actionName})");

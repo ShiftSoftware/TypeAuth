@@ -41,14 +41,12 @@ public class TypeAuthAttribute : AuthorizeAttribute, IAuthorizationFilter
 
         var typeAuthService = (TypeAuthContext) service;
         
-        //Check for authrization
         if (!(context.HttpContext.User.Identity?.IsAuthenticated ?? false))
         {
             context.Result = new UnauthorizedResult();
             return;
         }
 
-        //Check for authentication
         if (!typeAuthService.Can(actionTreeType, actionName, access))
         {
             context.Result = new ForbidResult();
