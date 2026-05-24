@@ -1,5 +1,8 @@
-﻿namespace ShiftSoftware.TypeAuth.Core.Actions
+namespace ShiftSoftware.TypeAuth.Core.Actions
 {
+    /// <summary>
+    /// Base class for all action types in the TypeAuth access control system.
+    /// </summary>
     public class ActionBase
     {
         /// <summary>
@@ -7,6 +10,9 @@
         /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// Dot-delimited path that uniquely identifies this action within the action tree hierarchy.
+        /// </summary>
         public string? Path { get; set; }
 
         /// <summary>
@@ -50,6 +56,9 @@
         }
     }
 
+    /// <summary>
+    /// An action that supports instance-level (per-ID) access control for individual data items.
+    /// </summary>
     public class DynamicAction : ActionBase
     {
         /// <summary>
@@ -74,6 +83,12 @@
 
         internal List<KeyValuePair<string, string>> Items { get; set; }
 
+        /// <summary>
+        /// Populates the expandable items for this dynamic action. Each item represents a data entity that can be individually granted or denied access.
+        /// </summary>
+        /// <param name="items">Key-value pairs where the key is the item ID and the value is its display name.</param>
+        /// <param name="addSelf">If true, adds a "Self" entry that resolves to the current user's own ID at evaluation time.</param>
+        /// <param name="addEmptyOrNull">If true, adds an "Unassigned" entry for items with no assigned owner.</param>
         public void Expand(List<KeyValuePair<string, string>> items, bool addSelf = false, bool addEmptyOrNull = false)
         {
             this.Items = items.ToList();

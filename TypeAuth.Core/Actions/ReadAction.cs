@@ -1,5 +1,8 @@
-﻿namespace ShiftSoftware.TypeAuth.Core.Actions
+namespace ShiftSoftware.TypeAuth.Core.Actions
 {
+    /// <summary>
+    /// An action that supports only Read access.
+    /// </summary>
     public class ReadAction : Action
     {
         public ReadAction() : base(ActionType.Read)
@@ -13,6 +16,9 @@
         }
     }
 
+    /// <summary>
+    /// A dynamic (per-ID) action that supports only Read access.
+    /// </summary>
     public class DynamicReadAction : DynamicAction
     {
         public DynamicReadAction() : base(ActionType.Read)

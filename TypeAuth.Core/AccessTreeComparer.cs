@@ -2,8 +2,14 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core;
 
+/// <summary>
+/// Extension methods for comparing two <see cref="TypeAuthContext"/> instances to find permission gaps.
+/// </summary>
 public static class AccessTreeComparer
 {
+    /// <summary>
+    /// Returns the actions and access levels present in <paramref name="typeAuthContextToCompare"/> but not granted in this context.
+    /// </summary>
     public static Dictionary<ActionBase, string> FindInAccessibleActionsOn(this TypeAuthContext typeAuthContext, TypeAuthContext typeAuthContextToCompare)
     {
         var inAccessibleActions = new Dictionary<ActionBase, string>();

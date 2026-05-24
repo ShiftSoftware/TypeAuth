@@ -1,5 +1,8 @@
-﻿namespace ShiftSoftware.TypeAuth.Core.Actions
+namespace ShiftSoftware.TypeAuth.Core.Actions
 {
+    /// <summary>
+    /// An action with simple on/off access. Equivalent to <see cref="ReadAction"/> under the hood.
+    /// </summary>
     public class BooleanAction : Action
     {
         public BooleanAction() : base(ActionType.Boolean)
@@ -13,6 +16,9 @@
         }
     }
 
+    /// <summary>
+    /// A dynamic (per-ID) action with simple on/off access.
+    /// </summary>
     public class DynamicBooleanAction : DynamicAction
     {
         public DynamicBooleanAction() : base(ActionType.Boolean)

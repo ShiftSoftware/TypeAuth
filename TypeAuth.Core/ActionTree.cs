@@ -1,4 +1,4 @@
-﻿namespace ShiftSoftware.TypeAuth.Core
+namespace ShiftSoftware.TypeAuth.Core
 {
     /// <summary>
     /// Used for organizing Actions in a hierarchical (Tree) structure.
@@ -25,6 +25,8 @@
 
         }
 
+        /// <param name="name">Friendly display name for the action tree.</param>
+        /// <param name="description">Description of what actions this tree contains.</param>
         public ActionTree(string? name, string? description/*, string? Id = null*/)
         {
             //this.ID = Id;
@@ -33,6 +35,9 @@
         }
     }
 
+    /// <summary>
+    /// Marks an action tree class as containing dynamic actions.
+    /// </summary>
     public class DynamicActionTree : ActionTree
     {
 

@@ -1,4 +1,4 @@
-﻿using ShiftSoftware.TypeAuth.Core.Actions;
+using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -16,8 +16,14 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal Type[] ActionTrees { get; set; } = default!;
 
+        /// <summary>
+        /// The hierarchical action tree built from the registered action tree types.
+        /// </summary>
         public ActionTreeNode ActionTree { get; set; } = default!;
 
+        /// <summary>
+        /// Constructs a context from a single access tree JSON string and one or more action tree types.
+        /// </summary>
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {
             this.TypeAuthContextHelper = new TypeAuthContextHelper();
@@ -25,10 +31,10 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <summary>
-        /// Constructs a Context by Providing a list of Action Trees and an Access Tree provided as a serialized JSON string.
+        /// Constructs a context from multiple access tree JSON strings (merged together) and one or more action tree types.
         /// </summary>
-        /// <param name="actionTrees">A list of Action Trees to Check your Access Tree against.</param>
-        /// <param name="accessTreeJSONString">The Access Tree provided as a JSON string. Access Tree contains the Actions that a Subject can perform.</param>
+        /// <param name="accessTreeJSONStrings">Access trees provided as JSON strings. Multiple trees are merged to form the combined permissions.</param>
+        /// <param name="actionTrees">Action tree types that define the available actions to check against.</param>
         public TypeAuthContext(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
             this.TypeAuthContextHelper = new TypeAuthContextHelper();
@@ -52,86 +58,104 @@ namespace ShiftSoftware.TypeAuth.Core
             this.TypeAuthContextHelper.ExpandDynamicActions(this.ActionTree);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.Can(ActionBase, Access)"/>
         public bool Can(ActionBase action, Access access)
         {
             return this.TypeAuthContextHelper.Can(action, access);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.Can(ActionBase, Access, string, string[])"/>
         public bool Can(ActionBase action, Access access, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(ReadAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(DynamicReadAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(ReadWriteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(ReadWriteDeleteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
+        /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
         public bool CanWrite(ReadWriteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
         public bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
         public bool CanWrite(ReadWriteDeleteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
         public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanDelete(ReadWriteDeleteAction)"/>
         public bool CanDelete(ReadWriteDeleteAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Delete);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanDelete(ReadWriteDeleteAction)"/>
         public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Delete, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanAccess(BooleanAction)"/>
         public bool CanAccess(BooleanAction action)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Maximum);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.CanAccess(BooleanAction)"/>
         public bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId)
         {
             return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.AccessValue(TextAction)"/>
         public string? AccessValue(TextAction action)
         {
             return GetTextAccessValue(action, action);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.AccessValue(DecimalAction)"/>
         public decimal? AccessValue(DecimalAction action)
         {
             var textValue = AccessValue(action as TextAction);
@@ -142,11 +166,13 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
+        /// <inheritdoc cref="ITypeAuthService.AccessValue(DynamicTextAction, string, string[])"/>
         public string? AccessValue(DynamicTextAction action, string? Id, params string[]? selfId)
         {
             return GetTextAccessValue(action, action, Id, selfId);
         }
 
+        /// <inheritdoc cref="ITypeAuthService.AccessValue(DynamicDecimalAction, string, string[])"/>
         public decimal? AccessValue(DynamicDecimalAction action, string? Id, params string[]? selfId)
         {
             var textValue = AccessValue(action as DynamicTextAction, Id, selfId);
@@ -183,11 +209,13 @@ namespace ShiftSoftware.TypeAuth.Core
             return access;
         }
 
+        /// <inheritdoc cref="ITypeAuthService.GetRegisteredActionTrees"/>
         public Type[] GetRegisteredActionTrees()
         {
             return this.ActionTrees.ToArray();
         }
 
+        /// <inheritdoc cref="ITypeAuthService.GetAccessibleItems"/>
         public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
         {
             var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction);

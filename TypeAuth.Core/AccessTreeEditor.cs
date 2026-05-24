@@ -2,13 +2,25 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core;
 
+/// <summary>
+/// Extension methods for modifying access values and toggling permissions on a <see cref="TypeAuthContext"/>'s action bank.
+/// </summary>
 public static class AccessTreeEditor
 {
+    /// <summary>
+    /// Sets the text access value for the given action, constrained by the specified maximum.
+    /// </summary>
     public static void SetAccessValue(this TypeAuthContext typeAuthContext, TextAction theAction, string? value, string? maximumValue)
     {
         typeAuthContext.SetTextAccessValue(theAction, theAction, value, maximumValue);
     }
 
+    /// <inheritdoc cref="SetAccessValue(TypeAuthContext, TextAction, string, string)"/>
+    /// <param name="typeAuthContext">The context to modify.</param>
+    /// <param name="theAction">The dynamic text action to set.</param>
+    /// <param name="Id">The data item ID.</param>
+    /// <param name="value">The value to assign.</param>
+    /// <param name="maximumValue">The maximum allowed value.</param>
     public static void SetAccessValue(this TypeAuthContext typeAuthContext, DynamicTextAction theAction, string? Id, string? value, string? maximumValue)
     {
         typeAuthContext.SetTextAccessValue(theAction, theAction, value, maximumValue, Id);
@@ -27,6 +39,9 @@ public static class AccessTreeEditor
         }
     }
 
+    /// <summary>
+    /// Toggles the specified access level on or off for the given action.
+    /// </summary>
     public static void ToggleAccess(this TypeAuthContext typeAuthContext, ActionBase theAction, Access access, string? Id = null)
     {
         var actionMatches = typeAuthContext.FindOrAddInActionBank(theAction, Id);
