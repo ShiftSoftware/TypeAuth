@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace ShiftSoftware.TypeAuth.Core
 {
@@ -10,22 +10,30 @@ namespace ShiftSoftware.TypeAuth.Core
 
         public AccessTreeNode(object? accessCursor)
         {
-            if (accessCursor == null)
+            if (accessCursor is null)
                 return;
 
-            if (accessCursor.GetType() == typeof(JValue))
+            if (accessCursor is JValue jValue)
             {
-                AccessValue = accessCursor.ToString();
+                if (jValue.Value is not null)
+                    AccessValue = jValue.Value.ToString();
             }
-            else if (accessCursor.GetType() == typeof(JArray))
+            else if (accessCursor is JArray jArray)
             {
-                var theArray = ((JArray)accessCursor).Select(x => x.ToObject<Access>()).ToList();
-
-                AccessArray.AddRange(theArray);
+                foreach (var item in jArray)
+                {
+                    try
+                    {
+                        AccessArray.Add(item.ToObject<Access>());
+                    }
+                    catch
+                    {
+                    }
+                }
             }
-            else if (accessCursor.GetType() == typeof(JObject))
+            else if (accessCursor is JObject jObject)
             {
-                AccessObject = (JObject)accessCursor;
+                AccessObject = jObject;
             }
         }
     }
