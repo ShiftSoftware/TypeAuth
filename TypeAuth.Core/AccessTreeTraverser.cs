@@ -1,3 +1,4 @@
+using System.Globalization;
 using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core;
@@ -150,7 +151,7 @@ internal static class AccessTreeTraverser
                     return null;
 
                 if (actionTreeItem.Action is DecimalAction || actionTreeItem.Action is DynamicDecimalAction)
-                    return decimal.Parse(value);
+                    return decimal.Parse(value, CultureInfo.InvariantCulture);
 
                 return value;
             }

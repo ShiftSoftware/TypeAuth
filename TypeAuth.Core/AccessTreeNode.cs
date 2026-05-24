@@ -1,3 +1,4 @@
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 
 namespace ShiftSoftware.TypeAuth.Core
@@ -16,7 +17,7 @@ namespace ShiftSoftware.TypeAuth.Core
             if (accessCursor is JValue jValue)
             {
                 if (jValue.Value is not null)
-                    AccessValue = jValue.Value.ToString();
+                    AccessValue = Convert.ToString(jValue.Value, CultureInfo.InvariantCulture);
             }
             else if (accessCursor is JArray jArray)
             {

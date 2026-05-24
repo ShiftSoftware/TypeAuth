@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace ShiftSoftware.TypeAuth.Core.Actions;
 
 /// <summary>
@@ -12,19 +14,19 @@ public class DecimalAction : TextAction
     public DecimalAction(string? name, string? description = null, decimal? minimumAccess = null, decimal? maximumAccess = null) : base(
             name,
             description,
-            minimumAccess?.ToString() ?? null,
-            maximumAccess?.ToString() ?? null,
+            minimumAccess?.ToString(CultureInfo.InvariantCulture),
+            maximumAccess?.ToString(CultureInfo.InvariantCulture),
             (a, b) =>
             {
                 var numbers = new List<decimal>();
 
                 if (a != null)
-                    numbers.Add(decimal.Parse(a));
+                    numbers.Add(decimal.Parse(a, CultureInfo.InvariantCulture));
                 if (b != null)
-                    numbers.Add(decimal.Parse(b));
+                    numbers.Add(decimal.Parse(b, CultureInfo.InvariantCulture));
 
                 if (numbers.Count > 0)
-                    return numbers.Max().ToString();
+                    return numbers.Max().ToString(CultureInfo.InvariantCulture);
 
                 return null;
             }
@@ -46,19 +48,19 @@ public class DynamicDecimalAction : DynamicTextAction
     public DynamicDecimalAction(string? name, string? description = null, decimal? minimumAccess = null, decimal? maximumAccess = null) : base(
             name,
             description,
-            minimumAccess?.ToString() ?? null,
-            maximumAccess?.ToString() ?? null,
+            minimumAccess?.ToString(CultureInfo.InvariantCulture),
+            maximumAccess?.ToString(CultureInfo.InvariantCulture),
             (a, b) =>
             {
                 var numbers = new List<decimal>();
 
                 if (a != null)
-                    numbers.Add(decimal.Parse(a));
+                    numbers.Add(decimal.Parse(a, CultureInfo.InvariantCulture));
                 if (b != null)
-                    numbers.Add(decimal.Parse(b));
+                    numbers.Add(decimal.Parse(b, CultureInfo.InvariantCulture));
 
                 if (numbers.Count > 0)
-                    return numbers.Max().ToString();
+                    return numbers.Max().ToString(CultureInfo.InvariantCulture);
 
                 return null;
             }

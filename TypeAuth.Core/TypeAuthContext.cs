@@ -1,3 +1,4 @@
+using System.Globalization;
 using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace ShiftSoftware.TypeAuth.Core
@@ -160,7 +161,7 @@ namespace ShiftSoftware.TypeAuth.Core
             var textValue = AccessValue(action as TextAction);
 
             if (textValue != null)
-                return decimal.Parse(textValue);
+                return decimal.Parse(textValue, CultureInfo.InvariantCulture);
 
             return null;
         }
@@ -177,7 +178,7 @@ namespace ShiftSoftware.TypeAuth.Core
             var textValue = AccessValue(action as DynamicTextAction, Id, selfId);
 
             if (textValue != null)
-                return decimal.Parse(textValue);
+                return decimal.Parse(textValue, CultureInfo.InvariantCulture);
 
             return null;
         }
