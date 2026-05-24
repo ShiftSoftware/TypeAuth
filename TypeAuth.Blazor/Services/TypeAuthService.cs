@@ -25,7 +25,7 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
             BuildTypeAuthConext();
         }
 
-        private static bool disableTypeAuthBuild = false;
+        private bool disableTypeAuthBuild = false;
         private void BuildTypeAuthConext()
         {
             if (disableTypeAuthBuild)
@@ -33,16 +33,20 @@ namespace ShiftSoftware.TypeAuth.Blazor.Services
 
             disableTypeAuthBuild = true;
 
-            //Get the access trees from the token
-            var state = authStateProvider.GetAuthenticationStateAsync().Result;
-            var accessTrees = state.User?.Claims?
-                .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
-                .Select(x => x.Value).ToList();
+            try
+            {
+                var state = authStateProvider.GetAuthenticationStateAsync().Result;
+                var accessTrees = state.User?.Claims?
+                    .Where(c => c.Type == TypeAuthClaimTypes.AccessTree)
+                    .Select(x => x.Value).ToList();
 
-            if (options.ActionTrees is not null && accessTrees is not null)
-                base.Init(accessTrees, options.ActionTrees.ToArray());
-
-            disableTypeAuthBuild = false;
+                if (options.ActionTrees is not null && accessTrees is not null)
+                    base.Init(accessTrees, options.ActionTrees.ToArray());
+            }
+            finally
+            {
+                disableTypeAuthBuild = false;
+            }
         }
     }
 }
