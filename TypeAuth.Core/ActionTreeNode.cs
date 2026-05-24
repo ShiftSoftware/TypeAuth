@@ -9,12 +9,12 @@ public class ActionTreeNode
     public dynamic? AdditionalData { get; set; }
     public List<Access> WildCardAccess { get; set; }
     public Actions.ActionBase? Action { get; set; }
-    public HashSet<ActionTreeNode> ActionTreeItems { get; set; }
+    public List<ActionTreeNode> ActionTreeItems { get; set; }
 
     public bool IsADynamicSubItem { get; set; }
     public ActionTreeNode(string? path)
     {
-        this.ActionTreeItems = new HashSet<ActionTreeNode>();
+        this.ActionTreeItems = new List<ActionTreeNode>();
         this.WildCardAccess = new List<Access>();
         this.Path = path;
     }
