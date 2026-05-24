@@ -26,7 +26,6 @@ namespace ShiftSoftware.TypeAuth.Core
         /// </summary>
         public TypeAuthContext(string accessTreeJSONString = "{}", params Type[] actionTrees)
         {
-            this.TypeAuthContextHelper = new TypeAuthContextHelper();
             this.Init(new List<string> { accessTreeJSONString }, actionTrees);
         }
 
@@ -37,12 +36,12 @@ namespace ShiftSoftware.TypeAuth.Core
         /// <param name="actionTrees">Action tree types that define the available actions to check against.</param>
         public TypeAuthContext(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
-            this.TypeAuthContextHelper = new TypeAuthContextHelper();
             this.Init(accessTreeJSONStrings, actionTrees);
         }
 
         internal void Init(List<string> accessTreeJSONStrings, params Type[] actionTrees)
         {
+            this.TypeAuthContextHelper = new TypeAuthContextHelper();
             this.AccessTreeJsonStrings = accessTreeJSONStrings;
             this.ActionTrees = actionTrees;
 
