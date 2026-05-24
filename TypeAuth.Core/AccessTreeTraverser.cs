@@ -63,13 +63,15 @@ internal static class AccessTreeTraverser
                 x => x.Path == actionTreeItem.Path
             );
 
-            var access = actionTreeItem.WildCardAccess.Where(x => reducerActionTreeItem.WildCardAccess.Contains(x)).ToList();
+            var reducerWildCard = reducerActionTreeItem?.WildCardAccess ?? new List<Access>();
+
+            var access = actionTreeItem.WildCardAccess.Where(x => reducerWildCard.Contains(x)).ToList();
 
             if (preserverActionTreeItem != null)
             {
                 foreach (var item in preserverActionTreeItem.WildCardAccess)
                 {
-                    if (!reducerActionTreeItem.WildCardAccess.Contains(item) && !access.Contains(item))
+                    if (!reducerWildCard.Contains(item) && !access.Contains(item))
                     {
                         access.Add(item);
                     }
@@ -77,8 +79,6 @@ internal static class AccessTreeTraverser
             }
 
             if (access.Count() > 0)
-                //return null;
-
                 return access;
         }
 
