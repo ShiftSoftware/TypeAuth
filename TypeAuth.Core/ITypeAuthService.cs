@@ -16,9 +16,9 @@ public interface ITypeAuthService
     /// <inheritdoc cref="Can(ActionBase, Access)"/>
     /// <param name="action">The action to check.</param>
     /// <param name="access">The access level to check for.</param>
-    /// <param name="Id">The data item ID for dynamic actions.</param>
+    /// <param name="Id">The data item ID for dynamic actions. When null, checks access for unassigned/ownerless items.</param>
     /// <param name="selfId">IDs that should be treated as "self" for self-reference resolution.</param>
-    bool Can(ActionBase action, Access access, string Id, params string[]? selfId);
+    bool Can(ActionBase action, Access access, string? Id, params string[]? selfId);
 
     /// <summary>
     /// Checks whether the given action has Read access.
@@ -26,19 +26,19 @@ public interface ITypeAuthService
     bool CanRead(ReadAction action);
 
     /// <inheritdoc cref="CanRead(ReadAction)"/>
-    bool CanRead(DynamicReadAction action, string Id, params string[]? selfId);
+    bool CanRead(DynamicReadAction action, string? Id, params string[]? selfId);
 
     /// <inheritdoc cref="CanRead(ReadAction)"/>
     bool CanRead(ReadWriteAction action);
 
     /// <inheritdoc cref="CanRead(ReadAction)"/>
-    bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId);
+    bool CanRead(DynamicReadWriteAction action, string? Id, params string[]? selfId);
 
     /// <inheritdoc cref="CanRead(ReadAction)"/>
     bool CanRead(ReadWriteDeleteAction action);
 
     /// <inheritdoc cref="CanRead(ReadAction)"/>
-    bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanRead(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId);
 
     /// <summary>
     /// Checks whether the given action has Write access.
@@ -46,13 +46,13 @@ public interface ITypeAuthService
     bool CanWrite(ReadWriteAction action);
 
     /// <inheritdoc cref="CanWrite(ReadWriteAction)"/>
-    bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId);
+    bool CanWrite(DynamicReadWriteAction action, string? Id, params string[]? selfId);
 
     /// <inheritdoc cref="CanWrite(ReadWriteAction)"/>
     bool CanWrite(ReadWriteDeleteAction action);
 
     /// <inheritdoc cref="CanWrite(ReadWriteAction)"/>
-    bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanWrite(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId);
 
     /// <summary>
     /// Checks whether the given action has Delete access.
@@ -60,7 +60,7 @@ public interface ITypeAuthService
     bool CanDelete(ReadWriteDeleteAction action);
 
     /// <inheritdoc cref="CanDelete(ReadWriteDeleteAction)"/>
-    bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId);
+    bool CanDelete(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId);
 
     /// <summary>
     /// Checks whether the given boolean action is granted.
@@ -68,7 +68,7 @@ public interface ITypeAuthService
     bool CanAccess(BooleanAction action);
 
     /// <inheritdoc cref="CanAccess(BooleanAction)"/>
-    bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId);
+    bool CanAccess(DynamicBooleanAction action, string? Id, params string[]? selfId);
 
     /// <summary>
     /// Returns the computed text access value for the given action.

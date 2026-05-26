@@ -697,5 +697,58 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Write, "I").AccessibleIds, new List<string> { "I", "_3", "_5", "_6" });
             CollectionAssert.AreEqual(typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Delete, "me").AccessibleIds, new List<string> { "_4", "_6" });
         }
+
+        [TestMethod("Null ID treated as EmptyOrNullKey")]
+        public void NullIdTreatedAsEmptyOrNullKey()
+        {
+            DataLevel.Departments.Expand(new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("_1", "One"),
+                new KeyValuePair<string, string>("_2", "Two"),
+            }, addEmptyOrNull: true);
+
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _shift_software_type_auth_core_empty_or_null = new List<Access> { Access.Read, Access.Write },
+                            _1 = new List<Access> { Access.Read },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            Assert.AreEqual(
+                typeAuth.CanRead(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey),
+                typeAuth.CanRead(DataLevel.Departments, (string?)null));
+
+            Assert.AreEqual(
+                typeAuth.CanWrite(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey),
+                typeAuth.CanWrite(DataLevel.Departments, (string?)null));
+
+            Assert.AreEqual(
+                typeAuth.CanDelete(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey),
+                typeAuth.CanDelete(DataLevel.Departments, (string?)null));
+
+            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, (string?)null));
+            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, (string?)null));
+            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, (string?)null));
+
+            Assert.IsTrue(typeAuth.Can(DataLevel.Departments, Access.Read, (string?)null));
+            Assert.IsTrue(typeAuth.Can(DataLevel.Departments, Access.Write, (string?)null));
+            Assert.IsFalse(typeAuth.Can(DataLevel.Departments, Access.Delete, (string?)null));
+
+            Assert.IsTrue(typeAuth.CanRead(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey));
+            Assert.IsTrue(typeAuth.CanWrite(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey));
+            Assert.IsFalse(typeAuth.CanDelete(DataLevel.Departments, TypeAuthContext.EmptyOrNullKey));
+
+            Assert.IsTrue(typeAuth.Can(DataLevel.Departments, Access.Read, TypeAuthContext.EmptyOrNullKey));
+            Assert.IsTrue(typeAuth.Can(DataLevel.Departments, Access.Write, TypeAuthContext.EmptyOrNullKey));
+            Assert.IsFalse(typeAuth.Can(DataLevel.Departments, Access.Delete, TypeAuthContext.EmptyOrNullKey));
+        }
     }
 }

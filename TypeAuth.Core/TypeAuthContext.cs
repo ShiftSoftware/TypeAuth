@@ -66,9 +66,9 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.Can(ActionBase, Access, string, string[])"/>
-        public bool Can(ActionBase action, Access access, string Id, params string[]? selfId)
+        public bool Can(ActionBase action, Access access, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, access, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, access, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
@@ -77,9 +77,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
-        public bool CanRead(DynamicReadAction action, string Id, params string[]? selfId)
+        public bool CanRead(DynamicReadAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id ?? EmptyOrNullKey, selfId);
         }
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(ReadWriteAction action)
@@ -87,9 +87,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
-        public bool CanRead(DynamicReadWriteAction action, string Id, params string[]? selfId)
+        public bool CanRead(DynamicReadWriteAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id ?? EmptyOrNullKey, selfId);
         }
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
         public bool CanRead(ReadWriteDeleteAction action)
@@ -97,9 +97,9 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.TypeAuthContextHelper.Can(action, Access.Read);
         }
         /// <inheritdoc cref="ITypeAuthService.CanRead(ReadAction)"/>
-        public bool CanRead(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
+        public bool CanRead(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Read, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Read, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
@@ -109,9 +109,9 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
-        public bool CanWrite(DynamicReadWriteAction action, string Id, params string[]? selfId)
+        public bool CanWrite(DynamicReadWriteAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Write, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
@@ -121,9 +121,9 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanWrite(ReadWriteAction)"/>
-        public bool CanWrite(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
+        public bool CanWrite(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Write, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Write, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanDelete(ReadWriteDeleteAction)"/>
@@ -133,9 +133,9 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanDelete(ReadWriteDeleteAction)"/>
-        public bool CanDelete(DynamicReadWriteDeleteAction action, string Id, params string[]? selfId)
+        public bool CanDelete(DynamicReadWriteDeleteAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Delete, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Delete, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanAccess(BooleanAction)"/>
@@ -145,9 +145,9 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.CanAccess(BooleanAction)"/>
-        public bool CanAccess(DynamicBooleanAction action, string Id, params string[]? selfId)
+        public bool CanAccess(DynamicBooleanAction action, string? Id, params string[]? selfId)
         {
-            return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id, selfId);
+            return this.TypeAuthContextHelper.Can(action, Access.Maximum, Id ?? EmptyOrNullKey, selfId);
         }
 
         /// <inheritdoc cref="ITypeAuthService.AccessValue(TextAction)"/>
