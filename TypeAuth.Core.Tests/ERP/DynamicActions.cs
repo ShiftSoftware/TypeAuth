@@ -750,5 +750,108 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.IsTrue(typeAuth.Can(DataLevel.Departments, Access.Write, TypeAuthContext.EmptyOrNullKey));
             Assert.IsFalse(typeAuth.Can(DataLevel.Departments, Access.Delete, TypeAuthContext.EmptyOrNullKey));
         }
+
+        [TestMethod("AccessibleItemsResult - HasAccessTo")]
+        public void AccessibleItemsResult_HasAccessTo()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new
+                        {
+                            _1 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Read },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var result = typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read);
+
+            Assert.IsFalse(result.WildCard);
+            Assert.IsTrue(result.HasAccessTo("_1"));
+            Assert.IsTrue(result.HasAccessTo("_2"));
+            Assert.IsFalse(result.HasAccessTo("_3"));
+        }
+
+        [TestMethod("AccessibleItemsResult - HasAccessTo with wildcard")]
+        public void AccessibleItemsResult_HasAccessToWildcard()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Cities = new List<Access> { Access.Read }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var result = typeAuth.GetAccessibleItems(DataLevel.Cities, x => x == Access.Read);
+
+            Assert.IsTrue(result.WildCard);
+            Assert.IsTrue(result.HasAccessTo("_1"));
+            Assert.IsTrue(result.HasAccessTo("anything"));
+        }
+
+        [TestMethod("AccessibleItemsResult - ConvertIds")]
+        public void AccessibleItemsResult_ConvertIds()
+        {
+            DataLevel.Departments.Expand(new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("_1", "One"),
+                new KeyValuePair<string, string>("_2", "Two"),
+                new KeyValuePair<string, string>("_3", "Three"),
+            }, addEmptyOrNull: true);
+
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _shift_software_type_auth_core_empty_or_null = new List<Access> { Access.Read },
+                            _1 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Read },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var result = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Read);
+            var converted = result.ConvertIds<long>(x => long.Parse(x.TrimStart('_')));
+
+            Assert.IsNotNull(converted);
+            Assert.AreEqual(3, converted!.Count);
+            Assert.IsNull(converted[0]);
+            Assert.AreEqual(1L, converted[1]);
+            Assert.AreEqual(2L, converted[2]);
+        }
+
+        [TestMethod("AccessibleItemsResult - ConvertIds returns null for wildcard")]
+        public void AccessibleItemsResult_ConvertIdsWildcard()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new List<Access> { Access.Read }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var result = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Read);
+            var converted = result.ConvertIds<long>(x => long.Parse(x));
+
+            Assert.IsNull(converted);
+        }
     }
 }

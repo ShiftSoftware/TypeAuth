@@ -217,7 +217,7 @@ namespace ShiftSoftware.TypeAuth.Core
         }
 
         /// <inheritdoc cref="ITypeAuthService.GetAccessibleItems"/>
-        public (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId )
+        public AccessibleItemsResult GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId)
         {
             var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction).ToList();
 
@@ -256,7 +256,7 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            return (wildCardAccess, ids);
+            return new AccessibleItemsResult(wildCardAccess, ids);
         }
     }
 }

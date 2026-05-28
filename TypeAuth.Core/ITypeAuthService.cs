@@ -97,5 +97,5 @@ public interface ITypeAuthService
     /// <param name="dynamicAction">The dynamic action to query.</param>
     /// <param name="predicate">Filter applied to each access level to determine if an item is accessible.</param>
     /// <param name="selfId">IDs that should be treated as "self" for self-reference resolution.</param>
-    (bool WildCard, List<string> AccessibleIds) GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
+    AccessibleItemsResult GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
 }
