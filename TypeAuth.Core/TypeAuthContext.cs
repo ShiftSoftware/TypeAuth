@@ -258,5 +258,29 @@ namespace ShiftSoftware.TypeAuth.Core
 
             return new AccessibleItemsResult(wildCardAccess, ids);
         }
+
+        /// <inheritdoc cref="ITypeAuthService.GetReadableItems(DynamicReadAction, string[])"/>
+        public AccessibleItemsResult GetReadableItems(DynamicReadAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Read, selfId);
+
+        /// <inheritdoc cref="ITypeAuthService.GetReadableItems(DynamicReadAction, string[])"/>
+        public AccessibleItemsResult GetReadableItems(DynamicReadWriteAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Read, selfId);
+
+        /// <inheritdoc cref="ITypeAuthService.GetReadableItems(DynamicReadAction, string[])"/>
+        public AccessibleItemsResult GetReadableItems(DynamicReadWriteDeleteAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Read, selfId);
+
+        /// <inheritdoc cref="ITypeAuthService.GetWritableItems(DynamicReadWriteAction, string[])"/>
+        public AccessibleItemsResult GetWritableItems(DynamicReadWriteAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Write, selfId);
+
+        /// <inheritdoc cref="ITypeAuthService.GetWritableItems(DynamicReadWriteAction, string[])"/>
+        public AccessibleItemsResult GetWritableItems(DynamicReadWriteDeleteAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Write, selfId);
+
+        /// <inheritdoc cref="ITypeAuthService.GetDeletableItems(DynamicReadWriteDeleteAction, string[])"/>
+        public AccessibleItemsResult GetDeletableItems(DynamicReadWriteDeleteAction action, params string[]? selfId)
+            => GetAccessibleItems(action, x => x == Access.Delete, selfId);
     }
 }

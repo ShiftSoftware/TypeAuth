@@ -853,5 +853,80 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
 
             Assert.IsNull(converted);
         }
+
+        [TestMethod("GetReadableItems / GetWritableItems / GetDeletableItems")]
+        public void GetReadableWritableDeletableItems()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Read, Access.Write },
+                            _3 = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                            _4 = new List<Access> { Access.Delete },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var readable = typeAuth.GetReadableItems(DataLevel.Departments);
+            var writable = typeAuth.GetWritableItems(DataLevel.Departments);
+            var deletable = typeAuth.GetDeletableItems(DataLevel.Departments);
+
+            CollectionAssert.AreEquivalent(new[] { "_1", "_2", "_3" }, readable.AccessibleIds);
+            CollectionAssert.AreEquivalent(new[] { "_2", "_3" }, writable.AccessibleIds);
+            CollectionAssert.AreEquivalent(new[] { "_3", "_4" }, deletable.AccessibleIds);
+
+            Assert.IsFalse(readable.WildCard);
+            Assert.IsFalse(writable.WildCard);
+            Assert.IsFalse(deletable.WildCard);
+        }
+
+        [TestMethod("GetReadableItems with self-reference")]
+        public void GetReadableItems_SelfReference()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Read },
+                            _1 = new List<Access> { Access.Read },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var readable = typeAuth.GetReadableItems(DataLevel.Departments, "me");
+
+            CollectionAssert.AreEqual(new[] { "me", "_1" }, readable.AccessibleIds);
+        }
+
+        [TestMethod("GetReadableItems / GetWritableItems / GetDeletableItems wildcard")]
+        public void GetReadableWritableDeletableItems_Wildcard()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new List<Access> { Access.Read, Access.Write, Access.Delete }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            Assert.IsTrue(typeAuth.GetReadableItems(DataLevel.Departments).WildCard);
+            Assert.IsTrue(typeAuth.GetWritableItems(DataLevel.Departments).WildCard);
+            Assert.IsTrue(typeAuth.GetDeletableItems(DataLevel.Departments).WildCard);
+        }
     }
 }

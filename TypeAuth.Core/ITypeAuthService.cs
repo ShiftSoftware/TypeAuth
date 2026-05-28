@@ -98,4 +98,28 @@ public interface ITypeAuthService
     /// <param name="predicate">Filter applied to each access level to determine if an item is accessible.</param>
     /// <param name="selfId">IDs that should be treated as "self" for self-reference resolution.</param>
     AccessibleItemsResult GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId);
+
+    /// <summary>
+    /// Returns the items the user can Read for the given dynamic action.
+    /// </summary>
+    AccessibleItemsResult GetReadableItems(DynamicReadAction action, params string[]? selfId);
+
+    /// <inheritdoc cref="GetReadableItems(DynamicReadAction, string[])"/>
+    AccessibleItemsResult GetReadableItems(DynamicReadWriteAction action, params string[]? selfId);
+
+    /// <inheritdoc cref="GetReadableItems(DynamicReadAction, string[])"/>
+    AccessibleItemsResult GetReadableItems(DynamicReadWriteDeleteAction action, params string[]? selfId);
+
+    /// <summary>
+    /// Returns the items the user can Write for the given dynamic action.
+    /// </summary>
+    AccessibleItemsResult GetWritableItems(DynamicReadWriteAction action, params string[]? selfId);
+
+    /// <inheritdoc cref="GetWritableItems(DynamicReadWriteAction, string[])"/>
+    AccessibleItemsResult GetWritableItems(DynamicReadWriteDeleteAction action, params string[]? selfId);
+
+    /// <summary>
+    /// Returns the items the user can Delete for the given dynamic action.
+    /// </summary>
+    AccessibleItemsResult GetDeletableItems(DynamicReadWriteDeleteAction action, params string[]? selfId);
 }
