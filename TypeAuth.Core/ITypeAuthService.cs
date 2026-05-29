@@ -122,4 +122,10 @@ public interface ITypeAuthService
     /// Returns the items the user can Delete for the given dynamic action.
     /// </summary>
     AccessibleItemsResult GetDeletableItems(DynamicReadWriteDeleteAction action, params string[]? selfId);
+
+    /// <summary>
+    /// Returns accessible items for all four access levels (Read, Write, Delete, Maximum) in a single traversal.
+    /// More efficient than calling <see cref="GetAccessibleItems"/> four times when all four are needed.
+    /// </summary>
+    AccessibleItemsByAccess GetAccessibleItemsByAccess(DynamicAction dynamicAction, params string[]? selfId);
 }

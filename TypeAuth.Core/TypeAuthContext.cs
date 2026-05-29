@@ -216,6 +216,60 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.ActionTrees.ToArray();
         }
 
+        /// <inheritdoc cref="ITypeAuthService.GetAccessibleItemsByAccess"/>
+        public AccessibleItemsByAccess GetAccessibleItemsByAccess(DynamicAction dynamicAction, params string[]? selfId)
+        {
+            var locatedActions = this.TypeAuthContextHelper.LocateActionInBank(dynamicAction).ToList();
+
+            var wildCardRead = false;
+            var wildCardWrite = false;
+            var wildCardDelete = false;
+            var wildCardMaximum = false;
+
+            foreach (var item in locatedActions)
+            {
+                if (!wildCardRead && item.AccessList.Contains(Access.Read)) wildCardRead = true;
+                if (!wildCardWrite && item.AccessList.Contains(Access.Write)) wildCardWrite = true;
+                if (!wildCardDelete && item.AccessList.Contains(Access.Delete)) wildCardDelete = true;
+                if (!wildCardMaximum && item.AccessList.Contains(Access.Maximum)) wildCardMaximum = true;
+
+                if (wildCardRead && wildCardWrite && wildCardDelete && wildCardMaximum) break;
+            }
+
+            var readIds = new List<string>();
+            var writeIds = new List<string>();
+            var deleteIds = new List<string>();
+            var maximumIds = new List<string>();
+
+            if (!wildCardRead || !wildCardWrite || !wildCardDelete || !wildCardMaximum)
+            {
+                foreach (var item in locatedActions)
+                {
+                    foreach (var subItem in item.SubActionBankItems)
+                    {
+                        var id = (subItem.Action as DynamicAction)!.Id!;
+                        var accessList = subItem.AccessList;
+
+                        if (!wildCardRead && accessList.Contains(Access.Read)) readIds.Add(id);
+                        if (!wildCardWrite && accessList.Contains(Access.Write)) writeIds.Add(id);
+                        if (!wildCardDelete && accessList.Contains(Access.Delete)) deleteIds.Add(id);
+                        if (!wildCardMaximum && accessList.Contains(Access.Maximum)) maximumIds.Add(id);
+                    }
+                }
+            }
+
+            ResolveSelfReference(readIds, selfId);
+            ResolveSelfReference(writeIds, selfId);
+            ResolveSelfReference(deleteIds, selfId);
+            ResolveSelfReference(maximumIds, selfId);
+
+            return new AccessibleItemsByAccess(
+                new AccessibleItemsResult(wildCardRead, readIds),
+                new AccessibleItemsResult(wildCardWrite, writeIds),
+                new AccessibleItemsResult(wildCardDelete, deleteIds),
+                new AccessibleItemsResult(wildCardMaximum, maximumIds));
+        }
+
         /// <inheritdoc cref="ITypeAuthService.GetAccessibleItems"/>
         public AccessibleItemsResult GetAccessibleItems(DynamicAction dynamicAction, Func<Access, bool> predicate, params string[]? selfId)
         {
@@ -246,18 +300,20 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
             }
 
-            if (selfId is not null)
-            {
-                if (ids.Contains(SelfReferenceKey))
-                {
-                    ids.Remove(SelfReferenceKey);
-
-                    ids.InsertRange(0, selfId);
-                }
-            }
+            ResolveSelfReference(ids, selfId);
 
             return new AccessibleItemsResult(wildCardAccess, ids);
         }
+
+        private static void ResolveSelfReference(List<string> ids, string[]? selfId)
+        {
+            if (selfId is null) return;
+            if (!ids.Contains(SelfReferenceKey)) return;
+
+            ids.Remove(SelfReferenceKey);
+            ids.InsertRange(0, selfId);
+        }
+
 
         /// <inheritdoc cref="ITypeAuthService.GetReadableItems(DynamicReadAction, string[])"/>
         public AccessibleItemsResult GetReadableItems(DynamicReadAction action, params string[]? selfId)

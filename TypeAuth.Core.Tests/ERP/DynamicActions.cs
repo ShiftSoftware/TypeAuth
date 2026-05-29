@@ -928,5 +928,107 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
             Assert.IsTrue(typeAuth.GetWritableItems(DataLevel.Departments).WildCard);
             Assert.IsTrue(typeAuth.GetDeletableItems(DataLevel.Departments).WildCard);
         }
+
+        [TestMethod("GetAccessibleItemsByAccess matches 4 individual calls")]
+        public void GetAccessibleItemsByAccess_MatchesIndividualCalls()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Read },
+                            _2 = new List<Access> { Access.Read, Access.Write },
+                            _3 = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum },
+                            _4 = new List<Access> { Access.Delete },
+                            _5 = new List<Access> { Access.Maximum },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var byAccess = typeAuth.GetAccessibleItemsByAccess(DataLevel.Departments);
+
+            var readSingle = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Read);
+            var writeSingle = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Write);
+            var deleteSingle = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Delete);
+            var maximumSingle = typeAuth.GetAccessibleItems(DataLevel.Departments, x => x == Access.Maximum);
+
+            Assert.AreEqual(readSingle.WildCard, byAccess.Read.WildCard);
+            Assert.AreEqual(writeSingle.WildCard, byAccess.Write.WildCard);
+            Assert.AreEqual(deleteSingle.WildCard, byAccess.Delete.WildCard);
+            Assert.AreEqual(maximumSingle.WildCard, byAccess.Maximum.WildCard);
+
+            CollectionAssert.AreEqual(readSingle.AccessibleIds, byAccess.Read.AccessibleIds);
+            CollectionAssert.AreEqual(writeSingle.AccessibleIds, byAccess.Write.AccessibleIds);
+            CollectionAssert.AreEqual(deleteSingle.AccessibleIds, byAccess.Delete.AccessibleIds);
+            CollectionAssert.AreEqual(maximumSingle.AccessibleIds, byAccess.Maximum.AccessibleIds);
+        }
+
+        [TestMethod("GetAccessibleItemsByAccess with mixed wildcard and per-id grants")]
+        public void GetAccessibleItemsByAccess_MixedWildcardAndIds()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        // Parent-level wildcard for Read only
+                        Departments = new List<Access> { Access.Read }
+                    }
+                }))
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _1 = new List<Access> { Access.Write },
+                            _2 = new List<Access> { Access.Delete },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var byAccess = typeAuth.GetAccessibleItemsByAccess(DataLevel.Departments);
+
+            Assert.IsTrue(byAccess.Read.WildCard);
+            Assert.IsFalse(byAccess.Write.WildCard);
+            Assert.IsFalse(byAccess.Delete.WildCard);
+            Assert.IsFalse(byAccess.Maximum.WildCard);
+
+            Assert.AreEqual(0, byAccess.Read.AccessibleIds.Count);
+            CollectionAssert.AreEqual(new[] { "_1" }, byAccess.Write.AccessibleIds);
+            CollectionAssert.AreEqual(new[] { "_2" }, byAccess.Delete.AccessibleIds);
+        }
+
+        [TestMethod("GetAccessibleItemsByAccess resolves self-reference for all levels")]
+        public void GetAccessibleItemsByAccess_SelfReference()
+        {
+            var typeAuth = new TypeAuthContextBuilder()
+                .AddAccessTree(JsonSerializer.Serialize(new
+                {
+                    DataLevel = new
+                    {
+                        Departments = new
+                        {
+                            _shift_software_type_auth_core_self_reference = new List<Access> { Access.Read, Access.Write, Access.Delete },
+                            _1 = new List<Access> { Access.Read },
+                        }
+                    }
+                }))
+                .AddActionTree<DataLevel>()
+                .Build();
+
+            var byAccess = typeAuth.GetAccessibleItemsByAccess(DataLevel.Departments, "me");
+
+            CollectionAssert.AreEqual(new[] { "me", "_1" }, byAccess.Read.AccessibleIds);
+            CollectionAssert.AreEqual(new[] { "me" }, byAccess.Write.AccessibleIds);
+            CollectionAssert.AreEqual(new[] { "me" }, byAccess.Delete.AccessibleIds);
+        }
     }
 }
