@@ -10,15 +10,14 @@ public class TypeAuthBlazorOptions
     }
 
     public TypeAuthBlazorOptions AddActionTree<T>()
-    {
-        ActionTrees.Add(typeof(T));
-
-        return this;
-    }
+        => AddActionTree(typeof(T));
 
     public TypeAuthBlazorOptions AddActionTree(Type actionTree)
     {
-        ActionTrees.Add(actionTree);
+        // Idempotent: registering the same action tree twice (e.g. explicitly here and again from a
+        // feature such as tagging) is a no-op instead of a duplicate entry.
+        if (!ActionTrees.Contains(actionTree))
+            ActionTrees.Add(actionTree);
 
         return this;
     }

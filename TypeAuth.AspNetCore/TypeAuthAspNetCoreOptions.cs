@@ -10,15 +10,14 @@ public class TypeAuthAspNetCoreOptions
     }
 
     public TypeAuthAspNetCoreOptions AddActionTree<T>()
-    {
-        ActionTrees.Add(typeof(T));
-
-        return this;
-    }
+        => AddActionTree(typeof(T));
 
     public TypeAuthAspNetCoreOptions AddActionTree(Type t)
     {
-        ActionTrees.Add(t);
+        // Idempotent: registering the same action tree twice (e.g. explicitly here and again from a
+        // feature such as tagging) is a no-op instead of a duplicate entry.
+        if (!ActionTrees.Contains(t))
+            ActionTrees.Add(t);
 
         return this;
     }
