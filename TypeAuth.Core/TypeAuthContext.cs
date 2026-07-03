@@ -216,6 +216,35 @@ namespace ShiftSoftware.TypeAuth.Core
             return this.ActionTrees.ToArray();
         }
 
+        /// <inheritdoc cref="ITypeAuthService.FindActionTreeNode(string)"/>
+        public ActionTreeNode? FindActionTreeNode(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return null;
+
+            return FindActionTreeNode(this.ActionTree, path);
+        }
+
+        private static ActionTreeNode? FindActionTreeNode(ActionTreeNode node, string path)
+        {
+            foreach (var child in node.ActionTreeItems)
+            {
+                // Expanded dynamic sub-items aren't addressable by an action path (their path is the
+                // parent path with the row id appended, no separator) — skip them.
+                if (child.IsADynamicSubItem)
+                    continue;
+
+                if (string.Equals(child.Path, path, StringComparison.Ordinal))
+                    return child;
+
+                var found = FindActionTreeNode(child, path);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
+        }
+
         /// <inheritdoc cref="ITypeAuthService.GetAccessibleItemsByAccess"/>
         public AccessibleItemsByAccess GetAccessibleItemsByAccess(DynamicAction dynamicAction, params string[]? selfId)
         {

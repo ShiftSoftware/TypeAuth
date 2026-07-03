@@ -92,6 +92,16 @@ public interface ITypeAuthService
     Type[] GetRegisteredActionTrees();
 
     /// <summary>
+    /// Finds a node in the action tree by its dot-delimited <see cref="ActionTreeNode.Path"/>
+    /// (e.g. "ShiftIdentityActions.Users" or "ShiftIdentityActions.DataLevelAccess.Branches").
+    /// The returned node may be an action node (<see cref="ActionTreeNode.Action"/> is set) or a
+    /// grouping/tree node. Returns null when no node has that path. Expanded dynamic sub-items are
+    /// never matched. The lookup is independent of the granted access trees — every registered
+    /// action is resolvable regardless of what the current subject can do.
+    /// </summary>
+    ActionTreeNode? FindActionTreeNode(string path);
+
+    /// <summary>
     /// Returns the list of data item IDs accessible for a dynamic action, or indicates wildcard access.
     /// </summary>
     /// <param name="dynamicAction">The dynamic action to query.</param>
