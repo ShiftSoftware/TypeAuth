@@ -1,5 +1,3 @@
-using ShiftSoftware.TypeAuth.Core.Actions;
-
 using System.Reflection;
 
 namespace ShiftSoftware.TypeAuth.Core
@@ -31,27 +29,24 @@ namespace ShiftSoftware.TypeAuth.Core
 
                 GenerateActionTree(childTress, accessTreeJSONStrings, actionTreeItem);
 
-                tree.GetFields(BindingFlags.Public | BindingFlags.Static).ToList().ForEach(y =>
+                // ActionTreeHelper owns the declaration convention (public static ActionBase
+                // fields), so lookups made through it always agree with the built tree.
+                foreach (var declared in ActionTreeHelper.GetDeclaredActions(tree))
                 {
-                    var value = y.GetValue(y);
+                    var action = declared.Value;
 
-                    if (value != null && (value as ActionBase) != null)
+                    action.Path = $"{actionTreeItem.Path}.{declared.Key}";
+
+                    var thisActionTreeItem = new ActionTreeNode(action.Path)
                     {
-                        var action = (ActionBase)value;
+                        ID = declared.Key,
+                        Action = action,
+                        DisplayName = action.Name,
+                        DisplayDescription = action.Description
+                    };
 
-                        action.Path = $"{actionTreeItem.Path}.{y.Name}";
-
-                        var thisActionTreeItem = new ActionTreeNode(action.Path)
-                        {
-                            ID = y.Name,
-                            Action = action,
-                            DisplayName = action.Name,
-                            DisplayDescription = action.Description
-                        };
-
-                        actionTreeItem.ActionTreeItems.Add(thisActionTreeItem);
-                    }
-                });
+                    actionTreeItem.ActionTreeItems.Add(thisActionTreeItem);
+                }
             }
 
             return rootActionTree;
