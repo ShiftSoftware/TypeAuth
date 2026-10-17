@@ -26,7 +26,7 @@ namespace ShiftSoftware.TypeAuth.Core
                     //The current Access is simply passed to every child node of the the current Action Node
                     if (node.AccessArray.Count > 0 || node.AccessValue != null)
                     {
-                        actionCursor.WildCardAccess = node.AccessArray;
+                        MergeWildCardAccess(actionCursor, node.AccessArray);
                         this.PopulateActionBank(entry, accessCursor);
                     }
                     else
@@ -50,10 +50,29 @@ namespace ShiftSoftware.TypeAuth.Core
                 }
 
                 if (theAction  is DynamicAction && node.AccessArray.Count > 0)
-                    actionCursor.WildCardAccess = node.AccessArray;
+                    MergeWildCardAccess(actionCursor, node.AccessArray);
 
                 this.ActionBank.Add(new ActionBankItem(theAction, node.AccessArray, node.AccessValue, node.AccessObject));
             }
+        }
+
+        //Several access trees can grant a wildcard on the same node. The node keeps the accesses of all of them, as Can
+        //does, so that it does not depend on the order the trees were added in.
+        private static void MergeWildCardAccess(ActionTreeNode actionCursor, List<Access> accessArray)
+        {
+            //The first wildcard keeps its list. On a dynamic action that list is also the action bank item's access list,
+            //and an editor that toggles one toggles the other.
+            if (actionCursor.WildCardAccess.Count == 0)
+            {
+                actionCursor.WildCardAccess = accessArray;
+                return;
+            }
+
+            if (accessArray.All(actionCursor.WildCardAccess.Contains))
+                return;
+
+            //A new list, so that the first tree's action bank item does not take the other trees' accesses.
+            actionCursor.WildCardAccess = actionCursor.WildCardAccess.Union(accessArray).ToList();
         }
 
         internal void ExpandDynamicActions(ActionTreeNode actionTreeItem)

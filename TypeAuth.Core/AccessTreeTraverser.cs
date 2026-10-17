@@ -58,6 +58,8 @@ internal static class AccessTreeTraverser
             );
         }
 
+        List<Access>? wildCardAccess = null;
+
         if (actionTreeItem.WildCardAccess.Count > 0 || preserverActionTreeItem?.WildCardAccess?.Count > 0)
         {
             var reducerActionTreeItem = reducedActionTreeItems.FirstOrDefault(
@@ -79,8 +81,22 @@ internal static class AccessTreeTraverser
                 }
             }
 
+            //In the order of Access, not of the trees that granted it.
+            access = Enum.GetValues(typeof(Access)).Cast<Access>().Where(access.Contains).ToList();
+
             if (access.Count() > 0)
-                return access;
+            {
+                //A dynamic action is written as a wildcard or as rows, never both, so rows that go beyond its wildcard
+                //cannot be written. The wildcard is kept, as the broader grant.
+                if (actionTreeItem.Action != null)
+                    return access;
+
+                if (WildCardWins(typeAuthContext, reducer, preserver))
+                    return access;
+
+                //Decided once what is beneath it is known: written unless that goes beyond it.
+                wildCardAccess = access;
+            }
         }
 
         foreach (var subActionTreeItem in actionTreeItem.ActionTreeItems)
@@ -106,8 +122,6 @@ internal static class AccessTreeTraverser
                     var preserverActionBankItems = preserver.TypeAuthContextHelper.LocateActionInBank(dynamicAction);
 
                     subItems.AddRange(preserverActionBankItems.SelectMany(x => x.SubActionBankItems.ToList()));
-
-                    subItems = subItems.Distinct().ToList();
                 }
 
                 if (subItems.Count() > 0)
@@ -116,12 +130,15 @@ internal static class AccessTreeTraverser
 
                     accessTree[actionTreeItem.ID] = dynamicItems;
 
-                    foreach (var item in subItems)
+                    //Each row once, in ordinal order, not in the order of the trees that listed it.
+                    var ids = subItems.Select(x => (x.Action as DynamicAction)!.Id!).Distinct().OrderBy(x => x, StringComparer.Ordinal);
+
+                    foreach (var id in ids)
                     {
                         var subActionTreeItem = new ActionTreeNode(actionTreeItem.Path)
                         {
                             Action = actionTreeItem.Action,
-                            ID = (item.Action as DynamicAction)!.Id!
+                            ID = id
                         };
 
                         var value = TraverseActionTree(typeAuthContext, subActionTreeItem, dynamicItems, reducer, reducedActionTreeItems, true, preserver, preservedActionTreeItems);
@@ -209,9 +226,37 @@ internal static class AccessTreeTraverser
             }
         }
 
+        if (wildCardAccess != null && !GoesBeyond(accessTree, wildCardAccess))
+            return wildCardAccess;
+
         if (accessTree.Count() == 0)
             return null;
 
         return accessTree;
+    }
+
+    //Whether a group's wildcard is written as it is, even when what is beneath it goes further.
+    //A context that is its own reducer, with nothing to preserve, is written out for what it grants. Built from several
+    //trees, it can hold one tree's wildcard on a group and another tree's grants beneath it, and Can grants both. A JSON
+    //node holds only one of them, so there the wildcard is written only when nothing beneath it goes beyond it.
+    //Elsewhere the wildcard wins, as before. One tree cannot hold both, so in a context built from one tree, grants
+    //beneath a wildcard mean an edit: editors change WildCardAccess in place, and their wildcard wins. With another
+    //reducer or a preserver, the wildcard is the only place a text action is preserved, or reduced when it has no comparer.
+    private static bool WildCardWins(TypeAuthContext typeAuthContext, TypeAuthContext reducer, TypeAuthContext? preserver)
+    {
+        return !ReferenceEquals(reducer, typeAuthContext) || preserver != null || typeAuthContext.AccessTreeJsonStrings.Count < 2;
+    }
+
+    //Whether a value written beneath a wildcard grants more than the wildcard: an access the wildcard lacks, or a text
+    //value when the wildcard lacks Maximum (such a wildcard sets text actions to their minimum, which is never written).
+    private static bool GoesBeyond(object value, List<Access> wildCardAccess)
+    {
+        if (value is List<Access> accesses)
+            return accesses.Any(x => !wildCardAccess.Contains(x));
+
+        if (value is Dictionary<string, object> items)
+            return items.Values.Any(x => GoesBeyond(x, wildCardAccess));
+
+        return !wildCardAccess.Contains(Access.Maximum);
     }
 }

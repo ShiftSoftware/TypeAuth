@@ -31,7 +31,8 @@ public class ActionTreeNode
     public dynamic? AdditionalData { get; set; }
 
     /// <summary>
-    /// Access levels inherited from a parent node's wildcard grant.
+    /// On a group or a dynamic action: the access levels that a wildcard (an access array) on this node, or on a node
+    /// above it, grants to everything beneath. With several access trees it holds the access levels of all of them.
     /// </summary>
     public List<Access> WildCardAccess { get; set; }
 
