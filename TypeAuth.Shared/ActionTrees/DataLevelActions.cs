@@ -11,7 +11,7 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
         public readonly static DynamicReadAction Countries = new DynamicReadAction("Countries");
         public readonly static DynamicReadWriteAction Companies = new DynamicReadWriteAction("Companies");
         public readonly static DynamicReadWriteDeleteAction Departments = new DynamicReadWriteDeleteAction("Departments");
-        public readonly static DynamicTextAction DiscountByDepartment = new DynamicTextAction("Discount", "", "0", "100", (a, b) =>
+        public readonly static DynamicTextAction DiscountByDepartment = new DynamicTextAction("Discount", TextCombine.Pick((a, b) =>
         {
             var numbers = new System.Collections.Generic.List<int>();
 
@@ -24,7 +24,7 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
                 return numbers.Max().ToString();
 
             return null;
-        });
+        }), "", "0", "100");
 
         public readonly static DynamicDecimalAction DiscountByDepartmentDecimal = new DynamicDecimalAction("Discount (Decimal)", "", 0, 100);
     }

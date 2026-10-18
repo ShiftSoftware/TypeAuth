@@ -7,33 +7,7 @@ internal static class AccessTreeTraverser
 {
     internal static string? ReduceValue(ITextAccessProperties textProps, string? value, string? maximumValue)
     {
-        var comparer = textProps.Comparer;
-
-        if (comparer != null)
-        {
-            //Only used to parse the value.
-            //For example if the comparer deals with numbers. And a number like 000100 is provided. Comparing the value against it self will return 100
-            value = comparer(value, value);
-
-            var assignableMaximumWinner = comparer(maximumValue, textProps.MaximumAccess);
-
-            if (assignableMaximumWinner == textProps.MaximumAccess)
-                assignableMaximumWinner = maximumValue;
-            else
-                assignableMaximumWinner = textProps.MaximumAccess;
-
-            var actionMaximumWinner = comparer(value, assignableMaximumWinner);
-
-            if (actionMaximumWinner == value)
-                value = assignableMaximumWinner;
-
-            var minimumWinner = comparer(value, textProps.MinimumAccess);
-
-            if (minimumWinner == textProps.MinimumAccess)
-                value = textProps.MinimumAccess;
-        }
-
-        return value;
+        return textProps.Combine.Reduce(value, maximumValue, textProps.MinimumAccess, textProps.MaximumAccess);
     }
 
     internal static void FlattenActionTree(List<ActionTreeNode> flattenedActionTreeItems, ActionTreeNode root)
@@ -84,18 +58,38 @@ internal static class AccessTreeTraverser
             //In the order of Access, not of the trees that granted it.
             access = Enum.GetValues(typeof(Access)).Cast<Access>().Where(access.Contains).ToList();
 
+            //A text action's wildcard without Maximum gives its minimum, which is never more than its rows. When the trees
+            //also list rows (one tree's wildcard on a group, another's rows), the rows are written.
+            if (access.Count() > 0 && actionTreeItem.Action is DynamicAction rowsAction && rowsAction.Type == ActionType.Text && !access.Contains(Access.Maximum) &&
+                typeAuthContext.TypeAuthContextHelper.LocateActionInBank(rowsAction).Any(x => x.SubActionBankItems.Count > 0))
+                access.Clear();
+
+            //Decided here: on a dynamic action, and on a group unless the context is written out for itself.
+            var decidedHere = actionTreeItem.Action != null || WildCardWins(typeAuthContext, reducer, preserver);
+
+            //A save never removes what the saver couldn't give back. Where writing this node's wildcard, or nothing for a
+            //group wildcard the reducer doesn't hold, would remove stored grants at or beneath the node that the reducer
+            //can't grant, the node is left as stored. The JSON can't hold a wildcard next to grants beneath it, and writing
+            //them out one by one would not cover the actions and rows added later.
+            if (decidedHere && !stopTraversing && preserver != null && preserverActionTreeItem != null && (access.Count > 0 || actionTreeItem.Action == null) &&
+                StoredGoesBeyond(preserver, reducer, reducedActionTreeItems, preserverActionTreeItem, access))
+                return TraverseActionTree(preserver, preserverActionTreeItem, new Dictionary<string, object>(), preserver, preservedActionTreeItems!);
+
             if (access.Count() > 0)
             {
-                //A dynamic action is written as a wildcard or as rows, never both, so rows that go beyond its wildcard
-                //cannot be written. The wildcard is kept, as the broader grant.
-                if (actionTreeItem.Action != null)
-                    return access;
-
-                if (WildCardWins(typeAuthContext, reducer, preserver))
+                //The wildcard is written. A dynamic action is written as a wildcard or as rows, never both, so rows that go
+                //beyond its wildcard cannot be written; the wildcard is kept, as the broader grant.
+                if (decidedHere)
                     return access;
 
                 //Decided once what is beneath it is known: written unless that goes beyond it.
                 wildCardAccess = access;
+            }
+            else if (decidedHere && actionTreeItem.Action == null && actionTreeItem.WildCardAccess.Count > 0)
+            {
+                //A wildcard is given only by the same wildcard: a group wildcard the reducer holds none of gives nothing,
+                //not even on the actions beneath it that the reducer holds one by one.
+                return null;
             }
         }
 
@@ -147,22 +141,26 @@ internal static class AccessTreeTraverser
                             dynamicItems![subActionTreeItem.ID] = value;
                     }
 
-                    if (dynamicItems.Count == 0)
-                        return null;
+                    if (dynamicItems.Count > 0)
+                        return dynamicItems;
 
-                    return dynamicItems;
+                    //No row is written: what is left to write is the action's own value, below.
                 }
             }
 
             if (actionTreeItem.Action.Type == ActionType.Text && actionTreeItem.Action is ITextAccessProperties textProps)
             {
-                var isDynamic = actionTreeItem.Action is DynamicAction;
-                var id = isDynamic ? actionTreeItem.ID : null;
+                //A row, or the action itself: a dynamic action's own value is its wildcard value.
+                var id = actionTreeItem.Action is DynamicAction && stopTraversing ? actionTreeItem.ID : null;
 
                 string? value = typeAuthContext.GetTextAccessValue(actionTreeItem.Action, textProps, id);
-                string? reducedValue = reducer.GetTextAccessValue(actionTreeItem.Action, textProps, id);
+                string? heldValue = reducer.GetTextAccessValue(actionTreeItem.Action, textProps, id);
 
-                value = ReduceValue(textProps, value, reducedValue);
+                value = ReduceValue(textProps, value, heldValue);
+
+                //What of the stored value the saver couldn't have given is kept.
+                if (preserver != null)
+                    value = textProps.Combine.Preserve(value, preserver.GetTextAccessValue(actionTreeItem.Action, textProps, id), heldValue, textProps.MinimumAccess, textProps.MaximumAccess);
 
                 if (value == null || value == textProps.MinimumAccess)
                     return null;
@@ -241,7 +239,8 @@ internal static class AccessTreeTraverser
     //node holds only one of them, so there the wildcard is written only when nothing beneath it goes beyond it.
     //Elsewhere the wildcard wins, as before. One tree cannot hold both, so in a context built from one tree, grants
     //beneath a wildcard mean an edit: editors change WildCardAccess in place, and their wildcard wins. With another
-    //reducer or a preserver, the wildcard is the only place a text action is preserved, or reduced when it has no comparer.
+    //reducer or a preserver, the wildcard wins as far as the reducer holds it as a wildcard at the node: a wildcard is
+    //given only by a wildcard, and grants the reducer holds on the actions beneath it don't count.
     private static bool WildCardWins(TypeAuthContext typeAuthContext, TypeAuthContext reducer, TypeAuthContext? preserver)
     {
         return !ReferenceEquals(reducer, typeAuthContext) || preserver != null || typeAuthContext.AccessTreeJsonStrings.Count < 2;
@@ -258,5 +257,79 @@ internal static class AccessTreeTraverser
             return items.Values.Any(x => GoesBeyond(x, wildCardAccess));
 
         return !wildCardAccess.Contains(Access.Maximum);
+    }
+
+    //Whether the stored grants at or beneath the node hold a wildcard, an access, a row or a text value that the reducer
+    //can't grant and that the wildcard being written doesn't give.
+    private static bool StoredGoesBeyond(TypeAuthContext preserver, TypeAuthContext reducer, List<ActionTreeNode> reducedActionTreeItems, ActionTreeNode node, List<Access> wildCard)
+    {
+        //A stored wildcard on the node or a group beneath it, compared with the reducer's wildcard there, as a save keeps
+        //one on the node itself. Its Maximum counts: it gives text actions added to the group later their maximum.
+        foreach (var group in NodesAt(node))
+        {
+            var held = reducedActionTreeItems.FirstOrDefault(x => x.Path == group.Path)?.WildCardAccess ?? new List<Access>();
+
+            if (group.WildCardAccess.Any(x => !held.Contains(x) && !wildCard.Contains(x)))
+                return true;
+        }
+
+        foreach (var action in ActionsAt(node))
+        {
+            var rows = action is DynamicAction dynamicAction
+                ? preserver.TypeAuthContextHelper.LocateActionInBank(dynamicAction).SelectMany(x => x.SubActionBankItems).Select(x => (x.Action as DynamicAction)!.Id).Distinct().ToList()
+                : new List<string?>();
+
+            if (action is ITextAccessProperties textProps)
+            {
+                var given = wildCard.Contains(Access.Maximum) ? textProps.MaximumAccess : textProps.MinimumAccess;
+
+                foreach (var id in new string?[] { null }.Concat(rows))
+                {
+                    var stored = preserver.GetTextAccessValue(action, textProps, id);
+
+                    if (!textProps.Combine.Within(reducer.GetTextAccessValue(action, textProps, id), stored, textProps.MinimumAccess, textProps.MaximumAccess) &&
+                        !textProps.Combine.Within(given, stored, textProps.MinimumAccess, textProps.MaximumAccess))
+                        return true;
+                }
+
+                continue;
+            }
+
+            //The accesses an action of its type can be given, as the assignment check counts them.
+            foreach (var access in AccessTreeComparer.Grantable(action).Where(x => !wildCard.Contains(x)))
+            {
+                if (preserver.Can(action, access) && !reducer.Can(action, access))
+                    return true;
+
+                if (rows.Any(id => preserver.Can(action, access, id) && !reducer.Can(action, access, id)))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    //The node and every node beneath it, other than a dynamic action's rows.
+    private static IEnumerable<ActionTreeNode> NodesAt(ActionTreeNode node)
+    {
+        yield return node;
+
+        foreach (var child in node.ActionTreeItems.Where(x => !x.IsADynamicSubItem))
+            foreach (var item in NodesAt(child))
+                yield return item;
+    }
+
+    //The node's action, or every action beneath it.
+    private static IEnumerable<ActionBase> ActionsAt(ActionTreeNode node)
+    {
+        if (node.Action != null)
+        {
+            yield return node.Action;
+            yield break;
+        }
+
+        foreach (var child in node.ActionTreeItems.Where(x => !x.IsADynamicSubItem))
+            foreach (var action in ActionsAt(child))
+                yield return action;
     }
 }

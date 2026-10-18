@@ -186,28 +186,9 @@ namespace ShiftSoftware.TypeAuth.Core
 
         internal string? GetTextAccessValue(ActionBase action, ITextAccessProperties textProps, string? Id = null, params string[]? selfId)
         {
-            var access = textProps.MinimumAccess;
+            var values = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId).Select(x => x.AccessValue);
 
-            var actionMatches = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId).ToList();
-
-            for (int i = 0; i < actionMatches.Count; i++)
-            {
-                string? thisAccess = actionMatches[i].AccessValue;
-
-                if (i > 0)
-                {
-                    if (textProps.Comparer != null)
-                        thisAccess = textProps.Comparer(access, thisAccess);
-
-                    if (textProps.Merger != null)
-                        thisAccess = textProps.Merger(access, thisAccess);
-                }
-
-                if (thisAccess != null)
-                    access = thisAccess;
-            }
-
-            return access;
+            return textProps.Combine.Fold(values, textProps.MinimumAccess, textProps.MaximumAccess);
         }
 
         /// <inheritdoc cref="ITypeAuthService.GetRegisteredActionTrees"/>

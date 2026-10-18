@@ -116,55 +116,265 @@ public static class AccessTreeComparer
     /// <summary>
     /// Returns the actions and access levels present in <paramref name="typeAuthContextToCompare"/> but not granted in this context.
     /// </summary>
+    /// <remarks>
+    /// The rule is the one saves use: the compared tree is within this context when reducing it against this context
+    /// (<see cref="AccessTreeGenerator.GenerateAccessTree"/>) drops nothing it grants. What the reduction would drop is reported
+    /// per action: tick lists, wildcards, rows (the self and empty-or-null rows included) and text values of every combine rule.
+    /// </remarks>
     public static Dictionary<ActionBase, string> FindInAccessibleActionsOn(this TypeAuthContext typeAuthContext, TypeAuthContext typeAuthContextToCompare)
     {
-        var inAccessibleActions = new Dictionary<ActionBase, string>();
+        var reduced = typeAuthContextToCompare.GenerateAccessTree(typeAuthContext);
 
-        foreach (var actionBankItem in typeAuthContextToCompare.TypeAuthContextHelper.ActionBank)
+        if (typeAuthContextToCompare.AccessTreeJsonStrings.Count == 1 && Equivalent(typeAuthContextToCompare.AccessTreeJsonStrings[0], reduced))
+            return new Dictionary<ActionBase, string>();
+
+        //Written differently is not always less (a pick value 090 is written 90), so what the tree grants is compared with
+        //what the reduced tree grants.
+        var after = new TypeAuthContext(reduced, typeAuthContextToCompare.ActionTrees);
+
+        return Changes(typeAuthContext, typeAuthContextToCompare, after, null, Wording.Grant).ToDictionary(x => x.Action!, x => x.Description);
+    }
+
+    internal enum Wording
+    {
+        //As what the saver can't grant: "Write, Delete", "Maximum allowed value is 20. You can't grant 90", "You can't grant /z".
+        Grant,
+
+        //As what the saver can't remove: "Write, Delete", "You can't lower 90", "You can't remove /z".
+        Remove,
+
+        //As it is: "Write, Delete", "90", "/z".
+        Plain,
+    }
+
+    //What `from` grants that `to` doesn't, other than what `excepted` grants and, when given, only what `within` grants,
+    //per action, worded for the saver.
+    internal static List<AccessTreeChange> Changes(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, Wording wording, string suffix = "", TypeAuthContext? within = null)
+    {
+        var changes = new List<AccessTreeChange>();
+
+        foreach (var action in Actions(from.ActionTree))
         {
-            var action = actionBankItem.Action;
+            var parts = action is ITextAccessProperties textProps
+                ? MissingValues(saver, from, to, excepted, within, action, textProps, wording)
+                : MissingAccesses(saver, from, to, excepted, within, action, wording);
 
-            if (action is not null)
+            if (parts.Count > 0)
+                changes.Add(new AccessTreeChange(action.Name ?? action.Path ?? "", action.Path ?? "", action, string.Join("; ", parts) + suffix));
+        }
+
+        return changes;
+    }
+
+    //An access the saver holds on the action itself is missing only when it comes from a group wildcard: a wildcard is
+    //given only by the same wildcard.
+    private const string FromGroupWildcard = " (from a group wildcard you don't hold)";
+
+    private static List<string> MissingAccesses(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, Wording wording)
+    {
+        var missing = new List<string>();
+        var accesses = Grantable(action).ToList();
+
+        var wildCard = accesses.Where(access => from.Can(action, access) && !to.Can(action, access) && excepted?.Can(action, access) != true && within?.Can(action, access) != false).ToList();
+
+        if (wildCard.Count > 0)
+            missing.Add(Describe(wildCard, access => wording != Wording.Plain && saver.Can(action, access)));
+
+        if (action is DynamicAction dynamicAction)
+        {
+            foreach (var id in RowIds(from, dynamicAction))
             {
-                var inAccessibleForThisAction = new List<object>();
+                var row = accesses.Where(access => from.Can(action, access, id) && !to.Can(action, access, id) && excepted?.Can(action, access, id) != true && within?.Can(action, access, id) != false).ToList();
 
-                foreach (var access in actionBankItem.AccessList)
-                {
-                    if (!typeAuthContext.Can(action, access))
-                    {
-                        if (action is BooleanAction && access != Access.Maximum)
-                            continue;
-
-                        if (action is ReadAction && access != Access.Read)
-                            continue;
-
-                        if (action is ReadWriteAction && !(access == Access.Read || access == Access.Write))
-                            continue;
-
-                        if (action is ReadWriteDeleteAction && !(access == Access.Read || access == Access.Write || access == Access.Delete))
-                            continue;
-
-                        inAccessibleForThisAction.Add(access);
-                    }
-                }
-
-                if (inAccessibleForThisAction.Count > 0)
-                    inAccessibleActions[action] = string.Join(", ", inAccessibleForThisAction);
-
-                if (action is DecimalAction decimalAction)
-                {
-                    var targetValue = typeAuthContextToCompare.AccessValue(decimalAction);
-                    var allowedValue = typeAuthContext.AccessValue(decimalAction);
-
-
-                    if (targetValue > allowedValue)
-                    {
-                        inAccessibleActions[action] = $"Maximum allowed value is {allowedValue}. You can't grant {targetValue}";
-                    }
-                }
+                if (row.Count > 0)
+                    missing.Add($"{RowName(dynamicAction, id)}: {Describe(row, access => wording != Wording.Plain && saver.Can(action, access, id))}");
             }
         }
 
-        return inAccessibleActions;
+        return missing;
+    }
+
+    private static string Describe(List<Access> accesses, Func<Access, bool> heldOnTheAction)
+    {
+        var parts = new List<string>();
+        var notHeld = accesses.Where(access => !heldOnTheAction(access)).ToList();
+        var throughWildcard = accesses.Where(heldOnTheAction).ToList();
+
+        if (notHeld.Count > 0)
+            parts.Add(string.Join(", ", notHeld));
+
+        if (throughWildcard.Count > 0)
+            parts.Add(string.Join(", ", throughWildcard) + FromGroupWildcard);
+
+        return string.Join("; ", parts);
+    }
+
+    private static List<string> MissingValues(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, ITextAccessProperties textProps, Wording wording)
+    {
+        var missing = new List<string>();
+        var combine = textProps.Combine;
+        var minimum = textProps.MinimumAccess;
+        var maximum = textProps.MaximumAccess;
+
+        var ids = new List<string?> { null };
+
+        if (action is DynamicAction dynamicAction)
+            ids.AddRange(RowIds(from, dynamicAction));
+
+        foreach (var id in ids)
+        {
+            var value = from.GetTextAccessValue(action, textProps, id);
+            var kept = to.GetTextAccessValue(action, textProps, id);
+
+            if (combine.Within(kept, value, minimum, maximum))
+                continue;
+
+            var other = excepted?.GetTextAccessValue(action, textProps, id);
+            var inside = within?.GetTextAccessValue(action, textProps, id);
+            var allowed = saver.GetTextAccessValue(action, textProps, id);
+            string? message;
+
+            if (combine.IsList)
+            {
+                var entries = combine.NotCovered(kept, value, minimum, maximum)
+                    .Where(entry => excepted == null || !combine.Within(other, entry, minimum, maximum))
+                    .Where(entry => within == null || combine.Within(inside, entry, minimum, maximum)).ToList();
+                var notHeld = entries.Where(entry => wording == Wording.Plain || !combine.Within(allowed, entry, minimum, maximum)).ToList();
+                var throughWildcard = entries.Except(notHeld).ToList();
+                var verb = wording == Wording.Remove ? "You can't remove " : wording == Wording.Grant ? "You can't grant " : "";
+
+                message = entries.Count == 0 ? null : string.Join("; ", new[]
+                {
+                    notHeld.Count > 0 ? verb + string.Join(", ", notHeld) : null,
+                    throughWildcard.Count > 0 ? verb + string.Join(", ", throughWildcard) + FromGroupWildcard : null,
+                }.Where(x => x != null));
+            }
+            else if (excepted != null && combine.Within(other, value, minimum, maximum))
+                message = null;
+            else if (within != null && !combine.Within(inside, value, minimum, maximum))
+                message = null;
+            else if (wording == Wording.Plain)
+                message = value;
+            else if (combine.Within(allowed, value, minimum, maximum))
+                message = (wording == Wording.Remove ? "You can't lower " : "You can't grant ") + value + FromGroupWildcard;
+            else if (wording == Wording.Remove)
+                message = $"You can't lower {value}";
+            else
+                message = allowed == null ? $"You can't grant {value}" : $"Maximum allowed value is {allowed}. You can't grant {value}";
+
+            if (message != null)
+                missing.Add(id == null ? message : $"{RowName((DynamicAction)action, id)}: {message}");
+        }
+
+        return missing;
+    }
+
+    //A group's wildcard that `from` has and `to` doesn't, where no action beneath it already says so: written for the
+    //topmost group only.
+    internal static List<AccessTreeChange> GroupChanges(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, List<AccessTreeChange> actionChanges, string notHeldSuffix, string heldSuffix)
+    {
+        var changes = new List<AccessTreeChange>();
+        var toNodes = new List<ActionTreeNode>();
+        var saverNodes = new List<ActionTreeNode>();
+
+        AccessTreeTraverser.FlattenActionTree(toNodes, to.ActionTree);
+        AccessTreeTraverser.FlattenActionTree(saverNodes, saver.ActionTree);
+
+        void Walk(ActionTreeNode node, List<Access> reported)
+        {
+            foreach (var child in node.ActionTreeItems.Where(x => !x.IsADynamicSubItem && x.Action == null))
+            {
+                var other = toNodes.FirstOrDefault(x => x.Path == child.Path)?.WildCardAccess ?? new List<Access>();
+                var held = saverNodes.FirstOrDefault(x => x.Path == child.Path)?.WildCardAccess ?? new List<Access>();
+                var missing = child.WildCardAccess.Where(x => !other.Contains(x) && !reported.Contains(x)).ToList();
+
+                //Said already by an action beneath it.
+                if (actionChanges.Any(x => x.Path.StartsWith(child.Path + ".", StringComparison.Ordinal)))
+                    missing.Clear();
+
+                missing = Enum.GetValues(typeof(Access)).Cast<Access>().Where(missing.Contains).ToList();
+
+                if (missing.Count > 0)
+                {
+                    var notHeld = missing.Where(x => !held.Contains(x)).ToList();
+                    var inReach = missing.Where(held.Contains).ToList();
+
+                    var parts = new List<string>();
+
+                    if (notHeld.Count > 0)
+                        parts.Add(string.Join(", ", notHeld) + notHeldSuffix);
+
+                    if (inReach.Count > 0)
+                        parts.Add(string.Join(", ", inReach) + heldSuffix);
+
+                    changes.Add(new AccessTreeChange(child.DisplayName ?? child.ID, child.Path ?? "", null, string.Join("; ", parts)));
+                }
+
+                Walk(child, reported.Concat(missing).ToList());
+            }
+        }
+
+        Walk(from.ActionTree, new List<Access>());
+
+        return changes;
+    }
+
+    //The accesses checked for an action, as before 2.0: a boolean, read, read-write or read-write-delete action is
+    //checked for the accesses it can be given; other actions for every access.
+    internal static IEnumerable<Access> Grantable(ActionBase action)
+    {
+        if (action is BooleanAction)
+            return new[] { Access.Maximum };
+
+        if (action is ReadAction)
+            return new[] { Access.Read };
+
+        if (action is ReadWriteAction)
+            return new[] { Access.Read, Access.Write };
+
+        if (action is ReadWriteDeleteAction)
+            return new[] { Access.Read, Access.Write, Access.Delete };
+
+        return Enum.GetValues(typeof(Access)).Cast<Access>();
+    }
+
+    private static IEnumerable<string> RowIds(TypeAuthContext context, DynamicAction action)
+    {
+        return context.TypeAuthContextHelper.LocateActionInBank(action)
+            .SelectMany(x => x.SubActionBankItems)
+            .Select(x => (x.Action as DynamicAction)!.Id!)
+            .Distinct()
+            .OrderBy(x => x, StringComparer.Ordinal);
+    }
+
+    private static string RowName(DynamicAction action, string id)
+    {
+        var item = action.Items.FirstOrDefault(x => x.Key == id);
+
+        if (item.Value != null)
+            return item.Value;
+
+        if (id == TypeAuthContext.SelfReferenceKey)
+            return "Self";
+
+        if (id == TypeAuthContext.EmptyOrNullKey)
+            return "Unassigned";
+
+        return id;
+    }
+
+    private static IEnumerable<ActionBase> Actions(ActionTreeNode node)
+    {
+        foreach (var child in node.ActionTreeItems)
+        {
+            if (child.IsADynamicSubItem)
+                continue;
+
+            if (child.Action != null)
+                yield return child.Action;
+
+            foreach (var action in Actions(child))
+                yield return action;
+        }
     }
 }

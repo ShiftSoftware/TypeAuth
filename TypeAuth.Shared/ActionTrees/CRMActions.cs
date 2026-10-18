@@ -12,7 +12,7 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
         public readonly static ReadWriteDeleteAction Customers = new ReadWriteDeleteAction("Customers");
         public readonly static ReadWriteDeleteAction DiscountVouchers = new ReadWriteDeleteAction("Discount Vouchers");
 
-        public readonly static TextAction DiscountValue = new TextAction("Sale Discount", "", "0", "100", (a, b) =>
+        public readonly static TextAction DiscountValue = new TextAction("Sale Discount", TextCombine.Pick((a, b) =>
         {
             var numbers = new List<int>();
 
@@ -25,7 +25,7 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
                 return numbers.Max().ToString();
 
             return null;
-        });
+        }), "", "0", "100");
 
         public static readonly DecimalAction DecimalDiscount = new DecimalAction("Sale Discount (Decimal)", null, 0, 100);
 
@@ -34,22 +34,10 @@ namespace ShiftSoftware.TypeAuth.Shared.ActionTrees
 
         public readonly static TextAction WorkSchedule = new TextAction(
             "Work Schedule",
+            TextCombine.UnionList(", "),
             "One or more time slots allowed for operation. Certain actions are not allowed outside work schedule.",
             null,
-            "00:00:00 - 23:59:59",
-            null,
-            (a, b) =>
-            {
-                var joined = new List<string>();
-
-                if (a != null)
-                    joined.AddRange(a.Split(',').Select(x => x.Trim()).ToList());
-
-                if (b != null)
-                    joined.AddRange(b.Split(',').Select(x => x.Trim()).ToList());
-
-                return string.Join(", ", joined);
-            }
+            "00:00:00 - 23:59:59"
         );
     }
 }

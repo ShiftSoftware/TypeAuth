@@ -40,6 +40,33 @@ public static class AccessTreeEditor
     }
 
     /// <summary>
+    /// Whether someone holding <paramref name="maximumValue"/> can change the text access value for the given action: the
+    /// value is within it. A value beyond it couldn't be set back once changed, and
+    /// <see cref="SetAccessValue(TypeAuthContext, TextAction, string, string)"/> with the same maximum would cut it down.
+    /// </summary>
+    public static bool CanChangeAccessValue(this TypeAuthContext typeAuthContext, TextAction theAction, string? maximumValue)
+    {
+        return typeAuthContext.CanChangeTextAccessValue(theAction, theAction, maximumValue);
+    }
+
+    /// <inheritdoc cref="CanChangeAccessValue(TypeAuthContext, TextAction, string)"/>
+    /// <param name="typeAuthContext">The context holding the value.</param>
+    /// <param name="theAction">The dynamic text action.</param>
+    /// <param name="Id">The data item ID.</param>
+    /// <param name="maximumValue">The value held by whoever would change it.</param>
+    public static bool CanChangeAccessValue(this TypeAuthContext typeAuthContext, DynamicTextAction theAction, string? Id, string? maximumValue)
+    {
+        return typeAuthContext.CanChangeTextAccessValue(theAction, theAction, maximumValue, Id);
+    }
+
+    private static bool CanChangeTextAccessValue(this TypeAuthContext typeAuthContext, ActionBase theAction, ITextAccessProperties textProps, string? maxAllowed, string? Id = null)
+    {
+        var value = typeAuthContext.GetTextAccessValue(theAction, textProps, Id);
+
+        return textProps.Combine.Within(maxAllowed, value, textProps.MinimumAccess, textProps.MaximumAccess);
+    }
+
+    /// <summary>
     /// Toggles the specified access level on or off for the given action.
     /// </summary>
     public static void ToggleAccess(this TypeAuthContext typeAuthContext, ActionBase theAction, Access access, string? Id = null)

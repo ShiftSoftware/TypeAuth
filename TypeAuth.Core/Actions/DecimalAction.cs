@@ -3,7 +3,7 @@ using System.Globalization;
 namespace ShiftSoftware.TypeAuth.Core.Actions;
 
 /// <summary>
-/// A <see cref="TextAction"/> specialized for decimal values, with a built-in max comparer.
+/// A <see cref="TextAction"/> specialized for decimal values, combined with <see cref="TextCombine.MaxDecimal"/>.
 /// </summary>
 public class DecimalAction : TextAction
 {
@@ -13,23 +13,10 @@ public class DecimalAction : TextAction
     /// <param name="maximumAccess">The decimal value representing full access.</param>
     public DecimalAction(string? name, string? description = null, decimal? minimumAccess = null, decimal? maximumAccess = null) : base(
             name,
+            TextCombine.MaxDecimal,
             description,
             minimumAccess?.ToString(CultureInfo.InvariantCulture),
-            maximumAccess?.ToString(CultureInfo.InvariantCulture),
-            (a, b) =>
-            {
-                var numbers = new List<decimal>();
-
-                if (a != null)
-                    numbers.Add(decimal.Parse(a, CultureInfo.InvariantCulture));
-                if (b != null)
-                    numbers.Add(decimal.Parse(b, CultureInfo.InvariantCulture));
-
-                if (numbers.Count > 0)
-                    return numbers.Max().ToString(CultureInfo.InvariantCulture);
-
-                return null;
-            }
+            maximumAccess?.ToString(CultureInfo.InvariantCulture)
         )
     {
 
@@ -37,7 +24,7 @@ public class DecimalAction : TextAction
 }
 
 /// <summary>
-/// A <see cref="DynamicTextAction"/> specialized for decimal values, with a built-in max comparer.
+/// A <see cref="DynamicTextAction"/> specialized for decimal values, combined with <see cref="TextCombine.MaxDecimal"/>.
 /// </summary>
 public class DynamicDecimalAction : DynamicTextAction
 {
@@ -47,23 +34,10 @@ public class DynamicDecimalAction : DynamicTextAction
     /// <param name="maximumAccess">The decimal value representing full access.</param>
     public DynamicDecimalAction(string? name, string? description = null, decimal? minimumAccess = null, decimal? maximumAccess = null) : base(
             name,
+            TextCombine.MaxDecimal,
             description,
             minimumAccess?.ToString(CultureInfo.InvariantCulture),
-            maximumAccess?.ToString(CultureInfo.InvariantCulture),
-            (a, b) =>
-            {
-                var numbers = new List<decimal>();
-
-                if (a != null)
-                    numbers.Add(decimal.Parse(a, CultureInfo.InvariantCulture));
-                if (b != null)
-                    numbers.Add(decimal.Parse(b, CultureInfo.InvariantCulture));
-
-                if (numbers.Count > 0)
-                    return numbers.Max().ToString(CultureInfo.InvariantCulture);
-
-                return null;
-            }
+            maximumAccess?.ToString(CultureInfo.InvariantCulture)
         )
     {
 

@@ -23,8 +23,9 @@ public class AccessTreeMergeTests
     // A wildcard in the first tree, grants beneath it in the others that go beyond it, and rows of one dynamic action
     // that two trees list.
     private const string ReadDirectory = """{"DirectoryActions":["r"]}""";
-    private const string ManageUsers = """{"DirectoryActions":{"Rows":{"Cities":["r","w"]},"Users":["r","w","d"],"Discount":25},"StorageActions":{"Buckets":{"9":["r"],"3":["r","w"]}}}""";
-    private const string ManageFiles = """{"DirectoryActions":{"Rows":{"Regions":["r","w","d","m"]}},"StorageActions":{"Files":["r","w","d"],"MaxUploadSize":40,"Buckets":{"12":["r"],"3":["d"]}}}""";
+    // Text actions of every combine rule, as values and as rows.
+    private const string ManageUsers = """{"DirectoryActions":{"Rows":{"Cities":["r","w"],"RowLimits":{"9":15,"3":40},"RowTags":{"9":"b|a"}},"Users":["r","w","d"],"Discount":25,"Level":"3","Tags":"b|a","Paths":"/x/y"},"StorageActions":{"Buckets":{"9":["r"],"3":["r","w"]},"BucketPaths":{"9":"/x"}}}""";
+    private const string ManageFiles = """{"DirectoryActions":{"Rows":{"Regions":["r","w","d","m"],"RowLimits":{"9":30},"RowTags":{"9":"c","12":"a"}},"Level":"7","Tags":"c","Paths":"/x"},"StorageActions":{"Files":["r","w","d"],"MaxUploadSize":40,"Buckets":{"12":["r"],"3":["d"]},"BucketPaths":{"9":"/z","12":"/x/y"}}}""";
 
     private static readonly Access[] Accesses = { Access.Read, Access.Write, Access.Delete, Access.Maximum };
 
@@ -211,6 +212,22 @@ public class AccessTreeMergeTests
                 continue;
             }
 
+            if (action is DynamicDecimalAction dynamicDecimalAction)
+            {
+                foreach (var id in RowIds)
+                    Assert.AreEqual(expected.AccessValue(dynamicDecimalAction, id), actual.AccessValue(dynamicDecimalAction, id), $"{action.Path} {id}");
+
+                continue;
+            }
+
+            if (action is DynamicTextAction dynamicTextAction)
+            {
+                foreach (var id in RowIds)
+                    Assert.AreEqual(expected.AccessValue(dynamicTextAction, id), actual.AccessValue(dynamicTextAction, id), $"{action.Path} {id}");
+
+                continue;
+            }
+
             foreach (var access in Accesses)
             {
                 if (action is DynamicAction dynamicAction)
@@ -250,11 +267,16 @@ public class AccessTreeMergeTests
         {
             public static readonly DynamicReadWriteDeleteAction Cities = new("Cities");
             public static readonly DynamicReadWriteDeleteAction Regions = new("Regions");
+            public static readonly DynamicDecimalAction RowLimits = new("Row Limits", minimumAccess: 0, maximumAccess: 100);
+            public static readonly DynamicTextAction RowTags = new("Row Tags", TextCombine.UnionList("|"), minimumAccess: "!", maximumAccess: "*");
         }
 
         public static readonly ReadWriteDeleteAction Users = new("Users");
         public static readonly BooleanAction Export = new("Export");
         public static readonly DecimalAction Discount = new("Discount", minimumAccess: 0, maximumAccess: 100);
+        public static readonly TextAction Level = new("Level", TextCombine.Pick(MaxInt), minimumAccess: "0", maximumAccess: "10");
+        public static readonly TextAction Tags = new("Tags", TextCombine.UnionList("|"), minimumAccess: "!", maximumAccess: "*");
+        public static readonly TextAction Paths = new("Paths", TextCombine.List("|", PathCovers), minimumAccess: "!", maximumAccess: "/");
     }
 
     public class StorageActions
@@ -263,5 +285,15 @@ public class AccessTreeMergeTests
         public static readonly ReadWriteDeleteAction Files = new("Files");
         public static readonly BooleanAction ViewDeletedFiles = new("View Deleted Files");
         public static readonly DynamicReadWriteDeleteAction Buckets = new("Buckets");
+        public static readonly DynamicTextAction BucketPaths = new("Bucket Paths", TextCombine.List("|", PathCovers), minimumAccess: "!", maximumAccess: "/");
     }
+
+    private static string? MaxInt(string? a, string? b)
+    {
+        var numbers = new[] { a, b }.Where(x => x != null).Select(x => int.Parse(x!)).ToList();
+
+        return numbers.Count > 0 ? numbers.Max().ToString() : null;
+    }
+
+    private static bool PathCovers(string held, string entry) => held == entry || entry.StartsWith(held.TrimEnd('/') + "/", StringComparison.Ordinal);
 }

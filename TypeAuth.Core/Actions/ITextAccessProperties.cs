@@ -3,7 +3,7 @@ namespace ShiftSoftware.TypeAuth.Core.Actions
     /// <summary>
     /// Shared contract for text-based action properties.
     /// Implemented by both <see cref="TextAction"/> and <see cref="DynamicTextAction"/>
-    /// to eliminate duplication of <c>MaximumAccess</c>, <c>MinimumAccess</c>, <c>Comparer</c>, and <c>Merger</c>.
+    /// to eliminate duplication of <c>MaximumAccess</c>, <c>MinimumAccess</c> and <c>Combine</c>.
     /// </summary>
     internal interface ITextAccessProperties
     {
@@ -21,15 +21,8 @@ namespace ShiftSoftware.TypeAuth.Core.Actions
         string? MinimumAccess { get; set; }
 
         /// <summary>
-        /// Compares two access values and returns the winning value.
-        /// Mutually exclusive with <see cref="Merger"/>.
+        /// How the values of a user's trees are combined, and what a saver can give.
         /// </summary>
-        Func<string?, string?, string?>? Comparer { get; set; }
-
-        /// <summary>
-        /// Merges two access values into a combined value.
-        /// Mutually exclusive with <see cref="Comparer"/>.
-        /// </summary>
-        Func<string?, string?, string?>? Merger { get; set; }
+        TextCombine Combine { get; }
     }
 }
