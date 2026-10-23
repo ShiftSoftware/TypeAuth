@@ -73,6 +73,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         [TestMethod]
         public void AccessReducer()
         {
+            //One tree: a tree is generated from one tree, against rights built from several.
             var tAuth = new TypeAuthContextBuilder()
                 .AddActionTree<CRMActions>()
                 .AddActionTree<SystemActions>()
@@ -81,10 +82,7 @@ namespace ShiftSoftware.TypeAuth.Tests
                     CRMActions = new
                     {
                         Customers = new List<Access> { Access.Read, Access.Write, Access.Delete }
-                    }
-                }))
-                .AddAccessTree(JsonConvert.SerializeObject(new
-                {
+                    },
                     SystemActions = new
                     {
                         Login = new
@@ -121,7 +119,7 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                tAuth_Reducer.GenerateMergedAccessTree()
             );
         }
 
@@ -228,22 +226,20 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                tAuth_Reducer.GenerateMergedAccessTree()
             );
         }
 
         [TestMethod]
         public void WildCardAccessReducer()
         {
+            //One tree: a tree is generated from one tree, against rights built from several.
             var tAuth = new TypeAuthContextBuilder()
                 .AddActionTree<CRMActions>()
                 .AddActionTree<SystemActions>()
                 .AddAccessTree(JsonConvert.SerializeObject(new
                 {
-                    CRMActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
-                }))
-                .AddAccessTree(JsonConvert.SerializeObject(new
-                {
+                    CRMActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum },
                     SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
                 }))
                 .Build();
@@ -271,7 +267,7 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                tAuth_Reducer.GenerateMergedAccessTree()
             );
         }
 
@@ -368,6 +364,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         [TestMethod]
         public void DynamicActions()
         {
+            //One tree: a tree is generated from one tree, against rights built from several.
             var tAuth = new TypeAuthContextBuilder()
                 .AddActionTree<DataLevel>()
                 .AddActionTree<SystemActions>()
@@ -382,10 +379,6 @@ namespace ShiftSoftware.TypeAuth.Tests
                             _3 = new List<Access> { Access.Read, Access.Write, Access.Delete },
                         }
                     },
-                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
-                }))
-                .AddAccessTree(JsonConvert.SerializeObject(new
-                {
                     SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
                 }))
                 .Build();
@@ -420,7 +413,7 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                tAuth_Reducer.GenerateMergedAccessTree()
             );
         }
 
@@ -529,6 +522,7 @@ namespace ShiftSoftware.TypeAuth.Tests
         [TestMethod]
         public void DynamicActionWildCard()
         {
+            //One tree: a tree is generated from one tree, against rights built from several.
             var tAuth = new TypeAuthContextBuilder()
                 .AddActionTree<DataLevel>()
                 .AddActionTree<SystemActions>()
@@ -538,10 +532,6 @@ namespace ShiftSoftware.TypeAuth.Tests
                     {
                         Departments = new List<Access> { Access.Read, Access.Write, Access.Delete },
                     },
-                    SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
-                }))
-                .AddAccessTree(JsonConvert.SerializeObject(new
-                {
                     SystemActions = new List<Access> { Access.Read, Access.Write, Access.Delete, Access.Maximum }
                 }))
                 .Build();
@@ -572,7 +562,7 @@ namespace ShiftSoftware.TypeAuth.Tests
 
             Assert.AreEqual(
                 tAuth.GenerateAccessTree(tAuth_Reducer),
-                tAuth_Reducer.GenerateAccessTree(tAuth_Reducer)
+                tAuth_Reducer.GenerateMergedAccessTree()
             );
         }
 

@@ -318,9 +318,10 @@ namespace ShiftSoftware.TypeAuth.Core
         private static void ResolveSelfReference(List<string> ids, string[]? selfId)
         {
             if (selfId is null) return;
-            if (!ids.Contains(SelfReferenceKey)) return;
 
-            ids.Remove(SelfReferenceKey);
+            //Each tree that lists the self row adds it, so a context built from several trees can hold it more than once.
+            if (ids.RemoveAll(x => x == SelfReferenceKey) == 0) return;
+
             ids.InsertRange(0, selfId);
         }
 

@@ -472,7 +472,7 @@ namespace ShiftSoftware.TypeAuth.Tests.ERP
                 .AddActionTree<DataLevel>()
                 .Build();
 
-            System.Diagnostics.Debug.WriteLine(typeAuth.GenerateAccessTree(typeAuth));
+            System.Diagnostics.Debug.WriteLine(typeAuth.GenerateMergedAccessTree());
 
             Assert.AreEqual(20, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_2"));
             Assert.AreEqual(30, typeAuth.AccessValue(DataLevel.DiscountByDepartmentDecimal, "_3"));

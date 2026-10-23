@@ -671,6 +671,113 @@ public class DelegatedAdministrationTests
         }
     }
 
+    // Each tree that lists the self row adds it, so with two the self key must not be left among the ids.
+    [TestMethod]
+    public void SelfRowOfTwoTreesResolvesToTheSelfIdOnly()
+    {
+        const string self = """{"App":{"DLA":{"Companies":{"_shift_software_type_auth_core_self_reference":["r"]}}}}""";
+
+        CollectionAssert.AreEqual(new[] { "B" }, Build(self).GetReadableItems(App.DLA.Companies, "B").AccessibleIds.ToList());
+        CollectionAssert.AreEqual(new[] { "B" }, Build(self, self).GetReadableItems(App.DLA.Companies, "B").AccessibleIds.ToList());
+    }
+
+    // A tree is generated from one tree: several can hold together what one tree can't.
+    [TestMethod]
+    public void TreeIsNotGeneratedFromSeveralTrees()
+    {
+        var two = Build("""{"App":{"DLA":{"Companies":["r","w"]}}}""", """{"App":{"DLA":{"Companies":{"B":["r","w","d"]}}}}""");
+
+        Assert.ThrowsExactly<InvalidOperationException>(() => two.GenerateAccessTree(Build(FullAccess)));
+        Assert.ThrowsExactly<InvalidOperationException>(() => two.GenerateAccessTree(two));
+        Assert.ThrowsExactly<InvalidOperationException>(() => two.GenerateAccessTreeWithReport(Build(FullAccess)));
+    }
+
+    // ---------- A user's trees: the cover check ----------
+    // A user holds their own tree and every assigned tree, and an admin covers them when they cover each tree, as each
+    // one's assignment is checked. 2.0.0 reduced the trees as one, and one tree can't hold what they grant together.
+
+    private const string FullAccess = """{"App":["r","w","d","m"]}""";
+
+    private static string Cover(string[] held, string[] saver)
+    {
+        var result = Build(saver).FindInAccessibleActionsOn(Build(held));
+
+        return result.Count == 0 ? Passes : "REJECTED: " + string.Join("; ", result.Select(x => $"{x.Key.Name}={x.Value}"));
+    }
+
+    // One tree's wildcard on a dynamic action and another's self row beyond it, as TCA's "System: Basic" and "Data by
+    // Branch: Self". As one tree the wildcard was kept and the row dropped: "Companies=Self: Delete (from a group wildcard
+    // you don't hold)", for every admin.
+    [TestMethod]
+    public void H1_DynamicWildcardAndARowBeyondItInAnotherTreeAreCovered()
+    {
+        Assert.AreEqual(Passes, Cover(new[]
+        {
+            """{"App":{"DLA":{"Companies":["r","w"]}}}""",
+            """{"App":{"DLA":{"Companies":{"_shift_software_type_auth_core_self_reference":["r","w","d"]}}}}""",
+        }, new[] { FullAccess }));
+    }
+
+    // A group wildcard in one tree and grants beneath it that go further in another.
+    [TestMethod]
+    public void H2_GroupWildcardAndGrantsBeyondItInAnotherTreeAreCovered()
+    {
+        Assert.AreEqual(Passes, Cover(new[] { """{"App":{"Sales":["r"]}}""", """{"App":{"Sales":{"Orders":["r","w","d"]}}}""" }, new[] { FullAccess }));
+    }
+
+    // A wildcard without Maximum in one tree, which gives text actions their minimum, and their values in another.
+    [TestMethod]
+    public void H3_WildcardAndTextValuesInAnotherTreeAreCovered()
+    {
+        Assert.AreEqual(Passes, Cover(new[] { """{"App":["r"]}""", """{"App":{"Discount":40,"Paths":"/x"}}""" }, new[] { FullAccess }));
+    }
+
+    // What one tree holds beyond the admin is reported as for that tree alone.
+    [TestMethod]
+    public void H4_ATreeBeyondTheAdminIsReportedAsAlone()
+    {
+        var admin = new[] { """{"App":{"DLA":["r","w","d","m"],"Tickets":["r"]}}""" };
+
+        Assert.AreEqual("REJECTED: Tickets=Write, Delete", Cover(new[] { """{"App":{"DLA":{"Companies":["r","w"]}}}""", """{"App":{"Tickets":["r","w","d"]}}""" }, admin));
+        Assert.AreEqual("REJECTED: Tickets=Write, Delete", Assign("""{"App":{"Tickets":["r","w","d"]}}""", admin));
+    }
+
+    // As G5: a group wildcard is given only by the same wildcard, also when another of the user's trees grants the actions
+    // beneath it one by one and the admin holds those.
+    [TestMethod]
+    public void H5_GroupWildcardNotHeldIsReportedWhenAnotherTreeGrantsItsActions()
+    {
+        Assert.AreEqual("REJECTED: Orders=Read (from a group wildcard you don't hold); Quotes=Read (from a group wildcard you don't hold)",
+            Cover(new[] { """{"App":{"Sales":["r"]}}""", """{"App":{"Sales":{"Orders":["r"],"Quotes":["r"]}}}""" }, new[] { """{"App":{"Sales":{"Orders":["r"],"Quotes":["r"]}}}""" }));
+    }
+
+    // An action several trees lose part of is reported once, with what each loses: a row only for the trees that list it.
+    [TestMethod]
+    public void H6_AnActionSeveralTreesLosePartOfIsReportedOnce()
+    {
+        var admin = new[] { """{"App":{"Tickets":["r"],"DLA":{"Companies":{"B":["r"]}}}}""" };
+
+        Assert.AreEqual("REJECTED: Tickets=Write, Delete", Cover(new[] { """{"App":{"Tickets":["r","w"]}}""", """{"App":{"Tickets":["r","w","d"]}}""" }, admin));
+        Assert.AreEqual("REJECTED: Companies=Read, Write; B: Write, Delete",
+            Cover(new[] { """{"App":{"DLA":{"Companies":["r","w"]}}}""", """{"App":{"DLA":{"Companies":{"B":["r","w","d"]}}}}""" }, admin));
+    }
+
+    // A pick value several trees give beyond the admin is reported once, as the trees give it together.
+    [TestMethod]
+    public void H7_APickValueSeveralTreesGiveIsReportedAsTheyGiveItTogether()
+    {
+        Assert.AreEqual("REJECTED: CmpText=Maximum allowed value is 20. You can't grant 90",
+            Cover(new[] { """{"App":{"CmpText":"30"}}""", """{"App":{"CmpText":"90"}}""" }, new[] { """{"App":{"CmpText":"20"}}""" }));
+    }
+
+    // List entries several trees give beyond the admin are reported once each, in ordinal order, in every tree order.
+    [TestMethod]
+    public void H8_ListEntriesSeveralTreesGiveAreReportedOnceEach()
+    {
+        foreach (var order in Orders("""{"App":{"PathsUnion":"/b|/a"}}""", """{"App":{"PathsUnion":"/a"}}"""))
+            Assert.AreEqual("REJECTED: PathsUnion=You can't grant /a, /b", Cover(order, new[] { """{"App":{"PathsUnion":"/c"}}""" }));
+    }
+
     private static IEnumerable<string[]> Orders(params string[] items)
     {
         if (items.Length <= 1)

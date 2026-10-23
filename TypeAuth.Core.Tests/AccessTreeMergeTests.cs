@@ -10,7 +10,8 @@ namespace ShiftSoftware.TypeAuth.Tests;
 /// <summary>
 /// A context merges its access trees as a union: Can is an Any over the action bank. The wildcards on its nodes and the
 /// tree it generates must not depend on the order the trees were added in, and the generated tree must grant what the
-/// context grants.
+/// context grants, as far as one tree can hold it. A context of several trees is written out only through the internal
+/// GenerateMergedAccessTree: GenerateAccessTree refuses it.
 /// </summary>
 [TestClass]
 public class AccessTreeMergeTests
@@ -41,7 +42,7 @@ public class AccessTreeMergeTests
 
             Assert.AreEqual(
                 """{"DirectoryActions":{"Rows":{"Cities":["r","w","d","m"]}},"StorageActions":["r","w","d","m"]}""",
-                context.GenerateAccessTree(context));
+                context.GenerateMergedAccessTree());
         }
     }
 
@@ -50,7 +51,7 @@ public class AccessTreeMergeTests
     {
         var generated = Orders(ReadDirectory, ManageUsers, ManageFiles)
             .Select(order => Build(order))
-            .Select(context => context.GenerateAccessTree(context))
+            .Select(context => context.GenerateMergedAccessTree())
             .Distinct()
             .ToList();
 
@@ -106,7 +107,7 @@ public class AccessTreeMergeTests
             {
                 var context = Build(order);
 
-                AssertSameDecisions(context, Build(context.GenerateAccessTree(context)));
+                AssertSameDecisions(context, Build(context.GenerateMergedAccessTree()));
             }
         }
     }
@@ -118,7 +119,7 @@ public class AccessTreeMergeTests
         {
             var context = Build(order);
 
-            Assert.AreEqual("""{"DirectoryActions":["r","w"]}""", context.GenerateAccessTree(context));
+            Assert.AreEqual("""{"DirectoryActions":["r","w"]}""", context.GenerateMergedAccessTree());
         }
     }
 
@@ -130,7 +131,7 @@ public class AccessTreeMergeTests
         foreach (var order in Orders("""{"DirectoryActions":{"Rows":{"Cities":["r"]}}}""", """{"DirectoryActions":{"Rows":{"Cities":{"3":["r","w"]}}}}"""))
         {
             var context = Build(order);
-            var generated = context.GenerateAccessTree(context);
+            var generated = context.GenerateMergedAccessTree();
 
             Assert.AreEqual("""{"DirectoryActions":{"Rows":{"Cities":["r"]}}}""", generated);
             Assert.IsTrue(context.CanWrite(DirectoryActions.Rows.Cities, "3"));

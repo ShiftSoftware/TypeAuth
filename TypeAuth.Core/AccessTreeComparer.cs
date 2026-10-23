@@ -120,19 +120,31 @@ public static class AccessTreeComparer
     /// The rule is the one saves use: the compared tree is within this context when reducing it against this context
     /// (<see cref="AccessTreeGenerator.GenerateAccessTree"/>) drops nothing it grants. What the reduction would drop is reported
     /// per action: tick lists, wildcards, rows (the self and empty-or-null rows included) and text values of every combine rule.
+    /// A context built from several trees, such as a user's own tree and assigned trees, is within this context when each
+    /// of its trees is, as each one's assignment is checked. Each tree is reduced on its own: one tree can't hold what
+    /// several grant together (rows beyond a dynamic action's wildcard, grants beneath a group wildcard that go further),
+    /// so reducing them as one would drop those and report them as missing. What the trees lose is merged per action.
     /// </remarks>
     public static Dictionary<ActionBase, string> FindInAccessibleActionsOn(this TypeAuthContext typeAuthContext, TypeAuthContext typeAuthContextToCompare)
     {
-        var reduced = typeAuthContextToCompare.GenerateAccessTree(typeAuthContext);
+        var trees = typeAuthContextToCompare.AccessTreeJsonStrings;
+        var reducedTrees = new List<(TypeAuthContext From, TypeAuthContext To)>();
 
-        if (typeAuthContextToCompare.AccessTreeJsonStrings.Count == 1 && Equivalent(typeAuthContextToCompare.AccessTreeJsonStrings[0], reduced))
-            return new Dictionary<ActionBase, string>();
+        foreach (var json in trees)
+        {
+            //One tree is reduced as the context holds it; each of several is built on its own.
+            var tree = trees.Count == 1 ? typeAuthContextToCompare : new TypeAuthContext(json, typeAuthContextToCompare.ActionTrees);
+            var reduced = tree.GenerateAccessTree(typeAuthContext);
 
-        //Written differently is not always less (a pick value 090 is written 90), so what the tree grants is compared with
-        //what the reduced tree grants.
-        var after = new TypeAuthContext(reduced, typeAuthContextToCompare.ActionTrees);
+            if (Equivalent(json, reduced))
+                continue;
 
-        return Changes(typeAuthContext, typeAuthContextToCompare, after, null, Wording.Grant).ToDictionary(x => x.Action!, x => x.Description);
+            //Written differently is not always less (a pick value 090 is written 90), so what the tree grants is compared with
+            //what the reduced tree grants.
+            reducedTrees.Add((tree, new TypeAuthContext(reduced, typeAuthContextToCompare.ActionTrees)));
+        }
+
+        return Changes(typeAuthContext, reducedTrees, null, Wording.Grant).ToDictionary(x => x.Action!, x => x.Description);
     }
 
     internal enum Wording
@@ -150,14 +162,22 @@ public static class AccessTreeComparer
     //What `from` grants that `to` doesn't, other than what `excepted` grants and, when given, only what `within` grants,
     //per action, worded for the saver.
     internal static List<AccessTreeChange> Changes(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, Wording wording, string suffix = "", TypeAuthContext? within = null)
+        => Changes(saver, new[] { (from, to) }, excepted, wording, suffix, within);
+
+    //The same over several trees, each with the tree it is reduced to: what any tree grants that its own reduced tree
+    //doesn't, a row only in the trees that list it, merged per action.
+    internal static List<AccessTreeChange> Changes(TypeAuthContext saver, IReadOnlyList<(TypeAuthContext From, TypeAuthContext To)> trees, TypeAuthContext? excepted, Wording wording, string suffix = "", TypeAuthContext? within = null)
     {
         var changes = new List<AccessTreeChange>();
 
-        foreach (var action in Actions(from.ActionTree))
+        if (trees.Count == 0)
+            return changes;
+
+        foreach (var action in Actions(trees[0].From.ActionTree))
         {
             var parts = action is ITextAccessProperties textProps
-                ? MissingValues(saver, from, to, excepted, within, action, textProps, wording)
-                : MissingAccesses(saver, from, to, excepted, within, action, wording);
+                ? MissingValues(saver, trees, excepted, within, action, textProps, wording)
+                : MissingAccesses(saver, trees, excepted, within, action, wording);
 
             if (parts.Count > 0)
                 changes.Add(new AccessTreeChange(action.Name ?? action.Path ?? "", action.Path ?? "", action, string.Join("; ", parts) + suffix));
@@ -170,21 +190,24 @@ public static class AccessTreeComparer
     //given only by the same wildcard.
     private const string FromGroupWildcard = " (from a group wildcard you don't hold)";
 
-    private static List<string> MissingAccesses(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, Wording wording)
+    private static List<string> MissingAccesses(TypeAuthContext saver, IReadOnlyList<(TypeAuthContext From, TypeAuthContext To)> trees, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, Wording wording)
     {
         var missing = new List<string>();
         var accesses = Grantable(action).ToList();
 
-        var wildCard = accesses.Where(access => from.Can(action, access) && !to.Can(action, access) && excepted?.Can(action, access) != true && within?.Can(action, access) != false).ToList();
+        var wildCard = accesses.Where(access => trees.Any(x => x.From.Can(action, access) && !x.To.Can(action, access)) && excepted?.Can(action, access) != true && within?.Can(action, access) != false).ToList();
 
         if (wildCard.Count > 0)
             missing.Add(Describe(wildCard, access => wording != Wording.Plain && saver.Can(action, access)));
 
         if (action is DynamicAction dynamicAction)
         {
-            foreach (var id in RowIds(from, dynamicAction))
+            var rows = trees.Select(x => RowIds(x.From, dynamicAction).ToList()).ToList();
+
+            foreach (var id in rows.SelectMany(x => x).Distinct().OrderBy(x => x, StringComparer.Ordinal))
             {
-                var row = accesses.Where(access => from.Can(action, access, id) && !to.Can(action, access, id) && excepted?.Can(action, access, id) != true && within?.Can(action, access, id) != false).ToList();
+                var listing = trees.Where((_, i) => rows[i].Contains(id)).ToList();
+                var row = accesses.Where(access => listing.Any(x => x.From.Can(action, access, id) && !x.To.Can(action, access, id)) && excepted?.Can(action, access, id) != true && within?.Can(action, access, id) != false).ToList();
 
                 if (row.Count > 0)
                     missing.Add($"{RowName(dynamicAction, id)}: {Describe(row, access => wording != Wording.Plain && saver.Can(action, access, id))}");
@@ -209,7 +232,7 @@ public static class AccessTreeComparer
         return string.Join("; ", parts);
     }
 
-    private static List<string> MissingValues(TypeAuthContext saver, TypeAuthContext from, TypeAuthContext to, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, ITextAccessProperties textProps, Wording wording)
+    private static List<string> MissingValues(TypeAuthContext saver, IReadOnlyList<(TypeAuthContext From, TypeAuthContext To)> trees, TypeAuthContext? excepted, TypeAuthContext? within, ActionBase action, ITextAccessProperties textProps, Wording wording)
     {
         var missing = new List<string>();
         var combine = textProps.Combine;
@@ -217,18 +240,27 @@ public static class AccessTreeComparer
         var maximum = textProps.MaximumAccess;
 
         var ids = new List<string?> { null };
+        var rows = new List<List<string>>();
 
         if (action is DynamicAction dynamicAction)
-            ids.AddRange(RowIds(from, dynamicAction));
+        {
+            rows = trees.Select(x => RowIds(x.From, dynamicAction).ToList()).ToList();
+            ids.AddRange(rows.SelectMany(x => x).Distinct().OrderBy(x => x, StringComparer.Ordinal));
+        }
 
         foreach (var id in ids)
         {
-            var value = from.GetTextAccessValue(action, textProps, id);
-            var kept = to.GetTextAccessValue(action, textProps, id);
+            //The value of each tree that gives it (every tree the action's own value, the trees that list a row the row's),
+            //where its reduced tree doesn't keep it.
+            var lost = trees.Where((_, i) => id == null || rows[i].Contains(id))
+                .Select(x => (Value: x.From.GetTextAccessValue(action, textProps, id), Kept: x.To.GetTextAccessValue(action, textProps, id)))
+                .Where(x => !combine.Within(x.Kept, x.Value, minimum, maximum)).ToList();
 
-            if (combine.Within(kept, value, minimum, maximum))
+            if (lost.Count == 0)
                 continue;
 
+            //The value the trees give together, as the context combines them.
+            var value = combine.Fold(lost.Select(x => x.Value), minimum, maximum);
             var other = excepted?.GetTextAccessValue(action, textProps, id);
             var inside = within?.GetTextAccessValue(action, textProps, id);
             var allowed = saver.GetTextAccessValue(action, textProps, id);
@@ -236,7 +268,12 @@ public static class AccessTreeComparer
 
             if (combine.IsList)
             {
-                var entries = combine.NotCovered(kept, value, minimum, maximum)
+                //Each entry once, in ordinal order when several trees give them, as a combined list is.
+                var notCovered = lost.Count == 1
+                    ? combine.NotCovered(lost[0].Kept, lost[0].Value, minimum, maximum)
+                    : lost.SelectMany(x => combine.NotCovered(x.Kept, x.Value, minimum, maximum)).Distinct(StringComparer.Ordinal).OrderBy(x => x, StringComparer.Ordinal).ToList();
+
+                var entries = notCovered
                     .Where(entry => excepted == null || !combine.Within(other, entry, minimum, maximum))
                     .Where(entry => within == null || combine.Within(inside, entry, minimum, maximum)).ToList();
                 var notHeld = entries.Where(entry => wording == Wording.Plain || !combine.Within(allowed, entry, minimum, maximum)).ToList();

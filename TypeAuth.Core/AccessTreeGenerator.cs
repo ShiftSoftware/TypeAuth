@@ -12,14 +12,33 @@ public static class AccessTreeGenerator
     /// The output does not depend on the order the access trees were added in, as long as each text action's
     /// <see cref="Actions.TextCombine"/> doesn't (see <see cref="Actions.TextCombineAssert"/>). Text values are reduced, and
     /// preserved, per value and per row with that rule.
-    /// Passing the context as its own reducer, with no preserver, writes out what the context grants: where the trees
-    /// grant more beneath a wildcard than the wildcard does, what is beneath it is written instead. Rows that go beyond
-    /// a dynamic action's wildcard cannot be written next to it and are left out.
+    /// The reducer and the preserver can be built from several trees, as a saver's rights are. The source can't: one tree
+    /// can't hold everything several trees grant together (rows beyond a dynamic action's wildcard, grants beneath a group
+    /// wildcard that go further), so a tree generated from them would grant less than they do, and comparing it with them
+    /// would report what they grant as missing. Generate each tree on its own, as
+    /// <see cref="AccessTreeComparer.FindInAccessibleActionsOn"/> does, and decide and show with the context itself.
     /// </remarks>
     /// <param name="typeAuthContext">The source context whose permissions are being serialized.</param>
     /// <param name="reducer">Context that constrains the output — only permissions present in both the source and reducer are included.</param>
     /// <param name="preserver">Optional context whose permissions are preserved even if the reducer would remove them.</param>
+    /// <exception cref="InvalidOperationException">The source context is built from more than one access tree.</exception>
     public static string GenerateAccessTree(this TypeAuthContext typeAuthContext, TypeAuthContext reducer, TypeAuthContext? preserver = null)
+    {
+        if (typeAuthContext.AccessTreeJsonStrings.Count > 1)
+            throw new InvalidOperationException($"The context is built from {typeAuthContext.AccessTreeJsonStrings.Count} access trees, and one access tree can't hold everything they grant together. Generate each tree on its own, and decide and show with the context itself.");
+
+        return Generate(typeAuthContext, reducer, preserver);
+    }
+
+    /// <summary>
+    /// Writes out what a context built from several access trees grants, as far as one tree can hold it: where the trees
+    /// grant more beneath a wildcard than the wildcard does, what is beneath it is written instead. Rows that go beyond a
+    /// dynamic action's wildcard can't be written next to it and are left out, so the tree can grant less than the context.
+    /// Nothing decides or shows with it: the merge's tests pin how several trees are written together.
+    /// </summary>
+    internal static string GenerateMergedAccessTree(this TypeAuthContext typeAuthContext) => Generate(typeAuthContext, typeAuthContext, null);
+
+    private static string Generate(TypeAuthContext typeAuthContext, TypeAuthContext reducer, TypeAuthContext? preserver)
     {
         var reducedActionTreeItems = new List<ActionTreeNode>();
 
