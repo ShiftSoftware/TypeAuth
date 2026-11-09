@@ -8,7 +8,7 @@ using System.Linq;
 namespace ShiftSoftware.TypeAuth.Tests;
 
 /// <summary>
-/// The cases of the delegated-administration review's harness (.shift/repos/shift-identity/delegated-administration-review.md),
+/// The cases of the delegated-administration review's harness,
 /// with their IDs. The calls mirror ShiftIdentity's:
 /// <list type="bullet">
 /// <item>save = Build(submitted).GenerateAccessTree(saver, stored)</item>
@@ -16,7 +16,7 @@ namespace ShiftSoftware.TypeAuth.Tests;
 /// </list>
 /// The saver context is built from the saver's trees (own tree and assigned trees), as the request's ITypeAuthService is.
 /// <para>
-/// The TextCombine plan (.shift/repos/typeauth/text-combine-plan.md) fixed 20 of them in Work 2; their names say the fixed
+/// The TextCombine plan fixed 20 of them in Work 2; their names say the fixed
 /// behavior and their comments say why. The text actions use the plan's rules: a Pick (CmpText), a union list (PathsUnion)
 /// and a path-aware list (Paths), as the hosts' File Explorer paths will.
 /// </para>

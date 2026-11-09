@@ -9,7 +9,7 @@ namespace ShiftSoftware.TypeAuth.Tests;
 
 /// <summary>
 /// Every built-in combine rule, as a value and as rows: one value in every order of three trees, and the same rule for
-/// reducing a save, preserving a stored value and checking an assignment (.shift/repos/typeauth/text-combine-plan.md).
+/// reducing a save, preserving a stored value and checking an assignment.
 /// </summary>
 [TestClass]
 public class TextCombineTests
