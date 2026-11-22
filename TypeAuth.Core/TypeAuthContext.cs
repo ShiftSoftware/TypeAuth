@@ -184,6 +184,23 @@ namespace ShiftSoftware.TypeAuth.Core
             return null;
         }
 
+        /// <summary>
+        /// Whether the value this context holds on <paramref name="action"/> covers <paramref name="value"/> under the action's
+        /// <see cref="TextAction.Combine"/> rule: the greatest value wins for one value, every entry is covered for a list.
+        /// A value that is the action's minimum (or null) is covered by any context, including one that holds nothing.
+        /// </summary>
+        /// <remarks>A <see cref="DecimalAction"/>'s value is parsed with the invariant culture and throws when it isn't a number.</remarks>
+        public bool Covers(TextAction action, string? value)
+        {
+            return action.Combine.Within(AccessValue(action), value, action.MinimumAccess, action.MaximumAccess);
+        }
+
+        /// <inheritdoc cref="Covers(TextAction, string)"/>
+        public bool Covers(DynamicTextAction action, string? value, string? Id, params string[]? selfId)
+        {
+            return action.Combine.Within(AccessValue(action, Id, selfId), value, action.MinimumAccess, action.MaximumAccess);
+        }
+
         internal string? GetTextAccessValue(ActionBase action, ITextAccessProperties textProps, string? Id = null, params string[]? selfId)
         {
             var values = this.TypeAuthContextHelper.LocateActionInBank(action, Id, selfId).Select(x => x.AccessValue);

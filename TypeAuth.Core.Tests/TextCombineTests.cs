@@ -134,6 +134,43 @@ public class TextCombineTests
     }
 
     [TestMethod]
+    [DataRow("MaxDecimal", false)]
+    [DataRow("MaxDecimal", true)]
+    [DataRow("Pick", false)]
+    [DataRow("Pick", true)]
+    [DataRow("Union", false)]
+    [DataRow("Union", true)]
+    [DataRow("Paths", false)]
+    [DataRow("Paths", true)]
+    public void AContextCoversAValueWithTheSameRule(string rule, bool row)
+    {
+        var c = Cases[rule];
+        var context = Build(Tree(rule, row, c.Held));
+
+        bool Covers(TypeAuthContext x, string value) => row ? x.Covers(RowAction(rule), value, "B") : x.Covers(Action(rule), value);
+
+        Assert.IsTrue(Covers(context, c.Held));
+        Assert.IsTrue(Covers(context, c.Within));
+        Assert.IsFalse(Covers(context, c.Beyond));
+        Assert.IsFalse(Covers(Build("{}"), c.Within));
+
+        // Two trees together cover what neither covers alone when the rule is a list.
+        if (rule is "Union" or "Paths")
+        {
+            var second = c.Beyond.Split('|').Last();
+            Assert.IsTrue(Covers(Build(Tree(rule, row, c.Held), Tree(rule, row, second)), c.Beyond));
+        }
+    }
+
+    [TestMethod]
+    public void TheMinimumIsCoveredByAContextThatHoldsNothing()
+    {
+        Assert.IsTrue(Build("{}").Covers(Rules.MaxDecimal, "0"));
+        Assert.IsTrue(Build("{}").Covers(Rules.Union, "!"));
+        Assert.IsFalse(Build("{}").Covers(Rules.MaxDecimal, "0.5"));
+    }
+
+    [TestMethod]
     public void TheMaximumCoversEveryEntry()
     {
         var saver = Build(Tree("Union", false, "*"));
