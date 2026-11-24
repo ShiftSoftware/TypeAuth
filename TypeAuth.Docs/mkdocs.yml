@@ -5,7 +5,7 @@ site_author: Shift Software
 edit_uri: edit/master/ShiftGrid/Docs/docs/
 site_description: >-
   TypeAuth
-copyright: Copyright &copy; 2022 Shift Software
+copyright: Copyright &copy; 2021-2026 Shift Software Company for General Trading and Information Technology Ltd
 default: getting-started
 theme:
   name: material
